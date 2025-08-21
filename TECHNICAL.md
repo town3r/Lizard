@@ -5,17 +5,33 @@ Deep dive into the technical implementation, architecture, and engineering decis
 ## 📱 Platform & Requirements
 
 ### Target Platform
-- **iOS Version**: 15.0+ minimum deployment target
+- **iOS Version**: 18.0+ minimum deployment target (updated from 15.0+)
+- **watchOS Version**: 9.0+ for companion app
 - **Architecture**: Universal (ARM64, supports all modern iOS devices)
 - **Orientation**: Portrait primary, landscape supported with adapted controls
-- **Performance**: Optimized for 120 FPS on capable devices
+- **Performance**: Optimized for 120 FPS on capable devices (ProMotion support)
 - **Memory**: Efficient resource management for sustained gameplay
 
+### Cross-Platform Architecture
+- **iOS**: Full SpriteKit physics simulation with advanced graphics
+- **watchOS**: Pure SwiftUI implementation optimized for Apple Watch hardware
+- **Shared Code**: Common business logic, Game Center integration, and configuration
+- **Platform Abstraction**: Conditional compilation for platform-specific features
+
 ### Hardware Dependencies
-- **Motion**: Accelerometer and gyroscope for tilt controls
-- **Audio**: Speaker or headphones for sound effects
-- **Display**: Supports all iOS screen sizes and resolutions
-- **Processor**: Optimized for A-series chips, compatible with older hardware
+- **Motion**: Accelerometer and gyroscope for tilt controls (iOS only)
+- **Audio**: Speaker or headphones for sound effects (both platforms)
+- **Display**: Supports all iOS screen sizes and Apple Watch displays
+- **Processor**: Optimized for A-series chips and Apple Watch processors
+- **Haptics**: Taptic Engine (iOS) and Haptic feedback (watchOS)
+
+### Performance Targets
+| Platform | Max Lizards | Target FPS | Min FPS | Cleanup Interval |
+|----------|-------------|------------|---------|------------------|
+| iOS (A17+) | 300 | 120 | 60 | 10s |
+| iOS (A12-A16) | 300 | 60 | 45 | 10s |
+| iOS (A8-A11) | 200 | 60 | 30 | 8s |
+| watchOS | 20 | 60 | 30 | 5s |
 
 ## 🎯 Architecture Overview
 
@@ -23,13 +39,89 @@ Deep dive into the technical implementation, architecture, and engineering decis
 The app uses a sophisticated hybrid architecture combining the best of both frameworks:
 
 ```
-LizardApp (SwiftUI)
+LizardApp (SwiftUI App)
 ├── ContentView (SwiftUI UI Layer)
-├── LizardScene (SpriteKit Physics)
-├── GameCenterManager (Game Services)
-├── SoundPlayer (Audio Engine)
-├── BetaFeedbackManager (TestFlight)
-└── DynamicBackgroundView (SwiftUI Graphics)
+│   ├── DynamicBackgroundView (Time-based rendering)
+│   ├── SpriteView(LizardScene) (Physics simulation)
+│   ├── HUD Controls (Statistics & buttons)
+│   └── Game Center Integration
+├── LizardScene (SpriteKit Physics Core)
+│   ├── Physics World (Gravity, collision detection)
+│   ├── Lizard Nodes (Individual physics objects)
+│   ├── Performance Monitor (FPS tracking, quality scaling)
+│   └── Motion Integration (Device tilt → gravity)
+├── Singleton Managers
+│   ├── GameCenterManager (Social features)
+│   ├── SoundPlayer (Audio pooling & effects)
+│   └── BetaFeedbackManager (TestFlight feedback)
+├── watchOS Implementation (LizardWatch)
+│   ├── Pure SwiftUI (No SpriteKit dependency)
+│   ├── Simplified Physics (SwiftUI animations)
+│   ├── Haptic Integration (WKInterfaceDevice)
+│   └── Independent Game Center
+└── Shared Components
+    ├── AppConfiguration (Centralized constants)
+    ├── Utilities (Motion, notifications, helpers)
+    └── Cross-platform logic
+```
+
+### Advanced Architectural Patterns
+
+#### Cross-Platform Code Organization
+```swift
+// Platform-specific conditional compilation
+#if os(iOS)
+import SpriteKit
+import CoreMotion
+typealias PlatformSpecificPhysics = SKScene
+#elseif os(watchOS)
+import WatchKit
+typealias PlatformSpecificPhysics = SwiftUIAnimationManager
+#endif
+
+// Shared business logic
+struct GameLogic {
+    static func calculateScore(lizards: Int, taps: Int) -> Int {
+        return lizards * 10 + taps * 5
+    }
+    
+    static func shouldUnlockAchievement(_ type: AchievementType, count: Int) -> Bool {
+        // Cross-platform achievement logic
+    }
+}
+```
+
+#### State Management Architecture
+```swift
+// iOS: SwiftUI + SpriteKit state synchronization
+class GameState: ObservableObject {
+    @Published var totalLizards = 0
+    @Published var buttonTaps = 0
+    @Published var currentFPS: Double = 60.0
+    
+    // Bidirectional communication with SpriteKit
+    func syncWithScene(_ scene: LizardScene) {
+        scene.onSpawn = { [weak self] in
+            DispatchQueue.main.async {
+                self?.totalLizards += 1
+                self?.checkAchievements()
+            }
+        }
+    }
+}
+
+// watchOS: Pure SwiftUI state management
+struct WatchGameState {
+    @State private var lizards: [LizardViewModel] = []
+    @State private var totalSpawned = 0
+    
+    // SwiftUI animation-driven physics
+    func spawnLizard() {
+        withAnimation(.easeOut(duration: 2.0)) {
+            lizards.append(LizardViewModel.random())
+        }
+    }
+}
 ```
 
 ### Key Architectural Decisions
@@ -100,6 +192,145 @@ private struct Config {
 - Performance monitoring with consecutive low-FPS detection
 - Dynamic spawning throttling under memory pressure
 - Efficient texture sharing across lizard instances
+
+#### Advanced Physics Implementation
+
+##### Physics World Configuration
+```swift
+override func didMove(to view: SKView) {
+    // Optimized physics settings
+    physicsWorld.gravity = CGVector(dx: 0, dy: AppConfiguration.Physics.gravityDown)
+    physicsWorld.speed = 1.0  // Can be reduced for performance
+    physicsWorld.contactDelegate = self
+    
+    // Performance optimizations
+    view.ignoresSiblingOrder = true
+    view.shouldCullNonVisibleNodes = true
+    view.isAsynchronous = true  // Background rendering
+}
+```
+
+##### Object Pooling for Performance
+```swift
+private var lizardPool: [SKSpriteNode] = []
+private var activeLizards: Set<SKSpriteNode> = []
+
+func spawnLizard(at position: CGPoint) {
+    let lizard = lizardPool.popLast() ?? createNewLizard()
+    configureLizard(lizard, at: position)
+    activeLizards.insert(lizard)
+    addChild(lizard)
+    
+    // Schedule cleanup
+    scheduleCleanup(for: lizard, after: AppConfiguration.Physics.lizardLifetime)
+}
+
+private func recycleLizard(_ lizard: SKSpriteNode) {
+    activeLizards.remove(lizard)
+    lizard.removeFromParent()
+    resetLizardState(lizard)
+    lizardPool.append(lizard)
+}
+```
+
+##### Motion-to-Gravity Conversion
+```swift
+private func updateGravity(from data: CMAccelerometerData) {
+    // Convert device tilt to physics gravity
+    let sensitivity: Double = 2.0
+    let x = data.acceleration.x * sensitivity
+    let y = data.acceleration.y * sensitivity
+    
+    // Apply gravity scaling
+    let gravityMagnitude = AppConfiguration.Physics.gravityDown
+    let gravity = CGVector(
+        dx: CGFloat(x * gravityMagnitude),
+        dy: CGFloat(y * gravityMagnitude)
+    )
+    
+    physicsWorld.gravity = gravity
+}
+```
+
+#### Collision Detection System
+```swift
+// Physics categories for efficient collision detection
+struct PhysicsCategory {
+    static let lizard: UInt32 = 0x1 << 0
+    static let boundary: UInt32 = 0x1 << 1
+    static let obstacle: UInt32 = 0x1 << 2
+}
+
+func configureLizardPhysics(_ node: SKSpriteNode) {
+    let physicsBody = SKPhysicsBody(circleOfRadius: node.size.width / 2)
+    physicsBody.categoryBitMask = PhysicsCategory.lizard
+    physicsBody.contactTestBitMask = PhysicsCategory.boundary
+    physicsBody.collisionBitMask = PhysicsCategory.boundary
+    
+    // Physics properties for realistic behavior
+    physicsBody.restitution = 0.6  // Bounce factor
+    physicsBody.friction = 0.3     // Surface friction
+    physicsBody.angularDamping = 0.5  // Rotation dampening
+    physicsBody.linearDamping = 0.1   // Linear velocity dampening
+    
+    node.physicsBody = physicsBody
+}
+```
+
+## 🎨 Advanced Rendering Pipeline
+
+### Dynamic Weather System
+
+#### Real-Time Weather Effects
+```swift
+struct WeatherSystem {
+    enum WeatherType {
+        case clear, cloudy, rainy, stormy
+    }
+    
+    struct WeatherState {
+        var cloudCover: Double = 0.3
+        var rainIntensity: Double = 0.0
+        var windSpeed: Double = 0.0
+        var lightingMood: Color = .blue
+    }
+    
+    // Weather interpolation for smooth transitions
+    func interpolateWeather(from: WeatherState, to: WeatherState, progress: Double) -> WeatherState {
+        WeatherState(
+            cloudCover: lerp(from.cloudCover, to.cloudCover, progress),
+            rainIntensity: lerp(from.rainIntensity, to.rainIntensity, progress),
+            windSpeed: lerp(from.windSpeed, to.windSpeed, progress),
+            lightingMood: Color.lerp(from.lightingMood, to.lightingMood, progress)
+        )
+    }
+}
+```
+
+#### Particle Effects System
+```swift
+class WeatherParticleSystem: SKNode {
+    private var rainEmitter: SKEmitterNode?
+    private var cloudParticles: [SKSpriteNode] = []
+    
+    func setupRainEffect() {
+        rainEmitter = SKEmitterNode(fileNamed: "Rain.sks")
+        rainEmitter?.particleBlendMode = .alpha
+        rainEmitter?.particleLifetime = 2.0
+        rainEmitter?.particleBirthRate = 100
+        
+        // Performance scaling based on device
+        if ProcessInfo.processInfo.thermalState != .nominal {
+            rainEmitter?.particleBirthRate *= 0.5  // Reduce for thermal management
+        }
+    }
+    
+    func updateRainIntensity(_ intensity: Double) {
+        rainEmitter?.particleBirthRate = CGFloat(intensity * 200)
+        rainEmitter?.particleLifetime = CGFloat(1.0 + intensity)
+    }
+}
+```
 
 ## 🎨 Rendering Pipeline
 

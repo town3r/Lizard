@@ -7,10 +7,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Planned
-- Additional weather effects and animations
-- Enhanced watchOS complications support
-- Advanced physics customization options
+### 🔮 Upcoming Features
+
+#### Enhanced Physics & Gameplay
+- **Advanced Physics Customization**: User-configurable gravity strength and direction
+- **Multiple Lizard Species**: Different colored lizards with unique physics properties
+- **Interactive Obstacles**: Walls, ramps, and barriers for enhanced gameplay
+- **Particle Effects**: Enhanced visual feedback with trails and explosions
+- **Photo Mode**: Freeze physics and capture perfect moments
+
+#### Visual & Audio Enhancements
+- **Additional Weather Effects**: Snow, fog, and storm animations
+- **Seasonal Themes**: Dynamic backgrounds that change with real-world seasons
+- **Sound Effect Variations**: Multiple audio clips for different interactions
+- **Customizable Themes**: User-selectable UI color schemes
+- **Accessibility Improvements**: Better contrast, voice-over support, and haptic patterns
+
+#### Social & Sharing Features
+- **Social Sharing**: Export gameplay videos and screenshots
+- **Custom Leaderboards**: Create and share personal challenges
+- **Replay System**: Record and playback gameplay sessions
+- **Community Challenges**: Weekly physics puzzles and competitions
+
+#### watchOS Enhancements
+- **Apple Watch Complications**: Quick access from watch face
+- **Standalone Mode**: Full game functionality without iPhone
+- **Advanced Haptics**: Rich tactile feedback patterns
+- **Crown Integration**: Use Digital Crown for precise controls
+
+#### Technical Improvements
+- **Cloud Save**: Cross-device progress synchronization via iCloud
+- **Performance Analytics**: Detailed FPS and memory monitoring
+- **Accessibility APIs**: Full support for assistive technologies
+- **Localization**: Support for multiple languages
+
+### 🐛 Known Issues to Address
+- Occasional audio delay on older devices
+- Memory optimization for extended gameplay sessions
+- Game Center authentication edge cases
 
 ## [1.1.0] - 2025-08-19
 
@@ -111,6 +145,50 @@ This release introduces significant new features including a complete watchOS co
 - Platform-specific implementation guides
 - Build and deployment instructions
 - Troubleshooting and FAQ sections
+
+### 🔄 Migration Guide
+
+#### For Existing Users
+- **No Action Required**: All existing save data and settings are preserved
+- **Game Center Progress**: Achievements and leaderboards remain intact
+- **New Features**: Weather system enabled by default, can be toggled in-app
+- **Performance**: Improved frame rates and reduced memory usage
+
+#### For Developers
+- **Build System**: Projects must now use Xcode 15.0+ for watchOS support
+- **iOS Deployment Target**: Update from 15.0+ to 18.0+ in your project settings
+- **New Architecture**: `AppConfiguration.swift` replaces scattered configuration constants
+- **Testing**: New test targets available for both iOS and watchOS platforms
+
+#### Breaking Changes
+- **Minimum iOS Version**: Now requires iOS 18.0+ (previously 15.0+)
+- **Configuration**: Some internal configuration constants moved to `AppConfiguration.swift`
+- **Build Process**: Additional Xcode targets required for full project compilation
+
+#### Recommended Updates
+1. Update Xcode to 15.0+ for full feature support
+2. Test builds on both iOS Simulator and watchOS Simulator
+3. Review new documentation for API changes
+4. Consider enabling weather system for enhanced user experience
+
+### 🏆 Contributors & Acknowledgments
+
+#### Special Thanks
+- **Apple Developer Community**: For comprehensive SwiftUI and watchOS guidance
+- **TestFlight Beta Testers**: Essential feedback for weather system refinement
+- **SpriteKit Community**: Physics simulation optimization techniques
+- **Accessibility Testing Team**: Ensuring inclusive user experience
+
+#### Development Team
+- **Architecture Design**: Cross-platform SwiftUI implementation patterns
+- **Performance Engineering**: Memory optimization and FPS monitoring systems
+- **Quality Assurance**: Comprehensive testing across iOS and watchOS platforms
+- **Documentation**: Technical writing and developer experience improvements
+
+#### Open Source Inspiration
+- **Apple Sample Code**: SwiftUI + SpriteKit integration patterns
+- **Community Contributions**: Performance optimization techniques and best practices
+- **Design Guidelines**: Following Human Interface Guidelines for both platforms
 
 ## [1.0.0] - 2024-01-XX
 
