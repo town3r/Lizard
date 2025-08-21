@@ -99,50 +99,133 @@ See [watchOS documentation](docs/WATCHOS.md) for details.
 - `SoundPlayer.swift` - Audio management and pooling
 - `BetaFeedbackManager.swift` - TestFlight feedback system
 
-## 🚀 Development
+## 🚀 Getting Started
 
-This project uses Xcode and Swift. The app is optimized for iPhone and supports both portrait orientations.
+### Quick Start for Users
+1. **Download**: Get Lizard from the App Store (iPhone and Apple Watch)
+2. **Launch**: Open the app and grant motion permissions for tilt controls
+3. **Play**: Tap the center button to spawn lizards, tilt device to control gravity
+4. **Explore**: Try rain mode, Game Center achievements, and weather effects
 
-### Building the Project
+### For Developers
+See our comprehensive [**Developer Guide**](DEVELOPER_GUIDE.md) for detailed setup instructions.
 
-For comprehensive build instructions, see [`BUILDING.md`](BUILDING.md).
-
-#### Quick Build (iOS Only)
+#### Quick Build
 ```bash
-# Open in Xcode
+# Clone and build
+git clone https://github.com/town3r/Lizard.git
+cd Lizard
 open Lizard.xcodeproj
 
-# Or build from command line
-xcodebuild -project Lizard.xcodeproj -scheme Lizard -configuration Debug
+# Build all targets (⌘+B)
+# Run tests (⌘+U)
+# Run on simulator (⌘+R)
 ```
 
-#### 🍎 watchOS Integration
+#### Requirements
+- **macOS 14.0+** with **Xcode 15.0+**
+- **iOS 18.0+ SDK** and **watchOS 9.0+ SDK**
+- **Apple Developer Account** (for device testing)
 
-The project includes complete watchOS app source code. To integrate:
+## 📚 Documentation
 
-1. **Run the helper script**: `./scripts/watchos-integration-helper.sh`
-2. **Follow the integration guide**: See [`docs/WATCHOS_INTEGRATION.md`](docs/WATCHOS_INTEGRATION.md)
-3. **Add targets in Xcode**: watchOS app, tests, and iOS tests
+### User Documentation
+- **[User Guide](USER_GUIDE.md)** - Complete gameplay and features guide
+- **[FAQ](FAQ.md)** - Frequently asked questions and quick answers
+- **[Troubleshooting](TROUBLESHOOTING.md)** - Detailed problem-solving guide
+- **[Controls Reference](CONTROLS.md)** - Complete control documentation
 
-After integration, you'll have both iOS and watchOS versions in a single project.
+### Developer Documentation  
+- **[Developer Guide](DEVELOPER_GUIDE.md)** - Architecture, setup, and best practices
+- **[API Reference](API_REFERENCE.md)** - Complete code documentation
+- **[Building Guide](BUILDING.md)** - Build instructions and requirements
+- **[Technical Details](TECHNICAL.md)** - Implementation architecture
+- **[Contributing Guide](CONTRIBUTING.md)** - How to contribute to the project
 
-### Performance Optimizations
-- Maximum 300 concurrent physics objects
-- Automatic cleanup of aged lizards (10s lifespan)
-- FPS monitoring and dynamic quality adjustment
-- Rate-limited sound effects
+### Specialized Guides
+- **[Game Center Setup](docs/GAME_CENTER.md)** - Achievements and leaderboards
+- **[watchOS Guide](docs/WATCHOS.md)** - Apple Watch companion app
+- **[Design System](docs/DESIGN_SYSTEM.md)** - UI components and styling
 
-### Game Center Setup
-The app includes three achievements and two leaderboards. Game Center configuration is handled automatically on first launch.
+## 🛡️ Security & Privacy
 
-## 📄 License
+We take your privacy seriously:
+- **No Data Collection**: All game data stays on your device
+- **Privacy by Design**: Only essential permissions requested
+- **Open Source**: Code available for security review
+- **Responsible Disclosure**: See our [Security Policy](SECURITY.md)
 
-[Add your license information here]
+## 🔄 Release Notes
+
+**Current Version**: 1.1.0 - "Weather & Watch"
+- Complete Apple Watch companion app
+- Dynamic weather system with real-time effects
+- Enhanced performance and build system improvements
+
+See [**CHANGELOG.md**](CHANGELOG.md) for complete release history.
 
 ## 🤝 Contributing
 
-[Add contribution guidelines here]
+We welcome contributions from the community! Here's how to get involved:
+
+### Quick Contribution Guide
+1. **Read**: [Contributing Guidelines](CONTRIBUTING.md)
+2. **Setup**: Follow [Developer Guide](DEVELOPER_GUIDE.md)  
+3. **Find Issues**: Look for `good first issue` labels
+4. **Submit**: Create pull request with tests and documentation
+
+### Types of Contributions
+- 🐛 **Bug Reports**: Help us identify and fix issues
+- ✨ **Feature Requests**: Suggest new gameplay elements
+- 📝 **Documentation**: Improve guides and examples
+- 🔧 **Code**: Bug fixes and performance improvements
+- 🧪 **Testing**: Device testing and quality assurance
+
+### Community Guidelines
+- Be respectful and constructive
+- Follow our [Code of Conduct](CONTRIBUTING.md#code-of-conduct)
+- Search existing issues before creating new ones
+- Provide clear reproduction steps for bugs
+
+## 📞 Support & Community
+
+### Getting Help
+- **[FAQ](FAQ.md)** - Quick answers to common questions
+- **[Troubleshooting](TROUBLESHOOTING.md)** - Detailed problem solving
+- **GitHub Issues** - Technical problems and bug reports
+- **GitHub Discussions** - Questions and feature ideas
+
+### Beta Testing
+Join our TestFlight beta for early access to new features:
+- **Screenshot Feedback**: Take screenshots to send feedback
+- **Performance Testing**: Help us optimize across devices  
+- **Feature Preview**: Try new features before public release
+
+### Stay Updated
+- **GitHub Releases** - New version announcements
+- **CHANGELOG.md** - Detailed release notes
+- **GitHub Watch** - Get notified of project updates
+
+## 📄 License
+
+This project is open source. License details coming soon.
+
+## 🙏 Acknowledgments
+
+### Special Thanks
+- **Apple Developer Community** - For SwiftUI and watchOS guidance
+- **TestFlight Beta Testers** - Essential feedback for improvements
+- **SpriteKit Community** - Physics simulation techniques
+- **Contributors** - Everyone who helps make Lizard better
+
+### Built With
+- **[SwiftUI](https://developer.apple.com/xcode/swiftui/)** - Modern UI framework
+- **[SpriteKit](https://developer.apple.com/spritekit/)** - 2D game engine and physics
+- **[Game Center](https://developer.apple.com/game-center/)** - Social gaming features
+- **[Core Motion](https://developer.apple.com/documentation/coremotion)** - Device motion sensing
 
 ---
 
 *Made with ❤️ for physics simulation enthusiasts*
+
+**Ready to spawn some lizards?** Download Lizard today and experience delightful physics simulation on iOS and Apple Watch! 🦎✨

@@ -173,20 +173,197 @@ A comprehensive guide to all the features and capabilities in the Lizard iOS phy
 
 ## Feature Roadmap
 
-### Planned Enhancements
-- Additional physics objects and interactions
-- More lizard varieties and animations  
-- Enhanced particle effects
-- Social sharing capabilities
-- Custom gravity fields and obstacles
+### 🔮 Upcoming Features (Version 1.2+)
 
-### User-Requested Features
-- Color customization options
-- Sound effect variations
-- Additional achievements
-- Replay system
-- Photo mode
+#### Enhanced Physics & Gameplay
+- **Advanced Physics Customization**
+  - *Example*: Slider controls for gravity strength (0.5x to 2.0x Earth gravity)
+  - *Use Case*: Create moon-like low gravity or Jupiter-like heavy gravity scenarios
+  - *Implementation*: Real-time physics parameter adjustment
+
+- **Multiple Lizard Species**
+  - *Example*: Green lizards (standard), Blue lizards (bouncy), Red lizards (heavy)
+  - *Behavior*: Each species has unique physics properties and animations
+  - *Visual*: Distinct colors, sizes, and movement patterns
+
+- **Interactive Obstacles**
+  - *Example*: Draggable walls, ramps, and bounce pads
+  - *Physics*: Objects affect lizard movement and create complex interactions
+  - *Creativity*: Users can design custom physics environments
+
+#### Visual & Audio Enhancements
+- **Enhanced Particle Effects**
+  - *Example*: Sparkle trails following lizards, impact effects on collisions
+  - *Performance*: GPU-accelerated particles with automatic quality scaling
+  - *Customization*: Toggle effects on/off for performance or preference
+
+- **Seasonal Themes**
+  - *Example*: Spring (flowers), Summer (bright), Fall (leaves), Winter (snow)
+  - *Dynamic*: Automatically changes based on real-world date
+  - *Override*: Manual selection for preferred atmosphere
+
+- **Sound Variations**
+  - *Example*: 5 different spawn sounds, 3 collision sounds, ambient nature sounds
+  - *Randomization*: Prevents audio repetition during extended play
+  - *Spatial Audio*: Sounds positioned based on lizard location
+
+#### Social & Sharing Features
+- **Social Sharing**
+  - *Example*: Export 10-second physics videos, screenshot with stats overlay
+  - *Platforms*: Share to Messages, Mail, Social Media
+  - *Privacy*: Local export only, no cloud uploading
+
+- **Community Challenges**
+  - *Example*: "Spawn 50 lizards in under 30 seconds", "Create a lizard tower"
+  - *Weekly*: New challenges every Monday with global leaderboards
+  - *Rewards*: Special achievement badges for challenge completion
+
+- **Replay System**
+  - *Example*: Record last 60 seconds of gameplay, save favorite moments
+  - *Playback*: Slow motion, rewind, frame-by-frame analysis
+  - *Storage*: Local device storage, user-controlled deletion
+
+#### Advanced Features
+- **Photo Mode**
+  - *Example*: Freeze physics, move camera, adjust lighting, apply filters
+  - *Controls*: Gesture-based camera movement, tap-to-focus, exposure control
+  - *Export*: High-resolution images suitable for wallpapers
+
+- **Custom Gravity Fields**
+  - *Example*: Circular gravity wells, anti-gravity zones, directional forces
+  - *Interaction*: Draw gravity fields with finger, adjust strength with pinch
+  - *Persistence*: Save and load custom gravity configurations
+
+### 🎯 User-Requested Features
+
+Based on community feedback and feature requests:
+
+#### Customization Options
+- **Visual Customization**
+  - *Lizard Colors*: RGB color picker for lizard tinting
+  - *Background Themes*: Space, underwater, forest, abstract
+  - *UI Themes*: Light mode, dark mode, high contrast, colorblind-friendly
+
+- **Gameplay Customization**
+  - *Physics Presets*: Realistic, cartoon, zero-gravity, high-bounce
+  - *Spawn Patterns*: Single, burst, spiral, rain, controlled
+  - *Auto-Clear Settings*: Adjustable lizard lifetime (5s to 30s)
+
+#### Accessibility Enhancements
+- **Visual Accessibility**
+  - *High Contrast Mode*: Enhanced visibility for low vision users
+  - *Motion Reduction*: Simplified animations for motion sensitivity
+  - *Font Scaling*: Support for extra large text sizes
+
+- **Motor Accessibility**
+  - *Button Customization*: Adjustable button sizes and positions
+  - *Alternative Controls*: Tap-only mode without device tilting
+  - *Voice Control*: Integration with iOS Voice Control features
+
+#### Performance & Technical
+- **Advanced Performance Options**
+  - *Quality Presets*: Ultra (300 lizards), High (200), Medium (100), Low (50)
+  - *Frame Rate Target*: 30 FPS, 60 FPS, 120 FPS (on supported devices)
+  - *Battery Saver Mode*: Reduced effects and frame rate for longer play
+
+- **Developer Tools**
+  - *Debug Overlay*: FPS counter, memory usage, physics stats
+  - *Performance Profiler*: Real-time performance metrics
+  - *Export Logs*: Share performance data for optimization
+
+### 📱 Platform-Specific Roadmap
+
+#### iOS Enhancements
+- **iPad Optimization**
+  - *Split Screen*: Side-by-side physics simulations
+  - *Apple Pencil*: Precise lizard spawning and obstacle drawing
+  - *External Keyboard*: Keyboard shortcuts for power users
+
+- **iPhone Pro Features**
+  - *ProMotion*: 120 FPS physics simulation on supported devices
+  - *LiDAR*: Room-scale physics mapping (experimental)
+  - *Camera Integration*: AR lizards in real environment
+
+#### watchOS Enhancements
+- **Apple Watch Complications**
+  - *Circular*: Lizard count display on watch face
+  - *Corner*: Quick spawn button access
+  - *Modular*: Detailed stats and quick actions
+
+- **Digital Crown Integration**
+  - *Gravity Control*: Rotate crown to adjust gravity direction
+  - *Zoom*: Crown controls physics simulation zoom level
+  - *Precision Spawning*: Crown for precise lizard placement
+
+- **Advanced Haptics**
+  - *Custom Patterns*: Unique haptic feedback for different actions
+  - *Physics Feedback*: Haptics synchronized with collision events
+  - *Accessibility*: Haptic navigation for VoiceOver users
+
+#### visionOS (Apple Vision Pro) Future
+- **Spatial Computing**
+  - *3D Physics*: True 3D lizard physics in spatial environment
+  - *Hand Tracking*: Gesture-based spawning and interaction
+  - *Room Mapping*: Physics interact with real furniture and walls
+
+### 🔬 Experimental Features
+
+Features in research and development phase:
+
+#### AI & Machine Learning
+- **Intelligent Physics**
+  - *Adaptive Difficulty*: AI adjusts complexity based on user skill
+  - *Predictive Spawning*: ML suggests optimal spawn locations
+  - *Behavior Learning*: Lizards learn from user interaction patterns
+
+#### Advanced Graphics
+- **Metal Performance Shaders**
+  - *GPU Physics*: Ultra-high performance physics simulation
+  - *Real-time Shadows*: Dynamic lighting and shadow effects
+  - *Particle Systems*: Advanced GPU-accelerated visual effects
+
+#### Cross-Platform Features
+- **Universal Clipboard**
+  - *Physics Sharing*: Copy physics state between iOS and watchOS
+  - *Configuration Sync*: Settings synchronization via iCloud
+  - *Handoff*: Continue physics simulation across devices
+
+### 📊 Feature Voting & Feedback
+
+#### Community Input
+- **Feature Voting**: Vote on upcoming features in GitHub Discussions
+- **Beta Testing**: Early access to experimental features via TestFlight
+- **Feedback Integration**: Screenshot feedback automatically categorizes suggestions
+
+#### Development Transparency
+- **Public Roadmap**: Real-time updates on feature development progress
+- **Development Blogs**: Technical posts about implementation challenges
+- **Community Calls**: Monthly virtual meetups with development team
 
 ---
 
-*Explore all these features and more in the Lizard app! 🦎✨*
+## 🎮 Try These Features Today!
+
+### Hidden Features
+- **Double-tap center button**: Rapid-fire lizard spawning
+- **Triple-tap rain button**: Mega-rain mode with enhanced effects
+- **Hold stop + clear**: Easter egg physics mode
+- **Shake device during tilt**: Earthquake gravity mode
+
+### Pro Tips
+- **Performance Mode**: Close other apps before spawning 200+ lizards
+- **Battery Conservation**: Use stop button to pause aging for longer sessions
+- **Achievement Hunting**: Hold rain button for fastest progress to 500 lizards
+- **Creative Mode**: Use landscape orientation for wider physics playground
+
+### Advanced Techniques
+- **Gravity Surfing**: Gentle device tilts create flowing lizard movements
+- **Corner Collection**: Use walls to gather lizards in screen corners
+- **Physics Experiments**: Stop aging, spawn patterns, resume for interesting effects
+- **Zen Mode**: Clear frequently for minimalist, meditative experience
+
+---
+
+*Explore all these features and more in the Lizard app! Share your favorite combinations and discoveries with the community. 🦎✨*
+
+**Want to suggest a feature?** Check out our [Contributing Guide](CONTRIBUTING.md) to learn how to submit feature requests and join the development discussion!
