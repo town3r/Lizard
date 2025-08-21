@@ -16,6 +16,8 @@ struct DynamicBackgroundView: View {
     @State private var weatherTimer: Timer?
     @AppStorage("weatherAutoMode") private var weatherAutoMode: Bool = true
     @AppStorage("weatherOffMode") private var weatherOffMode: Bool = false
+    @AppStorage("timeOfDayAutoMode") private var timeOfDayAutoMode: Bool = true
+    @AppStorage("manualTimeOfDay") private var manualTimeOfDay: Double = 0.5
     @WeatherConditionStorage(key: "manualWeatherCondition") private var manualWeatherCondition: WeatherCondition
     // Add shared current weather condition storage
     @WeatherConditionStorage(key: "currentWeatherCondition") private var currentWeatherCondition: WeatherCondition
@@ -23,7 +25,8 @@ struct DynamicBackgroundView: View {
     var body: some View {
         TimelineView(.animation) { timeline in
             let now = timeline.date
-            let t = progressOfDay(now)            // 0 at midnight → 1 at midnight
+            // Use manual time if override is enabled, otherwise use actual time
+            let t = timeOfDayAutoMode ? progressOfDay(now) : manualTimeOfDay
             let dayness = dayCurve(t)             // 0 at midnight → 1 at noon → 0 at midnight
             let isNight = dayness < 0.35
             let isDawn = t > 0.2 && t < 0.35      // 4:48 AM - 8:24 AM

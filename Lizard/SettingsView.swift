@@ -281,6 +281,8 @@ struct PhysicsSettingsView: View {
 
 struct VisualSettingsView: View {
     @AppStorage("backgroundType") private var backgroundType: String = "dynamic"
+    @AppStorage("timeOfDayAutoMode") private var timeOfDayAutoMode: Bool = true
+    @AppStorage("manualTimeOfDay") private var manualTimeOfDay: Double = 0.5 // 0.5 = noon
     
     var body: some View {
         ScrollView {
@@ -321,11 +323,103 @@ struct VisualSettingsView: View {
                         }
                     }
                 }
+                
+                // Time of Day Section
+                LiquidGlassSection(title: "Time of Day", subtitle: "Control lighting and sky appearance", systemImage: "sun.max") {
+                    VStack(spacing: 16) {
+                        VStack(alignment: .leading, spacing: 12) {
+                            HStack {
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text("Time Control")
+                                        .font(.body)
+                                        .fontWeight(.medium)
+
+                                    Text("How time of day is determined")
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
+
+                                Spacer()
+
+                                Text(timeOfDayAutoMode ? "Auto" : "Manual")
+                                    .font(.body)
+                                    .fontWeight(.semibold)
+                                    .foregroundStyle(.blue)
+                            }
+
+                            SettingsToggle(
+                                title: "Auto Time",
+                                subtitle: "Follow actual time of day",
+                                systemImage: "clock.arrow.circlepath",
+                                isOn: $timeOfDayAutoMode
+                            )
+                            
+                            if !timeOfDayAutoMode {
+                                VStack(alignment: .leading, spacing: 8) {
+                                    HStack {
+                                        Text("Time of Day")
+                                            .font(.subheadline)
+                                            .fontWeight(.medium)
+                                            .foregroundStyle(.primary)
+                                        
+                                        Spacer()
+                                        
+                                        Text(timeOfDayDisplayText)
+                                            .font(.subheadline)
+                                            .fontWeight(.medium)
+                                            .foregroundStyle(.blue)
+                                    }
+                                    .padding(.top, 8)
+                                    
+                                    Slider(value: $manualTimeOfDay, in: 0...1, step: 0.01) {
+                                        Text("Time of Day")
+                                    } minimumValueLabel: {
+                                        Image(systemName: "moon.fill")
+                                            .foregroundStyle(.secondary)
+                                    } maximumValueLabel: {
+                                        Image(systemName: "moon.fill")
+                                            .foregroundStyle(.secondary)
+                                    }
+                                    .tint(.blue)
+                                    
+                                    HStack {
+                                        Text("Midnight")
+                                            .font(.caption2)
+                                            .foregroundStyle(.secondary)
+                                        
+                                        Spacer()
+                                        
+                                        Text("Noon")
+                                            .font(.caption2)
+                                            .foregroundStyle(.secondary)
+                                        
+                                        Spacer()
+                                        
+                                        Text("Midnight")
+                                            .font(.caption2)
+                                            .foregroundStyle(.secondary)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
             .padding(.horizontal, 20)
         }
         .navigationTitle("Visual Settings")
         .navigationBarTitleDisplayMode(.large)
+    }
+    
+    // Helper to convert time progress to display text
+    private var timeOfDayDisplayText: String {
+        let hours24 = Int(manualTimeOfDay * 24)
+        let minutes = Int((manualTimeOfDay * 24 - Double(hours24)) * 60)
+        
+        let period = hours24 < 12 ? "AM" : "PM"
+        let hours12 = hours24 == 0 ? 12 : (hours24 > 12 ? hours24 - 12 : hours24)
+        
+        return String(format: "%d:%02d %@", hours12, minutes, period)
     }
 }
 
@@ -563,8 +657,8 @@ struct OrientationButton: View {
                 RoundedRectangle(cornerRadius: 16)
                     .stroke(isSelected ? .clear : .secondary.opacity(0.3), lineWidth: 1)
             )
+            .contentShape(Rectangle())
         }
-        .buttonStyle(.plain)
         .disabled(isApplying)
     }
 }
