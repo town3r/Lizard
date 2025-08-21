@@ -12,6 +12,11 @@ struct ContentView: View {
     @AppStorage("totalLizardsSpawned") private var totalSpawned = 0
     @AppStorage("mainButtonTaps")      private var mainButtonTaps = 0
 
+    // User-configurable settings
+    @AppStorage("maxLizards") private var maxLizards: Int = 300
+    @AppStorage("lizardSize") private var lizardSize: Double = 80.0
+    @AppStorage("rainIntensity") private var rainIntensity: Int = 15
+
     @State private var isPressingMain = false
     @State private var spewTimer: Timer?
     @State private var rainTimer: Timer?
@@ -25,6 +30,9 @@ struct ContentView: View {
     
     // Weather control state
     @State private var showWeatherControl = false
+    
+    // Settings control state
+    @State private var showSettings = false
 
     // MARK: Configuration
     private struct Config {
@@ -78,6 +86,9 @@ struct ContentView: View {
                 scene.startTilt()
                 scene.backgroundColor = .clear
 
+                // Apply user settings to scene on startup
+                updateSceneConfiguration()
+
                 // Set up lizard count tracking
                 scene.onLizardCountChange = { count in
                     lizardCount = count
@@ -85,7 +96,8 @@ struct ContentView: View {
                 }
 
                 GameCenterManager.shared.authenticate(presentingViewController: topViewController())
-                GameCenterManager.shared.configureAccessPoint(isActive: true, location: .topTrailing)
+                // Remove the floating GameCenter access point
+                GameCenterManager.shared.configureAccessPoint(isActive: false, location: .topTrailing)
             }
             .onChange(of: size) { _, newSize in
                 scene.size = newSize
@@ -127,7 +139,7 @@ struct ContentView: View {
 }
 
 private extension ContentView {
-    // HUD counters at top left with iOS 26 liquid glass styling and weather button
+    // HUD counters at top left with iOS 26 liquid glass styling and single settings button
     var topLeftHUD: some View {
         VStack(alignment: .leading, spacing: 8) {
             // Counter display
@@ -144,13 +156,26 @@ private extension ContentView {
             .background {
                 iOS26LiquidGlass(isPressed: false, size: .small)
             }
+            .onTapGesture {
+                // Open GameCenter on tap
+                GameCenterManager.shared.presentLeaderboards()
+            }
             
-            // Weather control button positioned under the counter
-            WeatherControlButton()
+            // Single settings control button
+            SettingsControlButton(showSettings: $showSettings)
         }
         .padding(.top, 12)
         .padding(.leading, 12)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .sheet(isPresented: $showSettings) {
+            SettingsView(
+                onSettingsChange: updateSceneConfiguration,
+                onWeatherChange: { _ in }, // Weather changes are handled internally by the settings view
+                onModeChange: { _ in }     // Mode changes are handled internally by the settings view
+            )
+            .presentationDetents([.medium, .large])
+            .presentationDragIndicator(.visible)
+        }
     }
     
     // Center circle button for spawning a lizard with iOS 26 liquid glass effect
@@ -348,63 +373,37 @@ private extension ContentView {
             buttonTaps: mainButtonTaps
         )
     }
+    
+    // Settings configuration update
+    func updateSceneConfiguration() {
+        scene.updateConfiguration(
+            maxLizards: maxLizards,
+            lizardSize: CGFloat(lizardSize),
+            rainIntensity: rainIntensity
+        )
+    }
 }
 
-// MARK: - Weather Control Button
+// MARK: - Settings Control Button
 
-private struct WeatherControlButton: View {
-    @AppStorage("weatherAutoMode") private var weatherAutoMode: Bool = true
-    @AppStorage("weatherOffMode") private var weatherOffMode: Bool = false
-    @WeatherConditionStorage(key: "currentWeatherCondition") private var currentWeatherCondition: WeatherCondition
-    @State private var showWeatherControl = false
-    
-    private var displayWeatherCondition: WeatherCondition {
-        if weatherOffMode {
-            return .none
-        }
-        return currentWeatherCondition
-    }
+private struct SettingsControlButton: View {
+    @Binding var showSettings: Bool
     
     var body: some View {
         Button {
-            showWeatherControl = true
+            showSettings.toggle()
         } label: {
-            VStack(spacing: 4) {
-                Image(systemName: displayWeatherCondition.iconName)
-                    .font(.system(size: 20, weight: .medium))
-                    .foregroundStyle(weatherOffMode ? .secondary : .primary)
-                
-                if weatherOffMode {
-                    Circle()
-                        .fill(.gray)
-                        .frame(width: 6, height: 6)
-                } else if weatherAutoMode {
-                    Circle()
-                        .fill(.blue)
-                        .frame(width: 6, height: 6)
-                } else {
-                    Circle()
-                        .fill(.orange)
-                        .frame(width: 6, height: 6)
+            Image(systemName: "gearshape.fill")
+                .font(.system(size: 20, weight: .medium))
+                .foregroundStyle(.primary)
+                .padding(10)
+                .background {
+                    iOS26LiquidGlass(isPressed: false, size: .small)
                 }
-            }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 10)
         }
         .buttonStyle(.plain)
-        .background {
-            iOS26LiquidGlass(isPressed: false, size: .small)
-        }
-        .accessibilityLabel("Weather Control")
-        .accessibilityHint("Tap to open weather settings")
-        .sheet(isPresented: $showWeatherControl) {
-            WeatherControlView(
-                onWeatherChange: { _ in },
-                onModeChange: { _ in }
-            )
-            .presentationDetents([.medium])
-            .presentationDragIndicator(.visible)
-        }
+        .accessibilityLabel("Settings")
+        .accessibilityHint("Tap to open game and weather settings")
     }
 }
 

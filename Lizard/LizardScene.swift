@@ -14,8 +14,9 @@ final class LizardScene: SKScene {
 
     // MARK: Configuration (using centralized AppConfiguration)
     private let gravityDown: CGFloat = AppConfiguration.Physics.gravityDown
-    private let maxPhysicsLizards = AppConfiguration.Physics.maxPhysicsLizards
-    private let baseLizardSize: CGFloat = AppConfiguration.Physics.baseLizardSize
+    private var maxPhysicsLizards = AppConfiguration.Physics.maxPhysicsLizards
+    private var baseLizardSize: CGFloat = AppConfiguration.Physics.baseLizardSize
+    private var rainIntensity = AppConfiguration.Physics.rainDropsPerBurst
     private let lifetime: TimeInterval = AppConfiguration.Physics.lizardLifetime
 
     // MARK: Nodes/Assets
@@ -108,7 +109,7 @@ final class LizardScene: SKScene {
     }
 
     func rainOnce() {
-        for _ in 0..<AppConfiguration.Physics.rainDropsPerBurst { rainStep() }
+        for _ in 0..<rainIntensity { rainStep() }
     }
 
     func rainStep() {
@@ -193,6 +194,53 @@ final class LizardScene: SKScene {
         physicsWorld.gravity = CGVector(dx: 0, dy: gravityDown)
     }
     
+    // MARK: - Configuration Updates
+    
+    /// Updates the scene configuration with user settings
+    func updateConfiguration(maxLizards: Int, lizardSize: CGFloat, rainIntensity: Int) {
+        self.maxPhysicsLizards = maxLizards
+        self.rainIntensity = rainIntensity
+        
+        // If lizard size changed, regenerate texture and update existing lizards
+        if self.baseLizardSize != lizardSize {
+            self.baseLizardSize = lizardSize
+            regenerateLizardTexture()
+        }
+        
+        // If max lizards was reduced, remove excess lizards
+        let currentCount = physicsLayer.children.count
+        if currentCount > maxLizards {
+            let excessCount = currentCount - maxLizards
+            for _ in 0..<excessCount {
+                physicsLayer.children.first?.removeFromParent()
+            }
+            updateLizardCount()
+        }
+    }
+    
+    private func regenerateLizardTexture() {
+        guard let view = self.view else { return }
+        
+        // Clear old texture
+        lizardTexture = nil
+        
+        // Generate new texture with updated size
+        let label = SKLabelNode(text: "🦎")
+        label.fontSize = baseLizardSize
+        label.verticalAlignmentMode = .center
+        label.horizontalAlignmentMode = .center
+        
+        if let tex = view.texture(from: label) {
+            tex.filteringMode = .nearest
+            lizardTexture = tex
+        } else {
+            let dot = SKShapeNode(circleOfRadius: baseLizardSize * 0.5)
+            dot.fillColor = .systemGreen
+            dot.strokeColor = .clear
+            lizardTexture = view.texture(from: dot)
+        }
+    }
+
     // MARK: Lifecycle cleanup
     deinit {
         // Ensure motion manager is properly cleaned up
@@ -325,12 +373,22 @@ final class LizardScene: SKScene {
 
         // Update FPS display only if it's significantly different (reduce UI updates)
         let roundedFPS = currentFPS.rounded()
-        if let currentText = fpsLabel.text, 
+        if let currentText = fpsLabel.text,
            let currentFPSFromText = Double(currentText.replacingOccurrences(of: " FPS", with: "")),
            abs(currentFPSFromText - roundedFPS) < 1.0 {
             // Skip update if change is less than 1 FPS
         } else {
             fpsLabel.text = String(format: "%.0f FPS", roundedFPS)
         }
+    }
+    
+    // MARK: - Interface Orientation Helper
+    
+    /// Gets the current interface orientation for gravity transformation
+    private func currentInterfaceOrientation() -> UIInterfaceOrientation {
+        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene else {
+            return .portrait
+        }
+        return windowScene.interfaceOrientation
     }
 }

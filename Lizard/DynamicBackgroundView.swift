@@ -992,20 +992,21 @@ private struct EnhancedHillsLayerView: View {
             let colors = hillColors(t: t, weather: weather, scheme: scheme)
 
             ZStack(alignment: .bottom) {
-                // Background hills
+                // Background hills - extend beyond screen edges to ensure full coverage
                 HillShape(offset: 0, amplitude: 22)
                     .fill(colors[0])
-                    .frame(height: geo.size.height * 0.35)
+                    .frame(width: geo.size.width + 100, height: geo.size.height * 0.35)
+                    .position(x: geo.size.width / 2, y: geo.size.height - (geo.size.height * 0.35) / 2)
 
                 HillShape(offset: 60, amplitude: 18)
                     .fill(colors[1])
-                    .frame(height: geo.size.height * 0.28)
-                    .offset(y: 12)
+                    .frame(width: geo.size.width + 100, height: geo.size.height * 0.28)
+                    .position(x: geo.size.width / 2, y: geo.size.height - (geo.size.height * 0.28) / 2 + 12)
 
                 HillShape(offset: 120, amplitude: 14)
                     .fill(colors[2])
-                    .frame(height: geo.size.height * 0.22)
-                    .offset(y: 24)
+                    .frame(width: geo.size.width + 100, height: geo.size.height * 0.22)
+                    .position(x: geo.size.width / 2, y: geo.size.height - (geo.size.height * 0.22) / 2 + 24)
                 
                 // Enhanced landscape elements
                 LandscapeElementsView(
@@ -1015,7 +1016,7 @@ private struct EnhancedHillsLayerView: View {
                     dayness: t
                 )
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
+            .clipped()
         }
         .onAppear {
             startWindAnimation()
