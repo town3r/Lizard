@@ -426,88 +426,89 @@ struct VisualSettingsView: View {
 // MARK: - Weather Settings
 
 struct WeatherSettingsView: View {
-    @AppStorage("weatherEffects") private var weatherEffects: Bool = true
-    @AppStorage("windEnabled") private var windEnabled: Bool = false
     @AppStorage("weatherAutoMode") private var weatherAutoMode: Bool = true
-    @WeatherConditionStorage(key: "manualWeatherCondition") private var manualWeatherCondition: WeatherCondition
+    @AppStorage("weatherOffMode") private var weatherOffMode: Bool = false
+    @AppStorage("manualWeatherCondition") private var manualWeatherConditionRaw: String = "clear"
     
     var body: some View {
         ScrollView {
             VStack(spacing: 24) {
                 // Weather Mode Section
-                LiquidGlassSection(title: "Weather Mode", subtitle: "Control weather condition behavior", systemImage: "cloud.sun") {
+                LiquidGlassSection(title: "Weather Control", subtitle: "Control weather effects and conditions", systemImage: "cloud.sun") {
                     VStack(spacing: 16) {
-                        VStack(alignment: .leading, spacing: 12) {
-                            HStack {
-                                VStack(alignment: .leading, spacing: 2) {
-                                    Text("Weather Control")
-                                        .font(.body)
-                                        .fontWeight(.medium)
+                        // Weather On/Off Toggle
+                        SettingsToggle(
+                            title: "Weather Effects",
+                            subtitle: "Enable or disable all weather effects",
+                            systemImage: "cloud.drizzle",
+                            isOn: Binding(
+                                get: { !weatherOffMode },
+                                set: { weatherOffMode = !$0 }
+                            )
+                        )
+                        
+                        // Only show weather controls if weather is enabled
+                        if !weatherOffMode {
+                            Divider()
+                                .padding(.vertical, 8)
+                            
+                            VStack(alignment: .leading, spacing: 12) {
+                                HStack {
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text("Weather Mode")
+                                            .font(.body)
+                                            .fontWeight(.medium)
 
-                                    Text("How weather conditions are determined")
-                                        .font(.caption)
-                                        .foregroundStyle(.secondary)
+                                        Text(weatherAutoMode ? "Weather changes automatically every 30 seconds" : "Weather stays as selected until changed")
+                                            .font(.caption)
+                                            .foregroundStyle(.secondary)
+                                    }
+
+                                    Spacer()
+
+                                    Text(weatherAutoMode ? "Auto" : "Manual")
+                                        .font(.body)
+                                        .fontWeight(.semibold)
+                                        .foregroundStyle(.blue)
                                 }
 
-                                Spacer()
-
-                                Text(weatherAutoMode ? "Auto" : "Manual")
-                                    .font(.body)
-                                    .fontWeight(.semibold)
-                                    .foregroundStyle(.blue)
-                            }
-
-                            SettingsToggle(
-                                title: "Auto Weather",
-                                subtitle: "Weather changes automatically over time",
-                                systemImage: "cloud.sun",
-                                isOn: $weatherAutoMode
-                            )
-                            
-                            if !weatherAutoMode {
-                                VStack(alignment: .leading, spacing: 8) {
-                                    Text("Weather Condition")
-                                        .font(.subheadline)
-                                        .fontWeight(.medium)
-                                        .foregroundStyle(.primary)
-                                        .padding(.top, 8)
-                                    
-                                    Picker("Weather Condition", selection: $manualWeatherCondition) {
-                                        Text("Clear").tag(WeatherCondition.clear)
-                                        Text("Partly Cloudy").tag(WeatherCondition.partlyCloudy)
-                                        Text("Cloudy").tag(WeatherCondition.cloudy)
-                                        Text("Rain").tag(WeatherCondition.rain)
-                                        Text("Storm").tag(WeatherCondition.storm)
-                                        Text("Winter").tag(WeatherCondition.winter)
+                                SettingsToggle(
+                                    title: "Automatic Weather",
+                                    subtitle: "Weather changes automatically over time",
+                                    systemImage: "clock.arrow.2.circlepath",
+                                    isOn: $weatherAutoMode
+                                )
+                                
+                                if !weatherAutoMode {
+                                    VStack(alignment: .leading, spacing: 8) {
+                                        Text("Weather Condition")
+                                            .font(.subheadline)
+                                            .fontWeight(.medium)
+                                            .foregroundStyle(.primary)
+                                            .padding(.top, 8)
+                                        
+                                        Picker("Weather Condition", selection: Binding(
+                                            get: { WeatherConditionUtility.condition(from: manualWeatherConditionRaw) },
+                                            set: { manualWeatherConditionRaw = WeatherConditionUtility.string(from: $0) }
+                                        )) {
+                                            ForEach(WeatherCondition.allCases.filter { $0 != .none }, id: \.self) { condition in
+                                                HStack {
+                                                    Image(systemName: condition.iconName)
+                                                    Text(condition.displayName)
+                                                }
+                                                .tag(condition)
+                                            }
+                                        }
+                                        .pickerStyle(WheelPickerStyle())
+                                        .frame(height: 120)
                                     }
-                                    .pickerStyle(WheelPickerStyle())
-                                    .frame(height: 120)
                                 }
                             }
                         }
                     }
                 }
                 
-                // Weather Effects Section
-                LiquidGlassSection(title: "Weather Effects", subtitle: "Rain effects and environmental controls", systemImage: "cloud.rain") {
-                    VStack(spacing: 16) {
-                        SettingsToggle(
-                            title: "Weather Effects",
-                            subtitle: "Visual weather enhancements",
-                            systemImage: "cloud.drizzle",
-                            isOn: $weatherEffects
-                        )
-                        
-                        SettingsToggle(
-                            title: "Wind Effects",
-                            subtitle: "Horizontal physics influence",
-                            systemImage: "wind",
-                            isOn: $windEnabled
-                        )
-                    }
-                }
-                
-                // Weather Info Section
+                // Weather Info Section  
                 LiquidGlassSection(title: "Weather Info", subtitle: "Current weather configuration", systemImage: "info.circle") {
                     VStack(spacing: 16) {
                         PerformanceInfoRow(
@@ -519,16 +520,22 @@ struct WeatherSettingsView: View {
                         if !weatherAutoMode {
                             PerformanceInfoRow(
                                 title: "Condition",
-                                value: manualWeatherCondition.displayName,
-                                systemImage: manualWeatherCondition.iconName
+                                value: WeatherConditionUtility.condition(from: manualWeatherConditionRaw).displayName,
+                                systemImage: WeatherConditionUtility.condition(from: manualWeatherConditionRaw).iconName
                             )
                         }
                         
                         PerformanceInfoRow(
-                            title: "Effects",
-                            value: weatherEffects ? "Enabled" : "Disabled",
-                            systemImage: weatherEffects ? "checkmark.circle" : "xmark.circle"
+                            title: "Weather Effects",
+                            value: !weatherOffMode ? "Enabled" : "Disabled",
+                            systemImage: !weatherOffMode ? "checkmark.circle" : "xmark.circle"
                         )
+                        
+                        Text("Weather effects include rain, snow, storms, clouds, and atmospheric animations")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .multilineTextAlignment(.center)
+                            .padding(.top, 8)
                     }
                 }
             }

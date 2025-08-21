@@ -10,17 +10,58 @@ import SwiftUI
 /// - Layered grassy hills with weather shadows
 struct DynamicBackgroundView: View {
     @Environment(\.colorScheme) private var colorScheme
-    @State private var weatherCondition: WeatherCondition = .clear
     @State private var animationOffset: CGFloat = 0
     @State private var rainDrops: [RainDrop] = []
     @State private var weatherTimer: Timer?
+    @State private var currentAutoWeather: WeatherCondition = .clear
+    @State private var isTransitioning: Bool = false
     @AppStorage("weatherAutoMode") private var weatherAutoMode: Bool = true
     @AppStorage("weatherOffMode") private var weatherOffMode: Bool = false
     @AppStorage("timeOfDayAutoMode") private var timeOfDayAutoMode: Bool = true
     @AppStorage("manualTimeOfDay") private var manualTimeOfDay: Double = 0.5
-    @WeatherConditionStorage(key: "manualWeatherCondition") private var manualWeatherCondition: WeatherCondition
-    // Add shared current weather condition storage
-    @WeatherConditionStorage(key: "currentWeatherCondition") private var currentWeatherCondition: WeatherCondition
+    @AppStorage("manualWeatherCondition") private var manualWeatherConditionRaw: String = "clear"
+    
+    // Computed property for current weather condition based on mode
+    private var weatherCondition: WeatherCondition {
+        if weatherOffMode {
+            return .none
+        } else if weatherAutoMode {
+            // Return stable automatic weather condition
+            return currentAutoWeather
+        } else {
+            // Return the manually selected condition
+            return WeatherConditionUtility.condition(from: manualWeatherConditionRaw)
+        }
+    }
+    
+    // Generate automatic weather based on time and weighted randomization
+    private func generateAutomaticWeatherCondition() -> WeatherCondition {
+        let hour = Calendar.current.component(.hour, from: Date())
+        let random = Double.random(in: 0...1)
+        
+        // Weather patterns based on time of day with realistic probabilities
+        if hour >= 18 || hour <= 6 {
+            // Evening/night - higher chance of rain and clouds
+            if random < 0.2 { return .rain }
+            if random < 0.3 { return .storm }
+            if random < 0.6 { return .cloudy }
+            if random < 0.8 { return .partlyCloudy }
+            return .clear
+        } else if hour >= 6 && hour <= 10 {
+            // Morning - often clear or partly cloudy
+            if random < 0.1 { return .rain }
+            if random < 0.2 { return .cloudy }
+            if random < 0.5 { return .partlyCloudy }
+            return .clear
+        } else {
+            // Midday/afternoon - varied conditions
+            if random < 0.15 { return .rain }
+            if random < 0.2 { return .storm }
+            if random < 0.4 { return .cloudy }
+            if random < 0.7 { return .partlyCloudy }
+            return .clear
+        }
+    }
 
     var body: some View {
         TimelineView(.animation) { timeline in
@@ -118,17 +159,16 @@ struct DynamicBackgroundView: View {
         .onAppear {
             startWeatherAnimation()
             
-            // Initialize current weather condition if not set
-            if currentWeatherCondition == .clear && UserDefaults.standard.object(forKey: "currentWeatherCondition") == nil {
-                currentWeatherCondition = weatherCondition
+            // Initialize automatic weather
+            if weatherAutoMode && !weatherOffMode {
+                currentAutoWeather = generateAutomaticWeatherCondition()
+                startAutomaticWeatherUpdates()
             }
-            
-            updateWeatherCondition()
             
             // Apply manual weather if not in auto mode and weather is not off
             if !weatherAutoMode && !weatherOffMode {
-                weatherCondition = manualWeatherCondition
-                if weatherCondition == .rain || weatherCondition == .storm {
+                let condition = WeatherConditionUtility.condition(from: manualWeatherConditionRaw)
+                if condition == .rain || condition == .storm {
                     generateRaindrops()
                 }
             }
@@ -138,18 +178,13 @@ struct DynamicBackgroundView: View {
         }
         .onChange(of: weatherAutoMode) { _, newValue in
             if newValue && !weatherOffMode {
-                updateWeatherCondition()
+                currentAutoWeather = generateAutomaticWeatherCondition()
+                startAutomaticWeatherUpdates()
             } else {
                 weatherTimer?.invalidate()
                 if !weatherOffMode {
-                    weatherCondition = manualWeatherCondition
-                    if weatherCondition == .rain || weatherCondition == .storm {
-                        generateRaindrops()
-                    } else {
-                        withAnimation(.easeOut(duration: 2)) {
-                            rainDrops.removeAll()
-                        }
-                    }
+                    let condition = WeatherConditionUtility.condition(from: manualWeatherConditionRaw)
+                    updateRaindropsForCondition(condition)
                 }
             }
         }
@@ -160,33 +195,21 @@ struct DynamicBackgroundView: View {
                 withAnimation(.easeOut(duration: 2)) {
                     rainDrops.removeAll()
                 }
-                weatherCondition = .none
             } else {
                 // Weather turned back on - restore previous behavior
                 if weatherAutoMode {
-                    updateWeatherCondition()
+                    currentAutoWeather = generateAutomaticWeatherCondition()
+                    startAutomaticWeatherUpdates()
                 } else {
-                    weatherCondition = manualWeatherCondition
-                    if weatherCondition == .rain || weatherCondition == .storm {
-                        generateRaindrops()
-                    }
+                    let condition = WeatherConditionUtility.condition(from: manualWeatherConditionRaw)
+                    updateRaindropsForCondition(condition)
                 }
             }
         }
-        .onChange(of: weatherCondition) { _, newCondition in
-            // Update the shared current weather condition whenever it changes
-            currentWeatherCondition = newCondition
-        }
-        .onChange(of: manualWeatherCondition) { _, _ in
+        .onChange(of: manualWeatherConditionRaw) { _, _ in
             if !weatherAutoMode && !weatherOffMode {
-                weatherCondition = manualWeatherCondition
-                if weatherCondition == .rain || weatherCondition == .storm {
-                    generateRaindrops()
-                } else {
-                    withAnimation(.easeOut(duration: 2)) {
-                        rainDrops.removeAll()
-                    }
-                }
+                let condition = WeatherConditionUtility.condition(from: manualWeatherConditionRaw)
+                updateRaindropsForCondition(condition)
             }
         }
     }
@@ -257,50 +280,35 @@ extension DynamicBackgroundView {
         }
     }
     
-    private func updateWeatherCondition() {
-        guard weatherAutoMode else { return } // Don't auto-update if in manual mode
-        
-        weatherTimer = Timer.scheduledTimer(withTimeInterval: 30, repeats: true) { _ in
+    private func startAutomaticWeatherUpdates() {
+        weatherTimer = Timer.scheduledTimer(withTimeInterval: 120, repeats: true) { _ in
             Task { @MainActor in
-                guard weatherAutoMode else { return } // Double check in case mode changed
+                guard weatherAutoMode && !weatherOffMode else { return }
                 
-                // Simulate dynamic weather changes
-                let conditions = WeatherCondition.allCases
-                weatherCondition = conditions.randomElement() ?? .clear
+                // Generate new weather condition with smooth transition
+                let newCondition = generateAutomaticWeatherCondition()
                 
-                // Update raindrops for rain conditions
-                if weatherCondition == .rain || weatherCondition == .storm {
-                    generateRaindrops()
-                } else {
-                    withAnimation(.easeOut(duration: 2)) {
-                        rainDrops.removeAll()
-                    }
+                // Only change weather if it's different to avoid unnecessary updates
+                guard newCondition != currentAutoWeather else { return }
+                
+                withAnimation(.easeInOut(duration: 3)) {
+                    currentAutoWeather = newCondition
+                }
+                
+                // Update raindrops for rain conditions with delay to match animation
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                    updateRaindropsForCondition(newCondition)
                 }
             }
         }
     }
     
-    // Methods for manual weather control
-    func setWeatherMode(auto: Bool) {
-        weatherAutoMode = auto
-        if auto {
-            updateWeatherCondition()
+    private func updateRaindropsForCondition(_ condition: WeatherCondition) {
+        if condition == .rain || condition == .storm {
+            generateRaindrops()
         } else {
-            weatherTimer?.invalidate()
-        }
-    }
-    
-    mutating func setManualWeather(_ condition: WeatherCondition) {
-        manualWeatherCondition = condition
-        if !weatherAutoMode {
-            weatherCondition = condition
-            
-            if condition == .rain || condition == .storm {
-                generateRaindrops()
-            } else {
-                withAnimation(.easeOut(duration: 2)) {
-                    rainDrops.removeAll()
-                }
+            withAnimation(.easeOut(duration: 2)) {
+                rainDrops.removeAll()
             }
         }
     }

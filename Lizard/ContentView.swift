@@ -18,6 +18,12 @@ struct ContentView: View {
     @AppStorage("rainIntensity") private var rainIntensity: Int = 15
     @AppStorage("randomSizeLizards") private var randomSizeLizards: Bool = false
     @AppStorage("backgroundType") private var backgroundType: String = "dynamic"
+    
+    // Weather control settings
+    @AppStorage("weatherAutoMode") private var weatherAutoMode: Bool = true
+    @AppStorage("weatherOffMode") private var weatherOffMode: Bool = false
+    @AppStorage("manualWeatherCondition") private var manualWeatherConditionRaw: String = "clear"
+    @State private var currentWeatherCondition: WeatherCondition = .clear
 
     @State private var isPressingMain = false
     @State private var spewTimer: Timer?
@@ -124,6 +130,18 @@ struct ContentView: View {
                     totalSpawned += 1
                     reportScoresIfReady()
                 }
+            }
+            .onChange(of: weatherAutoMode) { _, _ in
+                updateWeatherCondition()
+            }
+            .onChange(of: weatherOffMode) { _, _ in
+                updateWeatherCondition()
+            }
+            .onChange(of: manualWeatherConditionRaw) { _, _ in
+                updateWeatherCondition()
+            }
+            .onAppear {
+                updateWeatherCondition()
             }
             .onChange(of: scenePhase) { _, newPhase in
                 Task { @MainActor in
@@ -404,6 +422,20 @@ private extension ContentView {
             rainIntensity: rainIntensity,
             randomSizeLizards: randomSizeLizards
         )
+    }
+    
+    // Weather condition update handler
+    func updateWeatherCondition() {
+        if weatherOffMode {
+            currentWeatherCondition = .none
+        } else if weatherAutoMode {
+            // Auto mode will be handled by DynamicBackgroundView's timer
+            // Just ensure we're not overriding it here
+            return
+        } else {
+            // Manual mode - use the selected condition
+            currentWeatherCondition = WeatherConditionUtility.condition(from: manualWeatherConditionRaw)
+        }
     }
 }
 
