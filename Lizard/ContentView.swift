@@ -16,6 +16,8 @@ struct ContentView: View {
     @AppStorage("maxLizards") private var maxLizards: Int = 300
     @AppStorage("lizardSize") private var lizardSize: Double = 80.0
     @AppStorage("rainIntensity") private var rainIntensity: Int = 15
+    @AppStorage("randomSizeLizards") private var randomSizeLizards: Bool = false
+    @AppStorage("backgroundType") private var backgroundType: String = "dynamic"
 
     @State private var isPressingMain = false
     @State private var spewTimer: Timer?
@@ -67,8 +69,8 @@ struct ContentView: View {
         GeometryReader { proxy in
             let size = proxy.size
             ZStack {
-                // Background first
-                DynamicBackgroundView()
+                // Background switching based on user preference
+                backgroundView
                     .ignoresSafeArea()
                 
                 // Game content with TransparentSpriteView
@@ -81,59 +83,79 @@ struct ContentView: View {
                 centerButton(size: size)
             }
             .onAppear {
-                scene.scaleMode = .resizeFill
-                scene.size = size
-                scene.startTilt()
-                scene.backgroundColor = .clear
+                Task { @MainActor in
+                    scene.scaleMode = .resizeFill
+                    scene.size = size
+                    scene.startTilt()
+                    scene.backgroundColor = .clear
 
-                // Apply user settings to scene on startup
-                updateSceneConfiguration()
+                    updateSceneConfiguration()
 
-                // Set up lizard count tracking
-                scene.onLizardCountChange = { count in
-                    lizardCount = count
-                    updateButtonVisibility()
+                    scene.onLizardCountChange = { count in
+                        Task { @MainActor in
+                            lizardCount = count
+                            updateButtonVisibility()
+                        }
+                    }
+
+                    GameCenterManager.shared.authenticate(presentingViewController: { topViewController() })
+                    GameCenterManager.shared.configureAccessPoint(isActive: false, location: .topTrailing)
                 }
-
-                GameCenterManager.shared.authenticate(presentingViewController: topViewController())
-                // Remove the floating GameCenter access point
-                GameCenterManager.shared.configureAccessPoint(isActive: false, location: .topTrailing)
             }
             .onChange(of: size) { _, newSize in
-                scene.size = newSize
-            }
-            .onChange(of: colorScheme) { _, _ in
-                scene.backgroundColor = .clear
-            }
-            .onDisappear {
-                scene.stopTilt()
-                // Clean up timers to prevent leaks
-                stopSpewHold()
-                stopRainHold()
-            }
-            .onReceive(NotificationCenter.default.publisher(for: .lizardSpawned)) { _ in
-                totalSpawned += 1
-                reportScoresIfReady()
-            }
-            .onChange(of: scenePhase) { _, newPhase in
-                switch newPhase {
-                case .background:
-                    // App goes to background - pause physics and stop timers
-                    scene.setAgingPaused(true)
-                    stopSpewHold()
-                    stopRainHold()
-                case .active:
-                    // App becomes active - resume if not manually paused
-                    // We don't auto-resume since user might have manually paused
-                    break
-                case .inactive:
-                    // App becomes inactive (e.g., notification center) - pause timers but keep physics
-                    stopSpewHold()
-                    stopRainHold()
-                @unknown default:
-                    break
+                Task { @MainActor in
+                    scene.size = newSize
                 }
             }
+            .onChange(of: colorScheme) { _, _ in
+                Task { @MainActor in
+                    scene.backgroundColor = .clear
+                }
+            }
+            .onDisappear {
+                Task { @MainActor in
+                    scene.stopTilt()
+                    stopSpewHold()
+                    stopRainHold()
+                }
+            }
+            .onReceive(NotificationCenter.default.publisher(for: .lizardSpawned)) { _ in
+                Task { @MainActor in
+                    totalSpawned += 1
+                    reportScoresIfReady()
+                }
+            }
+            .onChange(of: scenePhase) { _, newPhase in
+                Task { @MainActor in
+                    switch newPhase {
+                    case .background:
+                        scene.setAgingPaused(true)
+                        stopSpewHold()
+                        stopRainHold()
+                    case .active:
+                        break
+                    case .inactive:
+                        stopSpewHold()
+                        stopRainHold()
+                    @unknown default:
+                        break
+                    }
+                }
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private var backgroundView: some View {
+        switch backgroundType {
+        case "dynamic":
+            DynamicBackgroundView()
+        case "solid":
+            SolidBackgroundView()
+        case "gradient":
+            GradientBackgroundView()
+        default:
+            DynamicBackgroundView()
         }
     }
 }
@@ -168,13 +190,9 @@ private extension ContentView {
         .padding(.leading, 12)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .sheet(isPresented: $showSettings) {
-            SettingsView(
-                onSettingsChange: updateSceneConfiguration,
-                onWeatherChange: { _ in }, // Weather changes are handled internally by the settings view
-                onModeChange: { _ in }     // Mode changes are handled internally by the settings view
-            )
-            .presentationDetents([.medium, .large])
-            .presentationDragIndicator(.visible)
+            SettingsView()
+                .presentationDetents([.medium, .large])
+                .presentationDragIndicator(.visible)
         }
     }
     
@@ -325,8 +343,10 @@ private extension ContentView {
         spewTimer?.invalidate()
         scene.setAgingPaused(false)
         spewTimer = Timer.scheduledTimer(withTimeInterval: Config.spewTimerInterval, repeats: true) { _ in
-            scene.emitFromCircleCenterRandom(sizeJitter: Config.sizeJitterHold)
-            SoundPlayer.shared.play(name: "lizard", ext: "wav")
+            Task { @MainActor in
+                scene.emitFromCircleCenterRandom(sizeJitter: Config.sizeJitterHold)
+                SoundPlayer.shared.play(name: "lizard", ext: "wav")
+            }
         }
         if let spewTimer { RunLoop.main.add(spewTimer, forMode: .common) }
     }
@@ -339,10 +359,12 @@ private extension ContentView {
     func startRainHold() {
         isRaining = true
         updateButtonVisibility()
-        
+
         rainTimer?.invalidate()
         rainTimer = Timer.scheduledTimer(withTimeInterval: Config.rainTimerInterval, repeats: true) { _ in
-            scene.rainStep()
+            Task { @MainActor in
+                scene.rainStep()
+            }
         }
         if let rainTimer { RunLoop.main.add(rainTimer, forMode: .common) }
     }
@@ -379,7 +401,8 @@ private extension ContentView {
         scene.updateConfiguration(
             maxLizards: maxLizards,
             lizardSize: CGFloat(lizardSize),
-            rainIntensity: rainIntensity
+            rainIntensity: rainIntensity,
+            randomSizeLizards: randomSizeLizards
         )
     }
 }
@@ -492,15 +515,17 @@ struct iOS26LiquidGlassButton: View {
     
     private func startJittering() {
         jitterTimer?.invalidate()
-        
+
         jitterTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { _ in
-            guard isJittering else { return }
-            
-            withAnimation(.easeInOut(duration: 0.1)) {
-                jitterOffset = CGSize(
-                    width: Double.random(in: -2.0...2.0),
-                    height: Double.random(in: -2.0...2.0)
-                )
+            Task { @MainActor in
+                guard isJittering else { return }
+
+                withAnimation(.easeInOut(duration: 0.1)) {
+                    jitterOffset = CGSize(
+                        width: Double.random(in: -2.0...2.0),
+                        height: Double.random(in: -2.0...2.0)
+                    )
+                }
             }
         }
     }
@@ -736,20 +761,6 @@ struct iOS26LiquidGlassCircle: View {
                 )
                 .blur(radius: 1.5)
                 .padding(-2)
-        }
-    }
-}
-
-extension WeatherCondition {
-    var rawValue: String {
-        switch self {
-        case .none: return "none"
-        case .clear: return "clear"
-        case .partlyCloudy: return "partlyCloudy"
-        case .cloudy: return "cloudy"
-        case .rain: return "rain"
-        case .storm: return "storm"
-        case .winter: return "winter"
         }
     }
 }

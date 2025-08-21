@@ -14,8 +14,8 @@ enum AudioSession {
 }
 
 /// Lightweight pool + tiny rate-limit to avoid spawning many AVAudioPlayers per frame.
-final class SoundPlayer: NSObject {
-    static let shared = SoundPlayer()
+final class SoundPlayer: NSObject, @unchecked Sendable {
+    @MainActor static let shared = SoundPlayer()
 
     private var pool: [AVAudioPlayer] = []
     private var nextIndex = 0
@@ -59,9 +59,9 @@ final class SoundPlayer: NSObject {
         if now - lastPlay < minInterval { return }   // rate limit
         lastPlay = now
 
-        guard !pool.isEmpty else { 
+        guard !pool.isEmpty else {
             print("⚠️ SoundPlayer: No audio players available for \(name).\(ext)")
-            return 
+            return
         }
         
         let p = pool[nextIndex]

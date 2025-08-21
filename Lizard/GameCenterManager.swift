@@ -4,17 +4,19 @@ import GameKit
 import UIKit
 
 /// A tiny, modern wrapper around GameKit for iOS 18 / SDK 26.
-final class GameCenterManager: NSObject {
+final class GameCenterManager: NSObject, @unchecked Sendable {
 
-    static let shared = GameCenterManager()
+    @MainActor static let shared = GameCenterManager()
 
     // MARK: - Authentication
 
     /// Call once on launch (e.g. from ContentView.onAppear).
-    func authenticate(presentingViewController: @autoclosure @escaping () -> UIViewController?) {
+    func authenticate(presentingViewController: @escaping @MainActor () -> UIViewController?) {
         GKLocalPlayer.local.authenticateHandler = { vc, error in
             if let vc = vc {
-                presentingViewController()?.present(vc, animated: true, completion: nil)
+                DispatchQueue.main.async {
+                    presentingViewController()?.present(vc, animated: true, completion: nil)
+                }
                 return
             }
             if let error { print("Game Center auth error:", error) }

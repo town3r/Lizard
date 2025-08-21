@@ -1,7 +1,7 @@
 // LizardScene.swift
 import SpriteKit
 import UIKit
-internal import CoreMotion   // quiets the implicit access warning
+@preconcurrency internal import CoreMotion   // quiets the implicit access warning
 
 final class LizardScene: SKScene {
 
@@ -18,6 +18,7 @@ final class LizardScene: SKScene {
     private var baseLizardSize: CGFloat = AppConfiguration.Physics.baseLizardSize
     private var rainIntensity = AppConfiguration.Physics.rainDropsPerBurst
     private let lifetime: TimeInterval = AppConfiguration.Physics.lizardLifetime
+    private var randomSizeLizards: Bool = false
 
     // MARK: Nodes/Assets
     private let physicsLayer = SKNode()
@@ -31,6 +32,9 @@ final class LizardScene: SKScene {
     private var consecutiveLowFPSFrames = 0
     private let lowFPSThreshold: Double = AppConfiguration.Performance.lowFPSThreshold
     private let maxConsecutiveLowFPS = AppConfiguration.Performance.maxConsecutiveLowFPS
+    private var showFPSCounter: Bool {
+        UserDefaults.standard.bool(forKey: "showFPSCounter")
+    }
 
     // MARK: Lifetime pause
     private var agingPaused = false
@@ -58,8 +62,34 @@ final class LizardScene: SKScene {
         addChild(physicsLayer)
         prepareAssets(on: view)
         setupFPSOverlay()
+        setupNotificationObservers()
 
         SoundPlayer.shared.preload(name: "lizard", ext: "wav", voices: 6)
+    }
+    
+    // MARK: - Notification Observers
+    
+    private func setupNotificationObservers() {
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleFPSCounterToggled(_:)),
+            name: .fpsCounterToggled,
+            object: nil
+        )
+    }
+    
+    @objc private func handleFPSCounterToggled(_ notification: Notification) {
+        guard let userInfo = notification.userInfo,
+              let enabled = userInfo["enabled"] as? Bool else { return }
+        
+        fpsLabel.isHidden = !enabled
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+        // Note: Cannot access tiltEnabled or motionMgr properties from deinit
+        // due to @MainActor isolation. The motion manager will be cleaned up
+        // automatically when the scene is deallocated.
     }
 
     override func didChangeSize(_ oldSize: CGSize) {
@@ -87,11 +117,15 @@ final class LizardScene: SKScene {
         guard size != .zero else { return }
         let count = Int.random(in: countRange)
         for _ in 0..<count {
+            let scale = randomSizeLizards ?
+                CGFloat.random(in: 0.5...1.5) :
+                CGFloat.random(in: 0.7...1.1)
+            
             spawnLizard(
                 at: CGPoint(x: size.width/2, y: size.height * 0.55),
                 impulse: CGVector(dx: CGFloat.random(in: -150...150),
                                   dy: CGFloat.random(in: 140...280)),
-                scale: CGFloat.random(in: 0.7...1.1),
+                scale: scale,
                 playSound: true
             )
         }
@@ -99,11 +133,15 @@ final class LizardScene: SKScene {
 
     func emitFromCircleCenterRandom(sizeJitter: CGFloat) {
         guard size != .zero else { return }
+        let scale = randomSizeLizards ?
+            CGFloat.random(in: 0.4...1.6) :
+            CGFloat.random(in: max(0.4, 1.0 - sizeJitter)...(1.0 + sizeJitter))
+        
         spawnLizard(
             at: CGPoint(x: size.width/2, y: size.height * 0.55),
             impulse: CGVector(dx: CGFloat.random(in: -90...90),
                               dy: CGFloat.random(in: 120...220)),
-            scale: CGFloat.random(in: max(0.4, 1.0 - sizeJitter)...(1.0 + sizeJitter)),
+            scale: scale,
             playSound: true
         )
     }
@@ -125,10 +163,15 @@ final class LizardScene: SKScene {
         let y = size.height - 2
         let impulse = CGVector(dx: CGFloat.random(in: -40...40),
                                dy: CGFloat.random(in: -10...30))
+        
+        let scale = randomSizeLizards ?
+            CGFloat.random(in: 0.3...1.2) :
+            CGFloat.random(in: 0.45...0.9)
+        
         spawnLizard(
             at: CGPoint(x: x, y: y),
             impulse: impulse,
-            scale: CGFloat.random(in: 0.45...0.9),
+            scale: scale,
             playSound: false
         )
     }
@@ -197,9 +240,10 @@ final class LizardScene: SKScene {
     // MARK: - Configuration Updates
     
     /// Updates the scene configuration with user settings
-    func updateConfiguration(maxLizards: Int, lizardSize: CGFloat, rainIntensity: Int) {
+    func updateConfiguration(maxLizards: Int, lizardSize: CGFloat, rainIntensity: Int, randomSizeLizards: Bool = false) {
         self.maxPhysicsLizards = maxLizards
         self.rainIntensity = rainIntensity
+        self.randomSizeLizards = randomSizeLizards
         
         // If lizard size changed, regenerate texture and update existing lizards
         if self.baseLizardSize != lizardSize {
@@ -239,12 +283,6 @@ final class LizardScene: SKScene {
             dot.strokeColor = .clear
             lizardTexture = view.texture(from: dot)
         }
-    }
-
-    // MARK: Lifecycle cleanup
-    deinit {
-        // Ensure motion manager is properly cleaned up
-        stopTilt()
     }
 
     // MARK: Internals ----------------------------------------------------------
@@ -336,6 +374,7 @@ final class LizardScene: SKScene {
         fpsLabel.zPosition = 9999
         fpsLabel.horizontalAlignmentMode = .right
         fpsLabel.verticalAlignmentMode = .top
+        fpsLabel.isHidden = !showFPSCounter  // Initially hidden based on user setting
         addChild(fpsLabel)
         layoutFPSOverlay()
     }

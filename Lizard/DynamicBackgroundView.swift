@@ -246,8 +246,10 @@ internal enum WeatherCondition: CaseIterable {
 extension DynamicBackgroundView {
     private func startWeatherAnimation() {
         Timer.scheduledTimer(withTimeInterval: 0.016, repeats: true) { _ in
-            withAnimation(.linear(duration: 0.016)) {
-                animationOffset += 1
+            Task { @MainActor in
+                withAnimation(.linear(duration: 0.016)) {
+                    animationOffset += 1
+                }
             }
         }
     }
@@ -256,18 +258,20 @@ extension DynamicBackgroundView {
         guard weatherAutoMode else { return } // Don't auto-update if in manual mode
         
         weatherTimer = Timer.scheduledTimer(withTimeInterval: 30, repeats: true) { _ in
-            guard weatherAutoMode else { return } // Double check in case mode changed
-            
-            // Simulate dynamic weather changes
-            let conditions = WeatherCondition.allCases
-            weatherCondition = conditions.randomElement() ?? .clear
-            
-            // Update raindrops for rain conditions
-            if weatherCondition == .rain || weatherCondition == .storm {
-                generateRaindrops()
-            } else {
-                withAnimation(.easeOut(duration: 2)) {
-                    rainDrops.removeAll()
+            Task { @MainActor in
+                guard weatherAutoMode else { return } // Double check in case mode changed
+                
+                // Simulate dynamic weather changes
+                let conditions = WeatherCondition.allCases
+                weatherCondition = conditions.randomElement() ?? .clear
+                
+                // Update raindrops for rain conditions
+                if weatherCondition == .rain || weatherCondition == .storm {
+                    generateRaindrops()
+                } else {
+                    withAnimation(.easeOut(duration: 2)) {
+                        rainDrops.removeAll()
+                    }
                 }
             }
         }
@@ -701,8 +705,10 @@ private struct ThunderLightningView: View {
         let interval = Double.random(in: 5.0...15.0)
         
         flashTimer = Timer.scheduledTimer(withTimeInterval: interval, repeats: false) { _ in
-            triggerLightning()
-            scheduleNextLightning()
+            Task { @MainActor in
+                triggerLightning()
+                scheduleNextLightning()
+            }
         }
     }
     
@@ -1025,9 +1031,11 @@ private struct EnhancedHillsLayerView: View {
     
     private func startWindAnimation() {
         Timer.scheduledTimer(withTimeInterval: 0.016, repeats: true) { _ in
-            let windSpeed = weather == .storm ? 3.0 : (weather == .rain ? 2.0 : 1.0)
-            withAnimation(.linear(duration: 0.016)) {
-                windOffset += CGFloat(windSpeed)
+            Task { @MainActor in
+                let windSpeed = weather == .storm ? 3.0 : (weather == .rain ? 2.0 : 1.0)
+                withAnimation(.linear(duration: 0.016)) {
+                    windOffset += CGFloat(windSpeed)
+                }
             }
         }
     }

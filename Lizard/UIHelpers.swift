@@ -7,6 +7,7 @@ import UIKit
 
 /// Gets the current interface orientation from the active foreground scene.
 /// Safe for multi-scene apps (no use of deprecated orientation APIs).
+@MainActor
 public func currentInterfaceOrientation() -> UIInterfaceOrientation {
     let scenes = UIApplication.shared.connectedScenes
         .compactMap { $0 as? UIWindowScene }
@@ -18,6 +19,7 @@ public func currentInterfaceOrientation() -> UIInterfaceOrientation {
 
 /// Finds the top-most visible view controller in the **active foreground** scene.
 /// Safe for multi-scene apps (no use of deprecated `keyWindow`).
+@MainActor
 public func topViewController() -> UIViewController? {
     // 1) Pick the active foreground UIWindowScene
     let scenes = UIApplication.shared.connectedScenes
@@ -37,6 +39,7 @@ public func topViewController() -> UIViewController? {
     return topViewController(from: keyWindow.rootViewController)
 }
 
+@MainActor
 private func topViewController(from base: UIViewController?) -> UIViewController? {
     guard let base = base else { return nil }
 

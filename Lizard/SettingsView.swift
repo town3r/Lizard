@@ -1,486 +1,703 @@
 import SwiftUI
 
-// MARK: - Settings View (Liquid Glass-ready)
+// MARK: - Main Settings View with Navigation
 
 struct SettingsView: View {
-    @AppStorage("maxLizards") private var maxLizards: Int = 300
-    @AppStorage("lizardSize") private var lizardSize: Double = 80.0
-    @AppStorage("rainIntensity") private var rainIntensity: Int = 15
-
-    // Weather settings
-    @AppStorage("weatherAutoMode") private var weatherAutoMode: Bool = true
-    @AppStorage("weatherOffMode") private var weatherOffMode: Bool = false
-    @AppStorage("manualWeatherCondition") private var manualWeatherConditionRaw: String = "clear"
-
     @Environment(\.dismiss) private var dismiss
 
-    var onSettingsChange: (() -> Void)?
-    var onWeatherChange: ((WeatherCondition) -> Void)?
-    var onModeChange: ((Bool) -> Void)?
-
-    private var currentWeatherCondition: WeatherCondition {
-        if weatherOffMode { return .none }
-        switch manualWeatherConditionRaw {
-        case "clear":         return .clear
-        case "partlyCloudy":  return .partlyCloudy
-        case "cloudy":        return .cloudy
-        case "rain":          return .rain
-        case "storm":         return .storm
-        case "winter":        return .winter
-        default:              return .clear
-        }
+    private struct Config {
+        static let liquidGlassCornerRadius: CGFloat = 28
+        static let liquidGlassBlur: CGFloat = 20
+        static let sectionSpacing: CGFloat = 24
+        static let itemSpacing: CGFloat = 16
     }
 
     var body: some View {
         NavigationView {
             ScrollView {
-                VStack(spacing: 32) {
-                    headerSection
-                    settingsSection
-                    descriptionSection
-                    resetSection
+                VStack(spacing: Config.sectionSpacing) {
+                    // Header with lizard image
+                    VStack(spacing: 8) {
+                        Image("lizard")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 60, height: 60)
+                            .clipShape(Circle())
+                        Text("Lizard Settings")
+                            .font(.title)
+                            .fontWeight(.bold)
+                    }
+                    .padding(.top, 20)
+
+                    // Settings Categories
+                    VStack(spacing: Config.itemSpacing) {
+                        NavigationLink(destination: ScreenOrientationSettingsView()) {
+                            SettingsCategoryRow(
+                                title: "Screen Orientation",
+                                subtitle: "Lock orientation for better physics",
+                                systemImage: "rotate.3d"
+                            )
+                        }
+                        
+                        NavigationLink(destination: PhysicsSettingsView()) {
+                            SettingsCategoryRow(
+                                title: "Physics Settings",
+                                subtitle: "Control lizard behavior",
+                                systemImage: "speedometer"
+                            )
+                        }
+                        
+                        NavigationLink(destination: VisualSettingsView()) {
+                            SettingsCategoryRow(
+                                title: "Visual Settings",
+                                subtitle: "Customize appearance",
+                                systemImage: "paintbrush"
+                            )
+                        }
+                        
+                        NavigationLink(destination: WeatherSettingsView()) {
+                            SettingsCategoryRow(
+                                title: "Weather Settings",
+                                subtitle: "Rain and environment",
+                                systemImage: "cloud.rain"
+                            )
+                        }
+                    }
+
+                    Spacer(minLength: 20)
                 }
-                .padding(.horizontal, 24)
-                .padding(.vertical, 20)
+                .padding(.horizontal, 20)
             }
-            // One background for the whole page
-            .modifier(PageGlassBackground())
-            .navigationTitle("Game Settings")
-            .navigationBarTitleDisplayMode(.large)
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") { dismiss() }
-                        .font(.system(size: 16, weight: .semibold))
-                        .modifier(GlassButtonStyle())
+                    Button("Done") {
+                        dismiss()
+                    }
+                    .fontWeight(.semibold)
                 }
             }
         }
-        .onChange(of: maxLizards) { _, _ in onSettingsChange?() }
-        .onChange(of: lizardSize) { _, _ in onSettingsChange?() }
-        .onChange(of: rainIntensity) { _, _ in onSettingsChange?() }
-        .onChange(of: weatherAutoMode) { _, newValue in onModeChange?(newValue) }
-        .onChange(of: weatherOffMode) { _, _ in onWeatherChange?(currentWeatherCondition) }
-        .onChange(of: manualWeatherConditionRaw) { _, _ in onWeatherChange?(currentWeatherCondition) }
     }
+}
 
-    // MARK: Header
+// MARK: - Settings Category Row
 
-    private var headerSection: some View {
-        VStack(spacing: 16) {
-            // Round “chip” with glass
+struct SettingsCategoryRow: View {
+    let title: String
+    let subtitle: String
+    let systemImage: String
+    
+    var body: some View {
+        HStack(spacing: 16) {
+            // Icon container
             ZStack {
-                RoundedRectangle(cornerRadius: 40, style: .continuous)
-                    .frame(width: 80, height: 80)
-                    .modifier(GlassChip())
-                Image(systemName: "lizard.fill")
-                    .font(.system(size: 32, weight: .medium))
-                    .foregroundStyle(.green)
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(.blue.gradient)
+                    .frame(width: 44, height: 44)
+                
+                Image(systemName: systemImage)
+                    .font(.title2)
+                    .foregroundStyle(.white)
             }
-            Text("Customize Your Lizard Experience")
-                .font(.title2).fontWeight(.semibold)
-                .multilineTextAlignment(.center)
-                .foregroundStyle(.primary)
+            
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.body)
+                    .fontWeight(.medium)
+                    .foregroundStyle(.primary)
+                
+                Text(subtitle)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            
+            Spacer()
+            
+            Image(systemName: "chevron.right")
+                .font(.caption)
+                .foregroundStyle(.tertiary)
         }
-        .padding(.top, 16)
+        .padding(16)
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(.white.opacity(0.2), lineWidth: 1)
+        )
     }
+}
 
-    // MARK: Settings
+// MARK: - Screen Orientation Settings
 
-    private var settingsSection: some View {
-        // Group everything so it reads as one slab if you prefer.
-        Group {
+struct ScreenOrientationSettingsView: View {
+    @AppStorage("orientationLock") private var orientationLock: String = "unlocked"
+    
+    var body: some View {
+        ScrollView {
             VStack(spacing: 24) {
-                // Max Lizards
-                settingCard(
-                    title: "Max Lizards",
-                    subtitle: "Maximum simultaneous lizards",
-                    icon: "number.circle.fill",
-                    iconColor: .blue
-                ) {
-                    VStack(spacing: 12) {
-                        HStack {
-                            Text("\(maxLizards)")
-                                .font(.system(size: 20, weight: .bold, design: .monospaced))
-                            Spacer()
-                            Pill(text: "lizards", color: .blue)
-                        }
-                        LiquidGlassSlider(
-                            value: Binding(
-                                get: { Double(maxLizards) },
-                                set: { maxLizards = Int($0) }
-                            ),
-                            range: 50...500,
-                            step: 10,
-                            color: .blue
+                LiquidGlassSection(title: "Screen Orientation", subtitle: "Lock orientation for better physics", systemImage: "rotate.3d") {
+                    VStack(spacing: 16) {
+                        OrientationButton(
+                            title: "Unlocked",
+                            subtitle: "Free rotation",
+                            systemImage: "rotate.3d",
+                            value: "unlocked",
+                            currentValue: $orientationLock
+                        )
+
+                        OrientationButton(
+                            title: "Portrait",
+                            subtitle: "Vertical gravity",
+                            systemImage: "iphone",
+                            value: "portrait",
+                            currentValue: $orientationLock
+                        )
+
+                        OrientationButton(
+                            title: "Landscape Left",
+                            subtitle: "Left-side gravity",
+                            systemImage: "iphone.landscape",
+                            value: "landscapeLeft",
+                            currentValue: $orientationLock
+                        )
+
+                        OrientationButton(
+                            title: "Landscape Right",
+                            subtitle: "Right-side gravity",
+                            systemImage: "iphone.landscape",
+                            value: "landscapeRight",
+                            currentValue: $orientationLock
                         )
                     }
                 }
+            }
+            .padding(.horizontal, 20)
+        }
+        .navigationTitle("Screen Orientation")
+        .navigationBarTitleDisplayMode(.large)
+    }
+}
 
-                // Lizard Size
-                settingCard(
-                    title: "Lizard Size",
-                    subtitle: "Base size of spawned lizards",
-                    icon: "resize",
-                    iconColor: .orange
-                ) {
-                    VStack(spacing: 12) {
-                        HStack {
-                            Text("\(Int(lizardSize))")
-                                .font(.system(size: 20, weight: .bold, design: .monospaced))
-                            Spacer()
-                            Pill(text: "points", color: .orange)
-                        }
-                        LiquidGlassSlider(
+// MARK: - Physics Settings
+
+struct PhysicsSettingsView: View {
+    @AppStorage("maxLizards") private var maxLizards: Int = 300
+    @AppStorage("lizardSize") private var lizardSize: Double = 80.0
+    @AppStorage("randomSizeLizards") private var randomSizeLizards: Bool = false
+    @AppStorage("showFPSCounter") private var showFPSCounter: Bool = false
+    @AppStorage("rainIntensity") private var rainIntensity: Int = 15
+    
+    var body: some View {
+        ScrollView {
+            VStack(spacing: 24) {
+                LiquidGlassSection(title: "Physics Settings", subtitle: "Control lizard behavior and performance", systemImage: "speedometer") {
+                    VStack(spacing: 16) {
+                        SettingsSlider(
+                            title: "Max Lizards",
+                            subtitle: "Performance limit",
+                            value: $maxLizards,
+                            range: 50...500,
+                            step: 25,
+                            formatter: { "\(Int($0))" }
+                        )
+
+                        SettingsSlider(
+                            title: "Lizard Size",
+                            subtitle: "Base size in points",
                             value: $lizardSize,
                             range: 40...120,
                             step: 5,
-                            color: .orange
+                            formatter: { "\(Int($0))pt" }
                         )
-                    }
-                }
-
-                // Rain Intensity
-                settingCard(
-                    title: "Rain Intensity",
-                    subtitle: "Lizards per rain burst",
-                    icon: "cloud.rain.fill",
-                    iconColor: .cyan
-                ) {
-                    VStack(spacing: 12) {
-                        HStack {
-                            Text("\(rainIntensity)")
-                                .font(.system(size: 20, weight: .bold, design: .monospaced))
-                            Spacer()
-                            Pill(text: "per burst", color: .cyan)
-                        }
-                        LiquidGlassSlider(
-                            value: Binding(
-                                get: { Double(rainIntensity) },
-                                set: { rainIntensity = Int($0) }
-                            ),
+                        
+                        SettingsSlider(
+                            title: "Rain Intensity",
+                            subtitle: "Lizards per second when raining",
+                            value: $rainIntensity,
                             range: 5...30,
                             step: 1,
-                            color: .cyan
+                            formatter: { "\(Int($0))" }
+                        )
+
+                        SettingsToggle(
+                            title: "Random Sizes",
+                            subtitle: "Vary lizard sizes",
+                            systemImage: "shuffle",
+                            isOn: $randomSizeLizards
                         )
                     }
                 }
-
-                // Weather Settings
-                settingCard(
-                    title: "Weather Settings",
-                    subtitle: "Control the weather effects in the game",
-                    icon: "cloud.sun.fill",
-                    iconColor: .purple
-                ) {
+                
+                LiquidGlassSection(title: "Performance Info", subtitle: "Performance monitoring and configuration", systemImage: "chart.line.uptrend.xyaxis") {
                     VStack(spacing: 16) {
-                        LiquidGlassToggle(
-                            title: "Automatic Weather",
-                            subtitle: "Dynamic weather based on conditions",
-                            isOn: $weatherAutoMode,
-                            color: .purple
+                        PerformanceInfoRow(
+                            title: "Current Limit",
+                            value: "\(maxLizards) lizards",
+                            systemImage: "speedometer"
                         )
 
-                        if !weatherAutoMode {
-                            VStack(alignment: .leading, spacing: 8) {
-                                Text("Manual Weather")
-                                    .font(.subheadline).fontWeight(.medium)
-                                Picker("Weather Condition", selection: $manualWeatherConditionRaw) {
-                                    Text("Clear").tag("clear")
-                                    Text("Partly Cloudy").tag("partlyCloudy")
-                                    Text("Cloudy").tag("cloudy")
-                                    Text("Rain").tag("rain")
-                                    Text("Storm").tag("storm")
-                                    Text("Winter").tag("winter")
-                                }
-                                .pickerStyle(.segmented)
-                                .padding(8)
-                                .modifier(GlassCard(cornerRadius: 8))
-                            }
-                            .padding(12)
-                            .modifier(GlassCard(cornerRadius: 10))
+                        PerformanceInfoRow(
+                            title: "Target FPS",
+                            value: "60 fps",
+                            systemImage: "timer"
+                        )
+                        
+                        PerformanceInfoRow(
+                            title: "Rain Rate",
+                            value: "\(rainIntensity)/sec",
+                            systemImage: "cloud.rain"
+                        )
+
+                        SettingsToggle(
+                            title: "FPS Counter",
+                            subtitle: "Show performance metrics",
+                            systemImage: "gauge.with.dots.needle.67percent",
+                            isOn: $showFPSCounter
+                        )
+                        .onChange(of: showFPSCounter) { _, newValue in
+                            NotificationCenter.default.post(
+                                name: .fpsCounterToggled,
+                                object: nil,
+                                userInfo: ["enabled": newValue]
+                            )
                         }
 
-                        LiquidGlassToggle(
-                            title: "Disable Weather",
-                            subtitle: "Turn off all weather effects",
-                            isOn: $weatherOffMode,
-                            color: .red
+                        Text("Lower max lizards if experiencing performance issues")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .multilineTextAlignment(.center)
+                            .padding(.top, 8)
+                    }
+                }
+            }
+            .padding(.horizontal, 20)
+        }
+        .navigationTitle("Physics Settings")
+        .navigationBarTitleDisplayMode(.large)
+    }
+}
+
+// MARK: - Visual Settings
+
+struct VisualSettingsView: View {
+    @AppStorage("backgroundType") private var backgroundType: String = "dynamic"
+    
+    var body: some View {
+        ScrollView {
+            VStack(spacing: 24) {
+                LiquidGlassSection(title: "Visual Settings", subtitle: "Customize appearance and display", systemImage: "paintbrush") {
+                    VStack(spacing: 16) {
+                        VStack(alignment: .leading, spacing: 12) {
+                            HStack {
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text("Background Style")
+                                        .font(.body)
+                                        .fontWeight(.medium)
+
+                                    Text("Visual background effects")
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
+
+                                Spacer()
+
+                                Text(backgroundType.capitalized)
+                                    .font(.body)
+                                    .fontWeight(.semibold)
+                                    .foregroundStyle(.blue)
+                            }
+
+                            Picker("Background Style", selection: $backgroundType) {
+                                Text("Dynamic").tag("dynamic")
+                                Text("Solid").tag("solid")
+                                Text("Gradient").tag("gradient")
+                            }
+                            .pickerStyle(SegmentedPickerStyle())
+                            
+                            Text("Dynamic: Full animated sky with weather effects\nSolid: Simple color background\nGradient: Animated gradient background")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                                .padding(.top, 4)
+                        }
+                    }
+                }
+            }
+            .padding(.horizontal, 20)
+        }
+        .navigationTitle("Visual Settings")
+        .navigationBarTitleDisplayMode(.large)
+    }
+}
+
+// MARK: - Weather Settings
+
+struct WeatherSettingsView: View {
+    @AppStorage("weatherEffects") private var weatherEffects: Bool = true
+    @AppStorage("windEnabled") private var windEnabled: Bool = false
+    @AppStorage("weatherAutoMode") private var weatherAutoMode: Bool = true
+    @WeatherConditionStorage(key: "manualWeatherCondition") private var manualWeatherCondition: WeatherCondition
+    
+    var body: some View {
+        ScrollView {
+            VStack(spacing: 24) {
+                // Weather Mode Section
+                LiquidGlassSection(title: "Weather Mode", subtitle: "Control weather condition behavior", systemImage: "cloud.sun") {
+                    VStack(spacing: 16) {
+                        VStack(alignment: .leading, spacing: 12) {
+                            HStack {
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text("Weather Control")
+                                        .font(.body)
+                                        .fontWeight(.medium)
+
+                                    Text("How weather conditions are determined")
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
+
+                                Spacer()
+
+                                Text(weatherAutoMode ? "Auto" : "Manual")
+                                    .font(.body)
+                                    .fontWeight(.semibold)
+                                    .foregroundStyle(.blue)
+                            }
+
+                            SettingsToggle(
+                                title: "Auto Weather",
+                                subtitle: "Weather changes automatically over time",
+                                systemImage: "cloud.sun",
+                                isOn: $weatherAutoMode
+                            )
+                            
+                            if !weatherAutoMode {
+                                VStack(alignment: .leading, spacing: 8) {
+                                    Text("Weather Condition")
+                                        .font(.subheadline)
+                                        .fontWeight(.medium)
+                                        .foregroundStyle(.primary)
+                                        .padding(.top, 8)
+                                    
+                                    Picker("Weather Condition", selection: $manualWeatherCondition) {
+                                        Text("Clear").tag(WeatherCondition.clear)
+                                        Text("Partly Cloudy").tag(WeatherCondition.partlyCloudy)
+                                        Text("Cloudy").tag(WeatherCondition.cloudy)
+                                        Text("Rain").tag(WeatherCondition.rain)
+                                        Text("Storm").tag(WeatherCondition.storm)
+                                        Text("Winter").tag(WeatherCondition.winter)
+                                    }
+                                    .pickerStyle(WheelPickerStyle())
+                                    .frame(height: 120)
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                // Weather Effects Section
+                LiquidGlassSection(title: "Weather Effects", subtitle: "Rain effects and environmental controls", systemImage: "cloud.rain") {
+                    VStack(spacing: 16) {
+                        SettingsToggle(
+                            title: "Weather Effects",
+                            subtitle: "Visual weather enhancements",
+                            systemImage: "cloud.drizzle",
+                            isOn: $weatherEffects
+                        )
+                        
+                        SettingsToggle(
+                            title: "Wind Effects",
+                            subtitle: "Horizontal physics influence",
+                            systemImage: "wind",
+                            isOn: $windEnabled
+                        )
+                    }
+                }
+                
+                // Weather Info Section
+                LiquidGlassSection(title: "Weather Info", subtitle: "Current weather configuration", systemImage: "info.circle") {
+                    VStack(spacing: 16) {
+                        PerformanceInfoRow(
+                            title: "Mode",
+                            value: weatherAutoMode ? "Automatic" : "Manual",
+                            systemImage: weatherAutoMode ? "cloud.sun" : "hand.point.up"
+                        )
+                        
+                        if !weatherAutoMode {
+                            PerformanceInfoRow(
+                                title: "Condition",
+                                value: manualWeatherCondition.displayName,
+                                systemImage: manualWeatherCondition.iconName
+                            )
+                        }
+                        
+                        PerformanceInfoRow(
+                            title: "Effects",
+                            value: weatherEffects ? "Enabled" : "Disabled",
+                            systemImage: weatherEffects ? "checkmark.circle" : "xmark.circle"
                         )
                     }
                 }
             }
+            .padding(.horizontal, 20)
         }
+        .navigationTitle("Weather Settings")
+        .navigationBarTitleDisplayMode(.large)
+    }
+}
+
+// MARK: - Supporting Views
+
+struct LiquidGlassSection<Content: View>: View {
+    let title: String
+    let subtitle: String
+    let systemImage: String
+    let content: Content
+
+    init(title: String, subtitle: String, systemImage: String, @ViewBuilder content: () -> Content) {
+        self.title = title
+        self.subtitle = subtitle
+        self.systemImage = systemImage
+        self.content = content()
     }
 
-    // MARK: Description
-
-    private var descriptionSection: some View {
+    var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            HStack(spacing: 12) {
-                Image(systemName: "info.circle.fill")
-                    .font(.system(size: 20))
+            HStack(spacing: 8) {
+                Image(systemName: systemImage)
+                    .font(.headline)
                     .foregroundStyle(.blue)
-                Text("Setting Effects")
-                    .font(.headline).fontWeight(.semibold)
-            }
-            VStack(alignment: .leading, spacing: 12) {
-                infoRow(icon: "number.circle", text: "Max Lizards: Controls performance and visual density")
-                infoRow(icon: "resize", text: "Lizard Size: Affects collision detection and visual impact")
-                infoRow(icon: "cloud.rain", text: "Rain Intensity: Changes \"Make it Rain\" button behavior")
-                infoRow(icon: "cloud.sun", text: "Weather Settings: Adjusts dynamic weather effects")
-            }
-        }
-        .padding(20)
-        .modifier(GlassCard(cornerRadius: 16))
-    }
-
-    private func infoRow(icon: String, text: String) -> some View {
-        HStack(spacing: 12) {
-            Image(systemName: icon)
-                .font(.system(size: 14))
-                .foregroundStyle(.blue)
-                .frame(width: 20)
-            Text(text)
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-        }
-    }
-
-    // MARK: Reset
-
-    private var resetSection: some View {
-        Button(action: resetToDefaults) {
-            HStack(spacing: 12) {
-                Image(systemName: "arrow.counterclockwise")
-                    .font(.system(size: 16, weight: .medium))
-                Text("Reset to Defaults")
-                    .font(.system(size: 16, weight: .semibold))
-            }
-            .foregroundStyle(.white)
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 16)
-            .background(
-                RoundedRectangle(cornerRadius: 16)
-                    .fill(
-                        LinearGradient(
-                            colors: [.red.opacity(0.9), .red.opacity(0.7)],
-                            startPoint: .topLeading, endPoint: .bottomTrailing
-                        )
-                    )
-            )
-            .overlay {
-                RoundedRectangle(cornerRadius: 16)
-                    .stroke(.white.opacity(0.3), lineWidth: 1)
-            }
-            .shadow(color: .red.opacity(0.25), radius: 8, x: 0, y: 4)
-        }
-        .buttonStyle(.plain)
-    }
-
-    private func settingCard<Content: View>(
-        title: String,
-        subtitle: String,
-        icon: String,
-        iconColor: Color,
-        @ViewBuilder content: () -> Content
-    ) -> some View {
-        VStack(alignment: .leading, spacing: 16) {
-            HStack(spacing: 16) {
-                ZStack {
-                    RoundedRectangle(cornerRadius: 10, style: .continuous)
-                        .frame(width: 40, height: 40)
-                        .modifier(GlassChip())
-                    Image(systemName: icon)
-                        .font(.system(size: 18, weight: .semibold))
-                        .foregroundStyle(iconColor)
-                }
+                
                 VStack(alignment: .leading, spacing: 4) {
                     Text(title)
-                        .font(.headline).fontWeight(.semibold)
+                        .font(.headline)
+                        .fontWeight(.semibold)
+
                     Text(subtitle)
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
-                Spacer()
             }
-            content()
+
+            content
         }
         .padding(20)
-        .modifier(GlassCard(cornerRadius: 20))
-    }
-
-    private func resetToDefaults() {
-        maxLizards = 300
-        lizardSize = 80.0
-        rainIntensity = 15
-        weatherAutoMode = true
-        weatherOffMode = false
-        manualWeatherConditionRaw = "clear"
-        onSettingsChange?()
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 28))
+        .overlay(
+            RoundedRectangle(cornerRadius: 28)
+                .stroke(.white.opacity(0.2), lineWidth: 1)
+        )
     }
 }
 
-// MARK: - Liquid Glass Components
-
-struct LiquidGlassSlider: View {
-    @Binding var value: Double
-    let range: ClosedRange<Double>
-    let step: Double
-    let color: Color
-
-    var body: some View {
-        VStack(spacing: 10) {
-            Slider(value: $value, in: range, step: step)
-                .tint(color)
-                .padding(.horizontal, 6)
-                .padding(.vertical, 12)
-                .modifier(GlassCard(cornerRadius: 12))
-        }
-    }
-}
-
-struct LiquidGlassToggle: View {
+struct OrientationButton: View {
     let title: String
     let subtitle: String
-    @Binding var isOn: Bool
-    let color: Color
+    let systemImage: String
+    let value: String
+    @Binding var currentValue: String
+    
+    @State private var isApplying = false
+
+    var isSelected: Bool {
+        currentValue == value
+    }
 
     var body: some View {
-        HStack {
-            VStack(alignment: .leading, spacing: 4) {
-                Text(title).font(.subheadline).fontWeight(.medium)
-                Text(subtitle).font(.caption).foregroundStyle(.secondary)
+        Button {
+            withAnimation(.easeInOut(duration: 0.3)) {
+                isApplying = true
             }
-            Spacer()
-            Toggle("", isOn: $isOn)
-                .tint(color) // system switch adopts the new look on iOS 26
-        }
-        .padding(12)
-        .modifier(GlassCard(cornerRadius: 10))
-    }
-}
-
-// Little pill for units
-private struct Pill: View {
-    let text: String
-    let color: Color
-    var body: some View {
-        Text(text)
-            .font(.caption)
-            .foregroundStyle(.secondary)
-            .padding(.horizontal, 8)
-            .padding(.vertical, 4)
-            .background(
-                Capsule().fill(color.opacity(0.12))
-            )
-            .overlay {
-                Capsule().stroke(color.opacity(0.28), lineWidth: 0.5)
-            }
-    }
-}
-
-// MARK: - Glass Helpers (iOS 26 with fallback)
-
-/// Page-wide background: Liquid Glass underlay on iOS 26, material fallback otherwise.
-private struct PageGlassBackground: ViewModifier {
-    func body(content: Content) -> some View {
-        content
-            .background {
-                if #available(iOS 26.0, *) {
-                    Rectangle()
-                        .glassBackgroundEffect(in: .rect, displayMode: .underlay)
-                        .ignoresSafeArea()
-                } else {
-                    // Fallback: single material layer with a faint vertical tint
-                    ZStack {
-                        Rectangle().fill(.ultraThinMaterial).ignoresSafeArea()
-                        LinearGradient(
-                            colors: [Color.primary.opacity(0.05), .clear, Color.primary.opacity(0.04)],
-                            startPoint: .top, endPoint: .bottom
-                        ).ignoresSafeArea()
+            
+            currentValue = value
+            
+            // Post notification with slight delay to show visual feedback
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                NotificationCenter.default.post(name: .orientationLockChanged, object: nil)
+                
+                // Reset applying state after orientation change
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    withAnimation(.easeInOut(duration: 0.3)) {
+                        isApplying = false
                     }
                 }
             }
+        } label: {
+            HStack(spacing: 16) {
+                Image(systemName: systemImage)
+                    .font(.title2)
+                    .foregroundStyle(isSelected ? .white : .primary)
+                    .frame(width: 24)
+                    .rotationEffect(.degrees(isApplying ? 360 : 0))
+                    .animation(.easeInOut(duration: 0.5), value: isApplying)
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(title)
+                        .font(.body)
+                        .fontWeight(.medium)
+                        .foregroundStyle(isSelected ? .white : .primary)
+
+                    Text(isApplying ? "Applying..." : subtitle)
+                        .font(.caption)
+                        .foregroundStyle(isSelected ? .white.opacity(0.8) : .secondary)
+                        .animation(.easeInOut(duration: 0.3), value: isApplying)
+                }
+
+                Spacer()
+
+                if isSelected && !isApplying {
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.title3)
+                        .foregroundStyle(.white)
+                } else if isApplying {
+                    ProgressView()
+                        .progressViewStyle(CircularProgressViewStyle(tint: isSelected ? .white : .blue))
+                        .scaleEffect(0.8)
+                }
+            }
+            .padding(16)
+            .background(
+                isSelected ? .blue : .clear,
+                in: RoundedRectangle(cornerRadius: 16)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(isSelected ? .clear : .secondary.opacity(0.3), lineWidth: 1)
+            )
+        }
+        .buttonStyle(.plain)
+        .disabled(isApplying)
     }
 }
 
-/// A card look that uses real Liquid Glass on iOS 26, otherwise a good material fallback.
-struct GlassCard: ViewModifier {
-    var cornerRadius: CGFloat = 20
-    @Environment(\.colorScheme) private var scheme
+struct SettingsSlider<T: BinaryFloatingPoint>: View where T.Stride: BinaryFloatingPoint {
+    let title: String
+    let subtitle: String
+    @Binding var value: T
+    let range: ClosedRange<T>
+    let step: T.Stride
+    let formatter: (T) -> String
 
-    func body(content: Content) -> some View {
-        if #available(iOS 26.0, *) {
-            // True Liquid Glass
-            GlassEffectContainer {
-                content
-                    .padding(.zero) // content already has padding where needed
-                    .glassEffect(.regular, in: RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
+    init(title: String, subtitle: String, value: Binding<T>, range: ClosedRange<T>, step: T.Stride, formatter: @escaping (T) -> String) {
+        self.title = title
+        self.subtitle = subtitle
+        self._value = value
+        self.range = range
+        self.step = step
+        self.formatter = formatter
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(title)
+                        .font(.body)
+                        .fontWeight(.medium)
+
+                    Text(subtitle)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+
+                Spacer()
+
+                Text(formatter(value))
+                    .font(.body)
+                    .fontWeight(.semibold)
+                    .foregroundStyle(.blue)
             }
-        } else {
-            // Fallback: frosted card with hairline stroke and subtle highlight
-            content
-                .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
-                .overlay {
-                    RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                        .strokeBorder(
-                            LinearGradient(
-                                colors: [
-                                    .white.opacity(scheme == .light ? 0.22 : 0.12),
-                                    .black.opacity(scheme == .light ? 0.06 : 0.22)
-                                ],
-                                startPoint: .topLeading, endPoint: .bottomTrailing
-                            ),
-                            lineWidth: 1
-                        )
-                }
-                .overlay {
-                    RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                        .strokeBorder(.white.opacity(0.30))
-                        .blendMode(.overlay)
-                        .opacity(0.5)
-                }
+
+            Slider(value: $value, in: range, step: step)
+                .tint(.blue)
         }
     }
 }
 
-/// Smaller chip variant for icons and small controls.
-struct GlassChip: ViewModifier {
-    var cornerRadius: CGFloat = 10
-    func body(content: Content) -> some View {
-        if #available(iOS 26.0, *) {
-            GlassEffectContainer {
-                content
-                    .glassEffect(.regular, in: RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
-            }
-        } else {
-            content
-                .background(.thinMaterial, in: RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
-                .overlay {
-                    RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                        .stroke(.white.opacity(0.22), lineWidth: 1)
-                }
-        }
+// Integer version of SettingsSlider
+extension SettingsSlider where T == Double {
+    init(title: String, subtitle: String, value: Binding<Int>, range: ClosedRange<Int>, step: Int, formatter: @escaping (Double) -> String) {
+        self.title = title
+        self.subtitle = subtitle
+        self._value = Binding(
+            get: { Double(value.wrappedValue) },
+            set: { value.wrappedValue = Int($0) }
+        )
+        self.range = Double(range.lowerBound)...Double(range.upperBound)
+        self.step = Double(step)
+        self.formatter = formatter
     }
 }
 
-/// Toolbar button that adopts the system’s glass style on iOS 26.
-struct GlassButtonStyle: ViewModifier {
-    func body(content: Content) -> some View {
-        if #available(iOS 26.0, *) {
-            content.buttonStyle(.glass)
-        } else {
-            content
+struct SettingsToggle: View {
+    let title: String
+    let subtitle: String
+    let systemImage: String
+    @Binding var isOn: Bool
+
+    var body: some View {
+        HStack(spacing: 16) {
+            Image(systemName: systemImage)
+                .font(.title2)
                 .foregroundStyle(.blue)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 8)
-                .background(.ultraThinMaterial, in: Capsule())
-                .overlay { Capsule().stroke(.blue.opacity(0.3), lineWidth: 1) }
+                .frame(width: 24)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.body)
+                    .fontWeight(.medium)
+
+                Text(subtitle)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
+            Spacer()
+
+            Toggle("", isOn: $isOn)
+                .toggleStyle(SwitchToggleStyle(tint: .blue))
         }
     }
 }
 
-// MARK: - Preview
+struct PerformanceInfoRow: View {
+    let title: String
+    let value: String
+    let systemImage: String
+
+    var body: some View {
+        HStack(spacing: 16) {
+            Image(systemName: systemImage)
+                .font(.title2)
+                .foregroundStyle(.green)
+                .frame(width: 24)
+
+            Text(title)
+                .font(.body)
+                .fontWeight(.medium)
+
+            Spacer()
+
+            Text(value)
+                .font(.body)
+                .fontWeight(.semibold)
+                .foregroundStyle(.green)
+        }
+    }
+}
+
+extension WeatherCondition {
+    var rawValue: String {
+        switch self {
+        case .none: return "none"
+        case .clear: return "clear"
+        case .partlyCloudy: return "partlyCloudy"
+        case .cloudy: return "cloudy"
+        case .rain: return "rain"
+        case .storm: return "storm"
+        case .winter: return "winter"
+        }
+    }
+}
 
 #Preview {
     SettingsView()
