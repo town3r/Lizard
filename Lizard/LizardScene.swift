@@ -380,7 +380,7 @@ final class LizardScene: SKScene {
     }
 
     private func layoutFPSOverlay() {
-        fpsLabel.position = CGPoint(x: size.width - 20, y: size.height - 50)
+        fpsLabel.position = CGPoint(x: size.width - 15, y: size.height - 40)
     }
 
     override func update(_ currentTime: TimeInterval) {

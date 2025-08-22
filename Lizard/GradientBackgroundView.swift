@@ -1,30 +1,142 @@
 import SwiftUI
 
-/// Animated gradient background with subtle color transitions
+/// Animated gradient background with customizable colors and directions
 struct GradientBackgroundView: View {
     @Environment(\.colorScheme) private var colorScheme
     @State private var animationOffset: CGFloat = 0
     
+    // Gradient customization settings
+    @AppStorage("gradientStyle") private var gradientStyle: String = "timeOfDay"
+    @AppStorage("customGradientColor1") private var customGradientColor1Data: Data = try! JSONEncoder().encode(CodableColor(color: .blue))
+    @AppStorage("customGradientColor2") private var customGradientColor2Data: Data = try! JSONEncoder().encode(CodableColor(color: .purple))
+    @AppStorage("customGradientColor3") private var customGradientColor3Data: Data = try! JSONEncoder().encode(CodableColor(color: .pink))
+    @AppStorage("gradientDirection") private var gradientDirection: String = "topToBottom"
+    @AppStorage("gradientAnimationEnabled") private var gradientAnimationEnabled: Bool = true
+    @AppStorage("gradientAnimationSpeed") private var gradientAnimationSpeed: Double = 1.0
+    @AppStorage("timeOfDayAutoMode") private var timeOfDayAutoMode: Bool = true
+    @AppStorage("manualTimeOfDay") private var manualTimeOfDay: Double = 0.5
+    
+    private var customGradientColor1: Color {
+        (try? JSONDecoder().decode(CodableColor.self, from: customGradientColor1Data))?.color ?? .blue
+    }
+    
+    private var customGradientColor2: Color {
+        (try? JSONDecoder().decode(CodableColor.self, from: customGradientColor2Data))?.color ?? .purple
+    }
+    
+    private var customGradientColor3: Color {
+        (try? JSONDecoder().decode(CodableColor.self, from: customGradientColor3Data))?.color ?? .pink
+    }
+    
     var body: some View {
         TimelineView(.animation) { timeline in
             let now = timeline.date
-            let t = progressOfDay(now)
+            let colors = getGradientColors(for: now)
             
-            // Create gradient colors based on time of day
-            let colors = gradientColors(for: t, scheme: colorScheme)
+            gradientView(with: colors)
+                .animation(gradientAnimationEnabled ? .easeInOut(duration: 2.0 / gradientAnimationSpeed) : .none, value: colors)
+        }
+        .ignoresSafeArea()
+        .onAppear {
+            if gradientAnimationEnabled {
+                startAnimation()
+            }
+        }
+        .onChange(of: gradientAnimationEnabled) { _, newValue in
+            if newValue {
+                startAnimation()
+            }
+        }
+        .onChange(of: gradientAnimationSpeed) { _, _ in
+            if gradientAnimationEnabled {
+                startAnimation()
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private func gradientView(with colors: [Color]) -> some View {
+        switch gradientDirection {
+        case "topToBottom":
+            LinearGradient(
+                gradient: Gradient(colors: colors),
+                startPoint: .top,
+                endPoint: .bottom
+            )
             
+        case "leftToRight":
+            LinearGradient(
+                gradient: Gradient(colors: colors),
+                startPoint: .leading,
+                endPoint: .trailing
+            )
+            
+        case "topLeadingToBottomTrailing":
             LinearGradient(
                 gradient: Gradient(colors: colors),
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )
-            .ignoresSafeArea()
-            .animation(.easeInOut(duration: 2), value: colors)
+            
+        case "topTrailingToBottomLeading":
+            LinearGradient(
+                gradient: Gradient(colors: colors),
+                startPoint: .topTrailing,
+                endPoint: .bottomLeading
+            )
+            
+        case "radial":
+            RadialGradient(
+                gradient: Gradient(colors: colors),
+                center: .center,
+                startRadius: 50,
+                endRadius: 500
+            )
+            
+        default:
+            LinearGradient(
+                gradient: Gradient(colors: colors),
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
         }
-        .onAppear {
-            withAnimation(.linear(duration: 30).repeatForever(autoreverses: false)) {
-                animationOffset = 360
-            }
+    }
+    
+    private func getGradientColors(for date: Date) -> [Color] {
+        switch gradientStyle {
+        case "custom":
+            return [customGradientColor1, customGradientColor2, customGradientColor3]
+            
+        case "preset":
+            return getDynamicPresetColors(for: date)
+            
+        case "timeOfDay":
+            fallthrough
+        default:
+            let t = timeOfDayAutoMode ? progressOfDay(date) : manualTimeOfDay
+            return timeBasedGradientColors(for: t, scheme: colorScheme)
+        }
+    }
+    
+    private func getDynamicPresetColors(for date: Date) -> [Color] {
+        // Cycle through different preset combinations based on time
+        let timeMultiplier = date.timeIntervalSince1970 / (30.0 / gradientAnimationSpeed) // Change every 30 seconds (adjusted by speed)
+        let presetIndex = Int(timeMultiplier) % 6
+        
+        switch presetIndex {
+        case 0: return [.blue, .cyan, .teal] // Ocean
+        case 1: return [.orange, .pink, .purple] // Sunset
+        case 2: return [.green, .mint, .yellow] // Forest
+        case 3: return [.purple, .indigo, .black] // Night
+        case 4: return [.red, .orange, .yellow] // Fire
+        case 5: return [.indigo, .blue, .cyan] // Sky
+        default: return [.blue, .purple, .pink] // Default
+        }
+    }
+    
+    private func startAnimation() {
+        withAnimation(.linear(duration: 30.0 / gradientAnimationSpeed).repeatForever(autoreverses: false)) {
+            animationOffset = 360
         }
     }
     
@@ -40,7 +152,7 @@ struct GradientBackgroundView: View {
         return totalSeconds / 86400.0 // 24 hours in seconds
     }
     
-    private func gradientColors(for t: Double, scheme: ColorScheme) -> [Color] {
+    private func timeBasedGradientColors(for t: Double, scheme: ColorScheme) -> [Color] {
         let isLight = scheme == .light
         
         if t < 0.25 { // Night (midnight to 6 AM)

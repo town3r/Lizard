@@ -1,4 +1,5 @@
 import SwiftUI
+import Vortex
 
 /// Enhanced time-of-day reactive background with dynamic weather effects:
 /// - Animated sky that shifts through the day with weather conditions
@@ -20,6 +21,11 @@ struct DynamicBackgroundView: View {
     @AppStorage("timeOfDayAutoMode") private var timeOfDayAutoMode: Bool = true
     @AppStorage("manualTimeOfDay") private var manualTimeOfDay: Double = 0.5
     @AppStorage("manualWeatherCondition") private var manualWeatherConditionRaw: String = "clear"
+    @AppStorage("vortexRainIntensity") private var vortexRainIntensity: Double = 0.7
+    @AppStorage("vortexSplashEnabled") private var vortexSplashEnabled: Bool = true
+    @AppStorage("vortexSnowIntensity") private var vortexSnowIntensity: Double = 0.6
+    @AppStorage("vortexSnowDriftEnabled") private var vortexSnowDriftEnabled: Bool = true
+    @AppStorage("vortexSnowFlakeSize") private var vortexSnowFlakeSize: Double = 1.0
     
     // Computed property for current weather condition based on mode
     private var weatherCondition: WeatherCondition {
@@ -117,28 +123,32 @@ struct DynamicBackgroundView: View {
                         .ignoresSafeArea()
                 }
 
-                // Rain effects (disabled when weather is off)
-                if !weatherOffMode && (effectiveWeather == .rain || effectiveWeather == .storm) {
-                    RainEffectView(
-                        intensity: effectiveWeather == .storm ? 1.0 : 0.6,
-                        animationOffset: animationOffset
-                    )
-                    .ignoresSafeArea()
-                }
-
-                // Snow effects (disabled when weather is off)
-                if !weatherOffMode && effectiveWeather == .winter {
-                    SnowEffectView(
-                        intensity: 0.8,
-                        animationOffset: animationOffset
-                    )
-                    .ignoresSafeArea()
-                }
-
-                // Thunder and lightning effects for storms (disabled when weather is off)
-                if !weatherOffMode && effectiveWeather == .storm {
-                    ThunderLightningView()
+                // Vortex-based rain and splash effects
+                if !weatherOffMode && effectiveWeather == .rain {
+                    VortexRainEffectView(intensity: vortexRainIntensity)
                         .ignoresSafeArea()
+                }
+                if !weatherOffMode && effectiveWeather == .storm {
+                    VortexRainEffectView(intensity: 1.0)
+                        .ignoresSafeArea()
+                    if vortexSplashEnabled {
+                        VortexSplashEffectView()
+                            .ignoresSafeArea()
+                    }
+                }
+                
+                // Vortex-based snow effects
+                if !weatherOffMode && effectiveWeather == .winter {
+                    VortexSnowEffectView(
+                        intensity: vortexSnowIntensity,
+                        flakeSize: vortexSnowFlakeSize
+                    )
+                    .ignoresSafeArea()
+                    
+                    if vortexSnowDriftEnabled {
+                        VortexSnowDriftEffectView()
+                            .ignoresSafeArea()
+                    }
                 }
 
                 // Hills with weather shadows
@@ -1217,7 +1227,13 @@ private struct SnowEffectView: View {
                 size: rng.nextDouble(in: 2...6),
                 opacity: rng.nextDouble(in: 0.4...0.9),
                 drift: rng.nextDouble(in: -1...1),
-                rotation: rng.nextDouble(in: 0...360)
+                rotation: rng.nextDouble(in: 0...360),
+                // Vortex properties
+                vortexCenterX: rng.nextDouble(),
+                vortexCenterY: rng.nextDouble(),
+                vortexRadius: rng.nextDouble(in: 50...150),
+                angularVelocity: rng.nextDouble(in: 0.5...2.0),
+                phase: rng.nextDouble(in: 0...360)
             )
         }
     }()
@@ -1225,24 +1241,43 @@ private struct SnowEffectView: View {
     var body: some View {
         Canvas { ctx, size in
             for flake in Self.snowFlakes.prefix(Int(Double(Self.snowFlakes.count) * intensity)) {
-                let x = flake.x * size.width
-                let speed = flake.speed * 3
-                let y = (animationOffset * CGFloat(speed)).truncatingRemainder(dividingBy: size.height + 100) - 50
+                // Calculate vortex center position (can move slowly for dynamic effect)
+                let vortexX = flake.vortexCenterX * size.width + sin(Double(animationOffset * 0.005)) * 30
+                let vortexY = flake.vortexCenterY * size.height * 0.6 // Keep vortices in upper area
                 
-                // Add horizontal drift for more realistic snow movement
-                let driftOffset = sin(animationOffset * 0.01 + CGFloat(flake.x * 10)) * CGFloat(flake.drift) * 20
-                let finalX = x + driftOffset
+                // Calculate time-based angle for rotation around vortex
+                let timeAngle = Double(animationOffset) * 0.02 * flake.angularVelocity + flake.phase
+                
+                // Calculate position in vortex spiral
+                let spiralRadius = flake.vortexRadius * (1.0 + sin(timeAngle * 0.3) * 0.2) // Pulsing radius
+                let vortexPosX = vortexX + cos(timeAngle) * spiralRadius
+                let vortexPosY = vortexY + sin(timeAngle) * spiralRadius * 0.6 // Flatten vertically
+                
+                // Base falling motion
+                let speed = flake.speed * 2
+                let fallY = (animationOffset * CGFloat(speed)).truncatingRemainder(dividingBy: size.height + 200) - 100
+                
+                // Combine vortex motion with falling and drift
+                let driftOffset = sin(Double(animationOffset * 0.01 + CGFloat(flake.x * 10))) * CGFloat(flake.drift) * 15
+                
+                // Weighted combination: more vortex effect at top, more falling at bottom
+                let vortexWeight = max(0, 1.0 - fallY / (size.height * 0.7))
+                let finalX = (vortexPosX * vortexWeight + (flake.x * size.width + driftOffset) * (1.0 - vortexWeight))
+                let finalY = (vortexPosY * vortexWeight + fallY * (1.0 - vortexWeight))
                 
                 let snowflakeSize = CGFloat(flake.size)
                 
-                // Draw snowflake as a small star/crystal shape
-                let center = CGPoint(x: finalX, y: y)
+                // Add rotation based on vortex motion
+                let vortexRotation = timeAngle * 180.0 / .pi
+                
+                // Draw snowflake
+                let center = CGPoint(x: finalX, y: finalY)
                 drawSnowflake(
                     ctx: ctx,
                     center: center,
                     size: snowflakeSize,
                     opacity: flake.opacity * intensity,
-                    rotation: flake.rotation + Double(animationOffset * 0.5)
+                    rotation: flake.rotation + Double(animationOffset * 0.5) + vortexRotation * 0.1
                 )
             }
         }
@@ -1308,4 +1343,64 @@ private struct SnowFlake {
     let opacity: Double
     let drift: Double
     let rotation: Double
+    // Vortex properties
+    let vortexCenterX: Double
+    let vortexCenterY: Double
+    let vortexRadius: Double
+    let angularVelocity: Double
+    let phase: Double
+}
+
+// MARK: - Vortex Rain Effect View
+struct VortexRainEffectView: View {
+    var intensity: Double
+    var body: some View {
+        VortexView(.rain) {
+            Circle()
+                .fill(.white)
+                .frame(width: 32)
+                .tag("circle")
+        }
+        .scaleEffect(intensity)
+    }
+}
+
+// MARK: - Vortex Splash Effect View
+struct VortexSplashEffectView: View {
+    var body: some View {
+        VortexView(.splash) {
+            Circle()
+                .fill(.white)
+                .frame(width: 16, height: 16)
+                .tag("circle")
+        }
+    }
+}
+
+// MARK: - Vortex Snow Effect View
+struct VortexSnowEffectView: View {
+    var intensity: Double
+    var flakeSize: Double
+    
+    var body: some View {
+        VortexView(.snow) {
+            Circle()
+                .fill(.white)
+                .frame(width: flakeSize)
+                .tag("circle")
+        }
+        .scaleEffect(intensity)
+    }
+}
+
+// MARK: - Vortex Snow Drift Effect View
+struct VortexSnowDriftEffectView: View {
+    var body: some View {
+        VortexView(.snow) {
+            Circle()
+                .fill(.white)
+                .frame(width: 24)
+                .tag("circle")
+        }
+    }
 }

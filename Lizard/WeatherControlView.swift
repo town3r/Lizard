@@ -7,264 +7,198 @@
 
 import SwiftUI
 
+/// Weather control panel for adjusting weather conditions and vortex effects
 struct WeatherControlView: View {
+    @Environment(\.dismiss) private var dismiss
+    
+    // Weather mode settings
     @AppStorage("weatherAutoMode") private var weatherAutoMode: Bool = true
     @AppStorage("weatherOffMode") private var weatherOffMode: Bool = false
     @AppStorage("manualWeatherCondition") private var manualWeatherConditionRaw: String = "clear"
-    @Environment(\.dismiss) private var dismiss
     
-    let onWeatherChange: (WeatherCondition) -> Void
-    let onModeChange: (Bool) -> Void
+    // Vortex rain settings
+    @AppStorage("vortexRainIntensity") private var vortexRainIntensity: Double = 0.7
+    @AppStorage("vortexSplashEnabled") private var vortexSplashEnabled: Bool = true
     
-    private var currentWeatherCondition: WeatherCondition {
-        if weatherOffMode {
-            return .none
-        }
-        switch manualWeatherConditionRaw {
-        case "clear": return .clear
-        case "partlyCloudy": return .partlyCloudy
-        case "cloudy": return .cloudy
-        case "rain": return .rain
-        case "storm": return .storm
-        case "winter": return .winter
-        default: return .clear
-        }
+    // Vortex snow settings
+    @AppStorage("vortexSnowIntensity") private var vortexSnowIntensity: Double = 0.6
+    @AppStorage("vortexSnowDriftEnabled") private var vortexSnowDriftEnabled: Bool = true
+    @AppStorage("vortexSnowFlakeSize") private var vortexSnowFlakeSize: Double = 1.0
+    
+    private var manualWeatherCondition: WeatherCondition {
+        get { WeatherConditionUtility.condition(from: manualWeatherConditionRaw) }
+        set { manualWeatherConditionRaw = WeatherConditionUtility.string(from: newValue) }
     }
     
     var body: some View {
-        VStack(spacing: 20) {
-            // Header
-            HStack {
-                Text("Weather Control")
-                    .font(.title2)
-                    .fontWeight(.bold)
-                
-                Spacer()
-                
-                Button("Done") {
-                    dismiss()
+        NavigationView {
+            Form {
+                Section("Weather Mode") {
+                    Toggle("Auto Weather", isOn: $weatherAutoMode)
+                        .disabled(weatherOffMode)
+                    
+                    Toggle("Weather Off", isOn: $weatherOffMode)
+                    
+                    if !weatherAutoMode && !weatherOffMode {
+                        Picker("Manual Weather", selection: .constant(manualWeatherCondition)) {
+                            ForEach(WeatherCondition.allCases, id: \.self) { condition in
+                                Label(condition.displayName, systemImage: condition.iconName)
+                                    .tag(condition)
+                            }
+                        }
+                        .onChange(of: manualWeatherCondition) { _, newValue in
+                            manualWeatherConditionRaw = WeatherConditionUtility.string(from: newValue)
+                        }
+                    }
                 }
-                .font(.system(size: 16, weight: .semibold))
-                .foregroundStyle(.blue)
-            }
-            .padding(.horizontal)
-            
-            // Auto/Manual/Off Toggle
-            VStack(alignment: .leading, spacing: 12) {
-                Text("Mode")
-                    .font(.headline)
-                    .foregroundStyle(.primary)
                 
-                VStack(spacing: 12) {
-                    HStack(spacing: 16) {
-                        Button {
-                            weatherAutoMode = true
-                            weatherOffMode = false
-                            onModeChange(true)
-                        } label: {
+                if !weatherOffMode {
+                    Section("Rain Vortex Effects") {
+                        VStack(alignment: .leading, spacing: 8) {
                             HStack {
-                                Image(systemName: weatherAutoMode && !weatherOffMode ? "checkmark.circle.fill" : "circle")
-                                    .foregroundStyle(weatherAutoMode && !weatherOffMode ? .blue : .secondary)
-                                Text("Automatic")
-                                    .foregroundStyle(weatherAutoMode && !weatherOffMode ? .primary : .secondary)
+                                Text("Rain Intensity")
+                                Spacer()
+                                Text("\(Int(vortexRainIntensity * 100))%")
+                                    .foregroundColor(.secondary)
                             }
+                            Slider(value: $vortexRainIntensity, in: 0.1...1.0, step: 0.1)
                         }
-                        .buttonStyle(.plain)
                         
-                        Spacer()
+                        Toggle("Storm Splash Effects", isOn: $vortexSplashEnabled)
                     }
                     
-                    HStack(spacing: 16) {
-                        Button {
-                            weatherAutoMode = false
-                            weatherOffMode = false
-                            onModeChange(false)
-                        } label: {
+                    Section("Snow Vortex Effects") {
+                        VStack(alignment: .leading, spacing: 8) {
                             HStack {
-                                Image(systemName: !weatherAutoMode && !weatherOffMode ? "checkmark.circle.fill" : "circle")
-                                    .foregroundStyle(!weatherAutoMode && !weatherOffMode ? .blue : .secondary)
-                                Text("Manual")
-                                    .foregroundStyle(!weatherAutoMode && !weatherOffMode ? .primary : .secondary)
+                                Text("Snow Intensity")
+                                Spacer()
+                                Text("\(Int(vortexSnowIntensity * 100))%")
+                                    .foregroundColor(.secondary)
                             }
+                            Slider(value: $vortexSnowIntensity, in: 0.1...1.0, step: 0.1)
                         }
-                        .buttonStyle(.plain)
                         
-                        Spacer()
-                    }
-                    
-                    HStack(spacing: 16) {
-                        Button {
-                            weatherOffMode = true
-                            weatherAutoMode = false
-                            onModeChange(false)
-                            onWeatherChange(.none)
-                        } label: {
+                        VStack(alignment: .leading, spacing: 8) {
                             HStack {
-                                Image(systemName: weatherOffMode ? "checkmark.circle.fill" : "circle")
-                                    .foregroundStyle(weatherOffMode ? .blue : .secondary)
-                                Text("Off")
-                                    .foregroundStyle(weatherOffMode ? .primary : .secondary)
+                                Text("Snowflake Size")
+                                Spacer()
+                                Text("\(Int(vortexSnowFlakeSize * 100))%")
+                                    .foregroundColor(.secondary)
                             }
+                            Slider(value: $vortexSnowFlakeSize, in: 0.5...2.0, step: 0.1)
                         }
-                        .buttonStyle(.plain)
                         
-                        Spacer()
+                        Toggle("Snow Drift Effects", isOn: $vortexSnowDriftEnabled)
+                    }
+                    
+                    Section("Weather Effects Preview") {
+                        weatherPreviewGrid
                     }
                 }
             }
-            .padding(.horizontal)
-            
-            // Current Condition Display
-            VStack(alignment: .leading, spacing: 12) {
-                Text("Current Condition")
-                    .font(.headline)
-                    .foregroundStyle(.primary)
-                
-                HStack {
-                    Image(systemName: currentWeatherCondition.iconName)
-                        .font(.title)
-                        .foregroundStyle(weatherOffMode ? Color.secondary : .blue)
-                    
-                    Text(currentWeatherCondition.displayName)
-                        .font(.title3)
-                        .fontWeight(.medium)
-                    
-                    Spacer()
-                    
-                    if weatherOffMode {
-                        Text("Off")
-                            .font(.caption)
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 4)
-                            .background(.gray.opacity(0.2))
-                            .foregroundStyle(.secondary)
-                            .clipShape(Capsule())
-                    } else if weatherAutoMode {
-                        Text("Auto")
-                            .font(.caption)
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 4)
-                            .background(.blue.opacity(0.2))
-                            .foregroundStyle(.blue)
-                            .clipShape(Capsule())
+            .navigationTitle("Weather Settings")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Done") {
+                        dismiss()
                     }
                 }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 12)
-                .background {
-                    iOS26LiquidGlass(isPressed: false, size: .medium)
-                }
             }
-            .padding(.horizontal)
-            
-            // Manual Weather Selection (only visible in manual mode)
-            if !weatherAutoMode && !weatherOffMode {
-                VStack(alignment: .leading, spacing: 12) {
-                    Text("Select Weather")
-                        .font(.headline)
-                        .foregroundStyle(.primary)
-                    
-                    LazyVGrid(columns: [
-                        GridItem(.flexible()),
-                        GridItem(.flexible()),
-                        GridItem(.flexible())
-                    ], spacing: 12) {
-                        ForEach(WeatherCondition.allCases.filter { $0 != .none }, id: \.self) { condition in
-                            WeatherConditionButton(
-                                condition: condition,
-                                isSelected: condition == currentWeatherCondition
-                            ) {
-                                selectWeatherCondition(condition)
-                            }
-                        }
-                    }
-                }
-                .padding(.horizontal)
-                .transition(.move(edge: .bottom).combined(with: .opacity))
+        }
+    }
+    
+    private var weatherPreviewGrid: some View {
+        LazyVGrid(columns: [
+            GridItem(.flexible()),
+            GridItem(.flexible()),
+            GridItem(.flexible())
+        ], spacing: 12) {
+            ForEach(WeatherCondition.allCases.filter { $0 != .none }, id: \.self) { condition in
+                weatherPreviewCard(for: condition)
             }
+        }
+    }
+    
+    private func weatherPreviewCard(for condition: WeatherCondition) -> some View {
+        VStack(spacing: 8) {
+            Image(systemName: condition.iconName)
+                .font(.title2)
+                .foregroundColor(weatherCardColor(for: condition))
+                .frame(height: 30)
             
-            Spacer()
-            
-            // Info text
-            Text(getInfoText())
+            Text(condition.displayName)
                 .font(.caption)
-                .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
-                .padding(.horizontal)
-        }
-        .padding(.top)
-        .background(.regularMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-        .shadow(radius: 20)
-        .animation(.easeInOut(duration: 0.3), value: weatherAutoMode)
-        .animation(.easeInOut(duration: 0.3), value: weatherOffMode)
-    }
-    
-    private func getInfoText() -> String {
-        if weatherOffMode {
-            return "Weather effects are disabled"
-        } else if weatherAutoMode {
-            return "Weather changes automatically every 30 seconds"
-        } else {
-            return "Weather will remain as selected until changed"
-        }
-    }
-    
-    private func selectWeatherCondition(_ condition: WeatherCondition) {
-        switch condition {
-        case .none: manualWeatherConditionRaw = "none"
-        case .clear: manualWeatherConditionRaw = "clear"
-        case .partlyCloudy: manualWeatherConditionRaw = "partlyCloudy"
-        case .cloudy: manualWeatherConditionRaw = "cloudy"
-        case .rain: manualWeatherConditionRaw = "rain"
-        case .storm: manualWeatherConditionRaw = "storm"
-        case .winter: manualWeatherConditionRaw = "winter"
-        }
-        
-        onWeatherChange(condition)
-    }
-}
-
-private struct WeatherConditionButton: View {
-    let condition: WeatherCondition
-    let isSelected: Bool
-    let action: () -> Void
-    
-    var body: some View {
-        Button(action: action) {
-            VStack(spacing: 8) {
-                Image(systemName: condition.iconName)
-                    .font(.title2)
-                    .foregroundStyle(isSelected ? .white : .blue)
-                
-                Text(condition.displayName)
-                    .font(.caption)
-                    .fontWeight(.medium)
-                    .foregroundStyle(isSelected ? .white : .primary)
-                    .multilineTextAlignment(.center)
+                .foregroundColor(.primary)
+            
+            if condition == .rain || condition == .storm {
+                Text("Rain: \(Int(vortexRainIntensity * 100))%")
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+                if condition == .storm && vortexSplashEnabled {
+                    Text("+ Splash")
+                        .font(.caption2)
+                        .foregroundColor(.blue)
+                }
             }
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 12)
-            .padding(.horizontal, 8)
-            .background {
-                if isSelected {
-                    RoundedRectangle(cornerRadius: 12, style: .continuous)
-                        .fill(.blue)
-                } else {
-                    iOS26LiquidGlass(isPressed: false, size: .small)
+            
+            if condition == .winter {
+                Text("Snow: \(Int(vortexSnowIntensity * 100))%")
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+                Text("Size: \(Int(vortexSnowFlakeSize * 100))%")
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+                if vortexSnowDriftEnabled {
+                    Text("+ Drift")
+                        .font(.caption2)
+                        .foregroundColor(.cyan)
                 }
             }
         }
-        .buttonStyle(.plain)
-        .scaleEffect(isSelected ? 1.05 : 1.0)
-        .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isSelected)
+        .padding(12)
+        .background(
+            RoundedRectangle(cornerRadius: 8)
+                .fill(.ultraThinMaterial)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 8)
+                .stroke(
+                    manualWeatherCondition == condition && !weatherAutoMode && !weatherOffMode
+                        ? .blue
+                        : .clear,
+                    lineWidth: 2
+                )
+        )
+        .onTapGesture {
+            if !weatherOffMode {
+                weatherAutoMode = false
+                manualWeatherConditionRaw = WeatherConditionUtility.string(from: condition)
+            }
+        }
+    }
+    
+    private func weatherCardColor(for condition: WeatherCondition) -> Color {
+        switch condition {
+        case .none:
+            return .gray
+        case .clear:
+            return .yellow
+        case .partlyCloudy:
+            return .orange
+        case .cloudy:
+            return .gray
+        case .rain:
+            return .blue
+        case .storm:
+            return .purple
+        case .winter:
+            return .cyan
+        }
     }
 }
 
 #Preview {
-    WeatherControlView(
-        onWeatherChange: { _ in },
-        onModeChange: { _ in }
-    )
-    .frame(height: 500)
+    WeatherControlView()
 }

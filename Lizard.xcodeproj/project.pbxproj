@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		77E455CAB218441BBEAA1649006E47DE /* LizardTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77E455C3B0B34013B5ACC360006E47DE /* LizardTests.swift */; };
+		88C3DF052E57E3A600A99C38 /* Vortex in Frameworks */ = {isa = PBXBuildFile; productRef = 88C3DF042E57E3A600A99C38 /* Vortex */; };
 		AA1001001234567890123456 /* LizardWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1001011234567890123456 /* LizardWatchApp.swift */; };
 		AA1001021234567890123456 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1001031234567890123456 /* ContentView.swift */; };
 		AA1001041234567890123456 /* WatchGameCenterManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1001051234567890123456 /* WatchGameCenterManager.swift */; };
@@ -81,6 +82,7 @@
 		88C233782E4D1BA4006E47DE /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
+				88C3DF052E57E3A600A99C38 /* Vortex in Frameworks */,
 			);
 		};
 		AA100123N234567890123456 /* Frameworks */ = {
@@ -184,6 +186,9 @@
 				88C2337D2E4D1BA4006E47DE /* Lizard */,
 			);
 			name = Lizard;
+			packageProductDependencies = (
+				88C3DF042E57E3A600A99C38 /* Vortex */,
+			);
 			productName = Lizard;
 			productReference = 88C2337B2E4D1BA4006E47DE /* Lizard.app */;
 			productType = "com.apple.product-type.application";
@@ -263,6 +268,9 @@
 			);
 			mainGroup = 88C233722E4D1BA4006E47DE;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				88C3DF032E57E3A600A99C38 /* XCRemoteSwiftPackageReference "Vortex" */,
+			);
 			preferredProjectObjectVersion = 90;
 			productRefGroup = 88C2337C2E4D1BA4006E47DE /* Products */;
 			projectDirPath = "";
@@ -540,7 +548,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UIStatusBarHidden = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -585,7 +593,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UIStatusBarHidden = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -765,6 +773,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		88C3DF032E57E3A600A99C38 /* XCRemoteSwiftPackageReference "Vortex" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/twostraws/Vortex";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.3;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		88C3DF042E57E3A600A99C38 /* Vortex */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 88C3DF032E57E3A600A99C38 /* XCRemoteSwiftPackageReference "Vortex" */;
+			productName = Vortex;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 88C233732E4D1BA4006E47DE /* Project object */;
 }

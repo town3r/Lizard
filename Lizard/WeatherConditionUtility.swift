@@ -3,34 +3,64 @@
 import Foundation
 import SwiftUI
 
-/// Utility for converting between WeatherCondition enum and string storage
-enum WeatherConditionUtility {
+/// Utility for converting between weather condition strings and enum values
+struct WeatherConditionUtility {
     
-    /// Convert string to WeatherCondition enum
+    /// Convert a string representation to a WeatherCondition enum
     static func condition(from string: String) -> WeatherCondition {
-        switch string {
-        case "none": return .none
-        case "clear": return .clear
-        case "partlyCloudy": return .partlyCloudy
-        case "cloudy": return .cloudy
-        case "rain": return .rain
-        case "storm": return .storm
-        case "winter": return .winter
-        default: return .clear
+        switch string.lowercased() {
+        case "none":
+            return .none
+        case "clear":
+            return .clear
+        case "partlycloudy", "partly_cloudy", "partly cloudy":
+            return .partlyCloudy
+        case "cloudy":
+            return .cloudy
+        case "rain":
+            return .rain
+        case "storm":
+            return .storm
+        case "winter", "snow":
+            return .winter
+        default:
+            return .clear // Default fallback
         }
     }
     
-    /// Convert WeatherCondition enum to string
+    /// Convert a WeatherCondition enum to its string representation
     static func string(from condition: WeatherCondition) -> String {
         switch condition {
-        case .none: return "none"
-        case .clear: return "clear"
-        case .partlyCloudy: return "partlyCloudy"
-        case .cloudy: return "cloudy"
-        case .rain: return "rain"
-        case .storm: return "storm"
-        case .winter: return "winter"
+        case .none:
+            return "none"
+        case .clear:
+            return "clear"
+        case .partlyCloudy:
+            return "partlycloudy"
+        case .cloudy:
+            return "cloudy"
+        case .rain:
+            return "rain"
+        case .storm:
+            return "storm"
+        case .winter:
+            return "winter"
         }
+    }
+    
+    /// Get all available weather conditions for UI selection
+    static var allConditions: [WeatherCondition] {
+        return WeatherCondition.allCases
+    }
+    
+    /// Get weather condition display name for UI
+    static func displayName(for condition: WeatherCondition) -> String {
+        return condition.displayName
+    }
+    
+    /// Get weather condition icon name for UI
+    static func iconName(for condition: WeatherCondition) -> String {
+        return condition.iconName
     }
 }
 
@@ -66,16 +96,11 @@ struct WeatherConditionStorage: DynamicProperty {
 }
 
 extension WeatherCondition {
+    var rawValue: String {
+        return WeatherConditionUtility.string(from: self)
+    }
+    
     static func fromRawValue(_ rawValue: String) -> WeatherCondition? {
-        switch rawValue {
-        case "none": return WeatherCondition.none
-        case "clear": return .clear
-        case "partlyCloudy": return .partlyCloudy
-        case "cloudy": return .cloudy
-        case "rain": return .rain
-        case "storm": return .storm
-        case "winter": return .winter
-        default: return nil
-        }
+        return WeatherConditionUtility.condition(from: rawValue)
     }
 }
