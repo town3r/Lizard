@@ -53,13 +53,36 @@ This release introduces significant new features including a dynamic weather sys
   - Animated sky that shifts throughout the day with weather conditions
   - Moving clouds with dynamic opacity and layering
   - Animated sun with rays and position tracking
-  - Rain effects with realistic screen raindrops
-  - Enhanced sunrise/sunset transitions
-  - Stars and moon at night with weather interaction
+  - Vortex-powered rain effects with realistic screen raindrops and splash systems
+  - Enhanced sunrise/sunset transitions with weather interaction
+  - Stars and moon at night with dynamic weather systems
   - Layered grassy hills with weather shadows
-- **Weather Control Interface**: Manual weather control system with auto/manual mode toggle
+- **Advanced Weather Modes**: Auto/manual/off weather control system
+  - Time-based weather generation with realistic probability patterns
+  - Manual weather selection with persistent preferences
+  - Complete weather system disable option for minimal distraction
 - **Weather Persistence**: Weather condition storage using custom property wrapper
 - **Performance Optimized**: Efficient rendering with minimal impact on gameplay FPS
+
+#### 🎆 Vortex Particle Effects System
+- **Fireworks Integration**: Advanced customizable fireworks with Vortex framework
+  - Adjustable intensity, particle count, scale, and multi-color support
+  - Trail effects, glow effects, and fade speed control
+  - Gravity-affected particles for realistic motion
+- **Weather Particles**: Vortex-powered rain and snow systems
+  - Realistic rain droplets with splash effects on surfaces
+  - Snow particles with wind drift and customizable sizes
+  - Enhanced visual immersion with particle physics
+
+#### ⚙️ Comprehensive Settings System
+- **Advanced Settings Panel**: 5 specialized settings categories
+  - Screen Orientation: Lock device orientation for optimal physics
+  - Physics Settings: Control lizard behavior and performance parameters
+  - Visual Settings: Customize appearance and background modes
+  - Firework Settings: Extensive particle effect customization
+  - Weather Settings: Environmental control with rain/snow effects
+- **Enhanced User Control**: Granular customization of all app aspects
+- **Persistent Preferences**: All settings saved and restored across app launches
 
 #### 🏗️ Architecture Enhancements
 - **Centralized Configuration**: New `AppConfiguration.swift` system consolidating scattered configs

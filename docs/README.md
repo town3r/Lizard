@@ -38,6 +38,14 @@ Welcome to the comprehensive documentation for Lizard - the delightful iOS and A
 |----------|---------|---------|
 | **[Features Guide](../FEATURES.md)** | Complete feature overview | Current & upcoming features |
 | **[Game Center Setup](GAME_CENTER.md)** | Social gaming features | Achievements & leaderboards |
+| **[Design System](DESIGN_SYSTEM.md)** | UI components & styling | Liquid glass effects & visual design |
+
+#### Advanced Features
+| Document | Purpose | Details |
+|----------|---------|---------|
+| **Particle Effects** | Vortex framework integration | Fireworks, rain, and snow systems |
+| **Weather System** | Dynamic weather controls | Auto/manual modes with time-based generation |
+| **Settings System** | Comprehensive customization | 5 specialized settings categories |
 
 ### 👨‍💻 Developer Documentation
 
