@@ -47,6 +47,7 @@ final class LizardScene: SKScene {
     override func didMove(to view: SKView) {
         super.didMove(to: view)
 
+        // Essential setup first for immediate visual feedback
         backgroundColor = .clear
         view.allowsTransparency = true
         view.isOpaque = false
@@ -60,11 +61,24 @@ final class LizardScene: SKScene {
         physicsBody?.categoryBitMask = 0x1 << 1
 
         addChild(physicsLayer)
-        prepareAssets(on: view)
-        setupFPSOverlay()
-        setupNotificationObservers()
-
-        SoundPlayer.shared.preload(name: "lizard", ext: "wav", voices: 6)
+        
+        // Defer heavy initialization to avoid blocking UI
+        Task.detached(priority: .userInitiated) { [weak self] in
+            await self?.performHeavyInitialization(view: view)
+        }
+    }
+    
+    private func performHeavyInitialization(view: SKView) async {
+        await MainActor.run {
+            prepareAssets(on: view)
+            setupFPSOverlay()
+            setupNotificationObservers()
+        }
+        
+        // Sound preloading happens asynchronously anyway now
+        await MainActor.run {
+            SoundPlayer.shared.preload(name: "lizard", ext: "wav", voices: 6)
+        }
     }
     
     // MARK: - Notification Observers

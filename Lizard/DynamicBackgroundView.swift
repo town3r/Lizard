@@ -132,8 +132,11 @@ struct DynamicBackgroundView: View {
                     VortexRainEffectView(intensity: 1.0)
                         .ignoresSafeArea()
                     if vortexSplashEnabled {
-                        VortexSplashEffectView()
-                            .ignoresSafeArea()
+                        // Use hill-positioned splash effects instead of full-screen splash
+                        GeometryReader { geo in
+                            VortexHillSplashEffectView(geometrySize: geo.size)
+                                .ignoresSafeArea()
+                        }
                     }
                 }
                 
@@ -1374,6 +1377,45 @@ struct VortexSplashEffectView: View {
                 .frame(width: 16, height: 16)
                 .tag("circle")
         }
+    }
+}
+
+// MARK: - Vortex Hill Splash Effect View
+struct VortexHillSplashEffectView: View {
+    let geometrySize: CGSize
+    
+    var body: some View {
+        GeometryReader { geo in
+            ZStack {
+                // Create multiple splash zones positioned along the hill contours
+                ForEach(0..<8, id: \.self) { index in
+                    let xPosition = CGFloat(index) * (geo.size.width / 7)
+                    let hillY = calculateHillY(x: xPosition, width: geo.size.width, height: geo.size.height)
+                    
+                    VortexView(.splash) {
+                        Circle()
+                            .fill(.white.opacity(0.8))
+                            .frame(width: 12, height: 12)
+                            .tag("splash\(index)")
+                    }
+                    .frame(width: geo.size.width / 6, height: 120) // Constrain splash area
+                    .position(x: xPosition, y: hillY - 40) // Position above hill surface
+                }
+            }
+        }
+    }
+    
+    // Calculate the hill surface Y position for a given X coordinate
+    private func calculateHillY(x: CGFloat, width: CGFloat, height: CGFloat) -> CGFloat {
+        let baseY = height * 0.55
+        let amplitude: CGFloat = 22
+        let offset: CGFloat = 0
+        
+        // Use the same hill calculation as HillShape
+        let y = baseY - amplitude * sin((x + offset) / 90)
+                     - amplitude * 0.4 * sin((x + offset) / 28)
+        
+        return height - (height * 0.35) / 2 + (baseY - y)
     }
 }
 

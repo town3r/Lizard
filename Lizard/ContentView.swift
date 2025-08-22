@@ -31,24 +31,42 @@ struct ContentView: View {
     @State private var showTrashButton = false
     @State private var buttonHideWorkItem: DispatchWorkItem?
     
-    // Settings control state
+    // MARK: - State Management
+    
     @State private var showSettings = false
+    @State private var totalLizardsSpawned = 0
+    @State private var totalButtonTaps = 0
+    @State private var gameScene = LizardScene()
     
-    // Dynamic Island vortex fireworks state
-    @State private var isVortexFireworksActive = false
-    @State private var vortexFireworksTimer: Timer?
-    
-    // Vortex fireworks state
+    // Firework state variables
     @State private var showVortexFireworks = false
-    @State private var settingsLongPressTimer: Timer?
-    @State private var isLongPressingSettings = false
     @State private var vortexFireworksDismissTimer: Timer?
     
-    // Firework configuration settings
+    // Dynamic Island vortex fireworks state
+    @State private var dynamicIslandVortexSystem: VortexSystem?
+    @State private var dynamicIslandFireworks = false
+    
+    // Beta feedback integration
+    @State private var showBetaFeedback = false
+    
+    // Firework customization settings
     @AppStorage("fireworkDensity") private var fireworkDensity: Double = 0.5
     @AppStorage("fireworkDuration") private var fireworkDuration: Double = 5.0
+    @AppStorage("fireworkShowLength") private var fireworkShowLength: Double = 5.0
     @AppStorage("fireworkColorScheme") private var fireworkColorScheme: String = "vibrant"
-    @AppStorage("fireworkSoundEffects") private var fireworkSoundEffects: Bool = true
+    @AppStorage("fireworkSoundEnabled") private var fireworkSoundEnabled: Bool = true
+    
+    // Add the missing comprehensive firework settings
+    @AppStorage("fireworkEnabled") private var fireworkEnabled: Bool = true
+    @AppStorage("fireworkIntensity") private var fireworkIntensity: Double = 0.5
+    @AppStorage("fireworkParticleCount") private var fireworkParticleCount: Int = 100
+    @AppStorage("fireworkExplosionPattern") private var fireworkExplosionPattern: String = "burst"
+    @AppStorage("fireworkTrailEnabled") private var fireworkTrailEnabled: Bool = true
+    @AppStorage("fireworkGlowEnabled") private var fireworkGlowEnabled: Bool = true
+    @AppStorage("fireworkMultiColor") private var fireworkMultiColor: Bool = false
+    @AppStorage("fireworkGravityAffected") private var fireworkGravityAffected: Bool = true
+    @AppStorage("fireworkFadeSpeed") private var fireworkFadeSpeed: Double = 1.0
+    @AppStorage("fireworkScale") private var fireworkScale: Double = 1.0
 
     // MARK: Configuration
     private struct Config {
@@ -96,25 +114,52 @@ struct ContentView: View {
                 topRightHUD
                 bottomBar
                 centerButton(size: size)
-            }
-            .onAppear {
-                Task { @MainActor in
-                    scene.scaleMode = .resizeFill
-                    scene.size = size
-                    scene.startTilt()
-                    scene.backgroundColor = .clear
-
-                    updateSceneConfiguration()
-
-                    scene.onLizardCountChange = { count in
-                        Task { @MainActor in
-                            lizardCount = count
-                            updateButtonVisibility()
+                
+                // Vortex fireworks overlay with user customization
+                if showVortexFireworks && fireworkEnabled {
+                    CustomizableVortexFireworks(
+                        intensity: fireworkIntensity,
+                        particleCount: fireworkParticleCount,
+                        scale: fireworkScale,
+                        multiColor: fireworkMultiColor,
+                        trailEnabled: fireworkTrailEnabled,
+                        glowEnabled: fireworkGlowEnabled,
+                        fadeSpeed: fireworkFadeSpeed,
+                        gravityAffected: fireworkGravityAffected
+                    )
+                    .ignoresSafeArea()
+                    .allowsHitTesting(false)
+                    .onTapGesture {
+                        // Allow tap to dismiss fireworks
+                        withAnimation(.easeOut(duration: 1.0)) {
+                            showVortexFireworks = false
                         }
                     }
-
-                    GameCenterManager.shared.authenticate(presentingViewController: { topViewController() })
-                    GameCenterManager.shared.configureAccessPoint(isActive: false, location: .topTrailing)
+                    .transition(.asymmetric(
+                        insertion: .scale(scale: 0.3).combined(with: .opacity).animation(.easeOut(duration: 0.8)),
+                        removal: .scale(scale: 1.5).combined(with: .opacity).animation(.easeIn(duration: 0.5))
+                    ))
+                }
+            }
+            .onAppear {
+                // Essential scene setup first for immediate UI response
+                scene.scaleMode = .resizeFill
+                scene.size = size
+                scene.backgroundColor = .clear
+                
+                // Set up scene callbacks immediately for UI responsiveness
+                scene.onLizardCountChange = { count in
+                    Task { @MainActor in
+                        lizardCount = count
+                        updateButtonVisibility()
+                    }
+                }
+                
+                // Defer heavy initialization to background to avoid blocking UI
+                Task.detached(priority: .userInitiated) {
+                    await MainActor.run {
+                        performDeferredInitialization()
+                    }
                 }
             }
             .onChange(of: size) { _, newSize in
@@ -205,66 +250,26 @@ private extension ContentView {
     
     // HUD settings icon at top right, positioned below the FPS counter
     var topRightHUD: some View {
-        ZStack {
-            VStack(alignment: .trailing, spacing: 8) {
-                // Settings control button positioned below where FPS counter appears
-                Button {
-                    // Don't open settings if fireworks are active
-                    if !showVortexFireworks {
-                        showSettings.toggle()
+        VStack(alignment: .trailing, spacing: 8) {
+            // Settings control button positioned below where FPS counter appears
+            Button {
+                showSettings.toggle()
+            } label: {
+                Image(systemName: "gearshape.fill")
+                    .font(.system(size: 20, weight: .medium))
+                    .foregroundStyle(.primary)
+                    .padding(10)
+                    .background {
+                        iOS26LiquidGlass(isPressed: false, size: .small)
                     }
-                } label: {
-                    Image(systemName: "gearshape.fill")
-                        .font(.system(size: 20, weight: .medium))
-                        .foregroundStyle(.primary)
-                        .padding(10)
-                        .background {
-                            iOS26LiquidGlass(isPressed: isLongPressingSettings, size: .small)
-                        }
-                }
-                .buttonStyle(.plain)
-                .scaleEffect(isLongPressingSettings ? 1.1 : 1.0)
-                .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isLongPressingSettings)
-                .accessibilityLabel("Settings")
-                .accessibilityHint("Tap to open settings, hold for 5 seconds for fireworks")
-                .simultaneousGesture(
-                    LongPressGesture(minimumDuration: 0.1)
-                        .onChanged { _ in
-                            startSettingsLongPress()
-                        }
-                        .onEnded { _ in
-                            stopSettingsLongPress()
-                        }
-                )
             }
-            .padding(.top, 14)
-            .padding(.trailing, 12)
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
-            
-            // Vortex fireworks overlay
-            if showVortexFireworks {
-                VortexView(.fireworks.makeUniqueCopy()) {
-                    Circle()
-                        .fill(.white)
-                        .frame(width: 32)
-                        .blur(radius: 5)
-                        .blendMode(.plusLighter)
-                        .tag("circle")
-                }
-                .ignoresSafeArea()
-                .allowsHitTesting(false)
-                .onTapGesture {
-                    // Allow tap to dismiss fireworks
-                    withAnimation(.easeOut(duration: 1.0)) {
-                        showVortexFireworks = false
-                    }
-                }
-                .transition(.asymmetric(
-                    insertion: .scale(scale: 0.3).combined(with: .opacity).animation(.easeOut(duration: 0.8)),
-                    removal: .scale(scale: 1.5).combined(with: .opacity).animation(.easeIn(duration: 0.5))
-                ))
-            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Settings")
+            .accessibilityHint("Tap to open settings")
         }
+        .padding(.top, 14)
+        .padding(.trailing, 12)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
         .sheet(isPresented: $showSettings) {
             SettingsView(onFireworksTrigger: triggerVortexFireworks)
                 .presentationDetents([.medium, .large])
@@ -319,8 +324,6 @@ private extension ContentView {
         }
         .frame(width: Config.centerButtonSize, height: Config.centerButtonSize)
         .position(x: size.width * 0.5, y: size.height * 0.5)
-        .opacity(showVortexFireworks ? 0 : 1) // Hide during fireworks
-        .animation(.easeInOut(duration: 0.5), value: showVortexFireworks)
         .simultaneousGesture(
             DragGesture(minimumDistance: 0)
                 .onChanged { _ in
@@ -401,16 +404,20 @@ private extension ContentView {
             .padding(.bottom, 10)
         }
         .frame(maxHeight: .infinity, alignment: .bottom)
-        .opacity(showVortexFireworks ? 0 : 1) // Hide during fireworks
-        .animation(.easeInOut(duration: 0.5), value: showVortexFireworks)
     }
 
     // MARK: - Button Visibility Logic
     
     func updateButtonVisibility() {
         withAnimation(.spring(response: Config.buttonAnimationDuration, dampingFraction: 0.8)) {
-            showStopButton = isRaining
-            showTrashButton = lizardCount > 0
+            // Don't show buttons during firework shows for clean viewing
+            if showVortexFireworks {
+                showStopButton = false
+                showTrashButton = false
+            } else {
+                showStopButton = isRaining
+                showTrashButton = lizardCount > 0
+            }
         }
     }
     
@@ -421,11 +428,14 @@ private extension ContentView {
         // Create a new work item
         let workItem = DispatchWorkItem {
             withAnimation(.easeInOut(duration: Config.buttonAnimationDuration)) {
-                if !self.isRaining {
-                    self.showStopButton = false
-                }
-                if self.lizardCount == 0 {
-                    self.showTrashButton = false
+                // Don't hide buttons during firework shows - let firework logic control visibility
+                if !self.showVortexFireworks {
+                    if !self.isRaining {
+                        self.showStopButton = false
+                    }
+                    if self.lizardCount == 0 {
+                        self.showTrashButton = false
+                    }
                 }
             }
         }
@@ -512,49 +522,7 @@ private extension ContentView {
         #endif
     }
     
-    // MARK: - Settings Long Press Fireworks Logic
-    
-    // Start the 5-second timer for settings button long press
-    func startSettingsLongPress() {
-        // Prevent multiple timers
-        guard settingsLongPressTimer == nil else { return }
-        
-        // Haptic feedback when starting long press
-        let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
-        impactFeedback.impactOccurred()
-        
-        // Visual feedback - button is being pressed
-        withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-            isLongPressingSettings = true
-        }
-        
-        // Start 5-second timer
-        settingsLongPressTimer = Timer.scheduledTimer(withTimeInterval: 5.0, repeats: false) { _ in
-            Task { @MainActor in
-                // Trigger fireworks after 5 seconds
-                triggerVortexFireworks()
-                // Reset long press state
-                isLongPressingSettings = false
-                settingsLongPressTimer = nil
-            }
-        }
-        
-        if let timer = settingsLongPressTimer {
-            RunLoop.main.add(timer, forMode: .common)
-        }
-    }
-    
-    // Stop the settings long press timer
-    func stopSettingsLongPress() {
-        // Cancel timer if it exists
-        settingsLongPressTimer?.invalidate()
-        settingsLongPressTimer = nil
-        
-        // Reset visual feedback
-        withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-            isLongPressingSettings = false
-        }
-    }
+    // MARK: - Firework Show Logic
     
     // Trigger the Vortex fireworks show
     func triggerVortexFireworks() {
@@ -562,7 +530,13 @@ private extension ContentView {
         vortexFireworksDismissTimer?.invalidate()
         vortexFireworksDismissTimer = nil
         
-        // Double haptic feedback when 5 seconds is reached and show is about to start
+        // Hide buttons during firework show for clean viewing
+        withAnimation(.easeOut(duration: 0.5)) {
+            showStopButton = false
+            showTrashButton = false
+        }
+        
+        // Double haptic feedback when show is about to start
         let impactFeedback = UIImpactFeedbackGenerator(style: .heavy)
         impactFeedback.impactOccurred()
         
@@ -572,7 +546,7 @@ private extension ContentView {
         }
         
         // Play audio feedback only if sound effects are enabled
-        if fireworkSoundEffects {
+        if fireworkSoundEnabled {
             SoundPlayer.shared.play(name: "lizard", ext: "wav")
         }
         
@@ -582,19 +556,40 @@ private extension ContentView {
         }
         
         // Auto-dismiss fireworks after user-configured duration
-        let dismissDelay = fireworkDuration
+        let dismissDelay = fireworkShowLength
         vortexFireworksDismissTimer = Timer.scheduledTimer(withTimeInterval: dismissDelay, repeats: false) { _ in
             Task { @MainActor in
                 withAnimation(.easeIn(duration: 1.0)) {
                     showVortexFireworks = false
                 }
                 vortexFireworksDismissTimer = nil
+                
+                // Restore button visibility after firework show ends
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                    updateButtonVisibility()
+                }
             }
         }
         
         if let timer = vortexFireworksDismissTimer {
             RunLoop.main.add(timer, forMode: .common)
         }
+    }
+    
+    // MARK: - Deferred Initialization
+    
+    /// Performs heavy initialization tasks in the background to avoid blocking UI startup
+    @MainActor
+    private func performDeferredInitialization() {
+        // Start tilt motion after UI is ready
+        scene.startTilt()
+        
+        // Update scene configuration with user settings
+        updateSceneConfiguration()
+        
+        // Initialize GameCenter authentication (heavy operation)
+        GameCenterManager.shared.authenticate(presentingViewController: { topViewController() })
+        GameCenterManager.shared.configureAccessPoint(isActive: false, location: .topTrailing)
     }
 }
 
@@ -1121,5 +1116,71 @@ private struct MagicalParticle: View {
     
     private var particleOpacity: Double {
         Double.random(in: 0.6...1.0)
+    }
+}
+
+// MARK: - Customizable Vortex Fireworks Component
+
+struct CustomizableVortexFireworks: View {
+    let intensity: Double
+    let particleCount: Int
+    let scale: Double
+    let multiColor: Bool
+    let trailEnabled: Bool
+    let glowEnabled: Bool
+    let fadeSpeed: Double
+    let gravityAffected: Bool
+    
+    var body: some View {
+        VortexView(createCustomVortexSystem()) {
+            // Let VortexView handle all particle rendering internally
+            // Remove manual particle creation to avoid performance issues
+        }
+        .scaleEffect(scale)
+    }
+    
+    private func createCustomVortexSystem() -> VortexSystem {
+        // Create a new fireworks system and modify its properties
+        var system = VortexSystem.fireworks.makeUniqueCopy()
+        
+        // Apply intensity scaling with reasonable limits
+        let clampedIntensity = min(max(intensity, 0.1), 2.0) // Clamp between 0.1 and 2.0
+        let clampedParticleCount = min(max(particleCount, 10), 150) // Clamp between 10 and 150
+        
+        // Configure birth rate based on particle count and intensity
+        system.birthRate = Double(clampedParticleCount) * clampedIntensity * 0.5
+        
+        // Apply speed scaling
+        system.speed = clampedIntensity * 150
+        system.speedVariation = clampedIntensity * 75
+        
+        // Apply fade speed with reasonable bounds
+        let clampedFadeSpeed = min(max(fadeSpeed, 0.2), 3.0)
+        system.lifespan = TimeInterval(2.5 / clampedFadeSpeed)
+        system.lifespanVariation = TimeInterval(1.0 / clampedFadeSpeed)
+        
+        // Apply scale with reasonable bounds
+        let clampedScale = min(max(scale, 0.3), 2.0)
+        system.size = clampedScale * 15
+        system.sizeVariation = clampedScale * 8
+        
+        // Configure colors using the correct VortexSystem.Color format
+        if multiColor {
+            // Use a predefined array of VortexSystem.Color values for multi-color fireworks
+            system.colors = .random([
+                VortexSystem.Color(red: 1.0, green: 0.0, blue: 0.0),  // Red
+                VortexSystem.Color(red: 0.0, green: 0.0, blue: 1.0),  // Blue
+                VortexSystem.Color(red: 0.0, green: 1.0, blue: 0.0),  // Green
+                VortexSystem.Color(red: 1.0, green: 1.0, blue: 0.0),  // Yellow
+                VortexSystem.Color(red: 1.0, green: 0.0, blue: 1.0),  // Purple
+                VortexSystem.Color(red: 1.0, green: 0.5, blue: 0.0),  // Orange
+                VortexSystem.Color(red: 1.0, green: 0.7, blue: 0.8)   // Pink
+            ])
+        } else {
+            // Use single white color for classic fireworks
+            system.colors = .single(VortexSystem.Color(red: 1.0, green: 1.0, blue: 1.0))
+        }
+        
+        return system
     }
 }

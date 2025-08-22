@@ -23,9 +23,12 @@ final class SoundPlayer: NSObject, @unchecked Sendable {
     private let minInterval: CFTimeInterval = AppConfiguration.Audio.rateLimitInterval
     private var currentSoundName: String?
     private var currentSoundExt: String?
+    private var isPreloaded = false
 
-    /// Call once early (optional). We'll lazy-init if you don't.
-    func preload(name: String, ext: String, voices: Int = AppConfiguration.Audio.defaultVoiceCount) {
+    /// Lazy preload - only loads when first needed for faster startup
+    private func ensurePreloaded(name: String, ext: String, voices: Int = AppConfiguration.Audio.defaultVoiceCount) {
+        guard !isPreloaded || currentSoundName != name || currentSoundExt != ext else { return }
+        
         guard let url = Bundle.main.url(forResource: name, withExtension: ext) else {
             print("⚠️ Sound file \(name).\(ext) not found.")
             return
@@ -48,11 +51,24 @@ final class SoundPlayer: NSObject, @unchecked Sendable {
                 print("⚠️ Failed to create AVAudioPlayer: \(error)")
             }
         }
+        isPreloaded = true
+    }
+
+    /// Call once early (optional). We'll lazy-init if you don't.
+    func preload(name: String, ext: String, voices: Int = AppConfiguration.Audio.defaultVoiceCount) {
+        // Store for lazy loading but don't actually load yet
+        currentSoundName = name
+        currentSoundExt = ext
+        
+        // Preload asynchronously to avoid blocking
+        Task { @MainActor in
+            self.ensurePreloaded(name: name, ext: ext, voices: voices)
+        }
     }
 
     func play(name: String, ext: String) {
         if pool.isEmpty || currentSoundName != name || currentSoundExt != ext {
-            preload(name: name, ext: ext)
+            ensurePreloaded(name: name, ext: ext)
         }
 
         let now = CACurrentMediaTime()

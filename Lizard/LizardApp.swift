@@ -9,11 +9,18 @@ struct LizardApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     
     init() {
-        // Start beta feedback manager for screenshot detection
-        BetaFeedbackManager.shared.start()
+        // Defer heavy initialization to background
+        Task.detached(priority: .utility) {
+            // Start beta feedback manager asynchronously
+            await MainActor.run {
+                BetaFeedbackManager.shared.start()
+            }
+        }
         
-        // Configure audio session
-        configureAudioSession()
+        // Configure audio session asynchronously to avoid blocking startup
+        Task.detached(priority: .background) {
+            await Self.configureAudioSessionAsync()
+        }
     }
 
     var body: some Scene {
@@ -28,10 +35,12 @@ struct LizardApp: App {
         }
     }
     
-    private func configureAudioSession() {
+    @Sendable
+    private static func configureAudioSessionAsync() async {
         do {
-            try AVAudioSession.sharedInstance().setCategory(.ambient, mode: .default)
-            try AVAudioSession.sharedInstance().setActive(true)
+            let audioSession = AVAudioSession.sharedInstance()
+            try audioSession.setCategory(.ambient, mode: .default)
+            try audioSession.setActive(true)
         } catch {
             print("Failed to configure audio session: \(error)")
         }

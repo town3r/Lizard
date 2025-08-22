@@ -234,7 +234,7 @@ struct PhysicsSettingsView: View {
                             title: "Max Lizards",
                             subtitle: "Performance limit",
                             value: $maxLizards,
-                            range: 50...500,
+                            range: 50...1000,
                             step: 25,
                             formatter: { "\(Int($0))" }
                         )
@@ -324,43 +324,88 @@ struct VisualSettingsView: View {
     
     // Gradient customization settings
     @AppStorage("gradientStyle") private var gradientStyle: String = "timeOfDay"
-    @AppStorage("customGradientColor1") private var customGradientColor1Data: Data = try! JSONEncoder().encode(CodableColor(color: .blue))
-    @AppStorage("customGradientColor2") private var customGradientColor2Data: Data = try! JSONEncoder().encode(CodableColor(color: .purple))
-    @AppStorage("customGradientColor3") private var customGradientColor3Data: Data = try! JSONEncoder().encode(CodableColor(color: .pink))
+    @AppStorage("customGradientColor1") private var customGradientColor1Data: Data = {
+        do {
+            return try JSONEncoder().encode(CodableColor(color: .blue))
+        } catch {
+            return Data()
+        }
+    }()
+    @AppStorage("customGradientColor2") private var customGradientColor2Data: Data = {
+        do {
+            return try JSONEncoder().encode(CodableColor(color: .purple))
+        } catch {
+            return Data()
+        }
+    }()
+    @AppStorage("customGradientColor3") private var customGradientColor3Data: Data = {
+        do {
+            return try JSONEncoder().encode(CodableColor(color: .pink))
+        } catch {
+            return Data()
+        }
+    }()
     @AppStorage("gradientDirection") private var gradientDirection: String = "topToBottom"
     @AppStorage("gradientAnimationEnabled") private var gradientAnimationEnabled: Bool = true
     @AppStorage("gradientAnimationSpeed") private var gradientAnimationSpeed: Double = 1.0
     
-    // Helper computed properties for gradient colors
+    // Helper computed properties for gradient colors with safe decoding
     private var customGradientColor1: Color {
         get {
-            (try? JSONDecoder().decode(CodableColor.self, from: customGradientColor1Data))?.color ?? .blue
+            do {
+                let codableColor = try JSONDecoder().decode(CodableColor.self, from: customGradientColor1Data)
+                return codableColor.color
+            } catch {
+                return .blue // Safe fallback
+            }
         }
     }
     
     private var customGradientColor2: Color {
         get {
-            (try? JSONDecoder().decode(CodableColor.self, from: customGradientColor2Data))?.color ?? .purple
+            do {
+                let codableColor = try JSONDecoder().decode(CodableColor.self, from: customGradientColor2Data)
+                return codableColor.color
+            } catch {
+                return .purple // Safe fallback
+            }
         }
     }
     
     private var customGradientColor3: Color {
         get {
-            (try? JSONDecoder().decode(CodableColor.self, from: customGradientColor3Data))?.color ?? .pink
+            do {
+                let codableColor = try JSONDecoder().decode(CodableColor.self, from: customGradientColor3Data)
+                return codableColor.color
+            } catch {
+                return .pink // Safe fallback
+            }
         }
     }
     
-    // Helper functions for setting custom colors
+    // Helper functions for setting custom colors with safe encoding
     private func setCustomGradientColor1(_ color: Color) {
-        customGradientColor1Data = try! JSONEncoder().encode(CodableColor(color: color))
+        do {
+            customGradientColor1Data = try JSONEncoder().encode(CodableColor(color: color))
+        } catch {
+            print("Failed to encode gradient color 1: \(error)")
+        }
     }
     
     private func setCustomGradientColor2(_ color: Color) {
-        customGradientColor2Data = try! JSONEncoder().encode(CodableColor(color: color))
+        do {
+            customGradientColor2Data = try JSONEncoder().encode(CodableColor(color: color))
+        } catch {
+            print("Failed to encode gradient color 2: \(error)")
+        }
     }
     
     private func setCustomGradientColor3(_ color: Color) {
-        customGradientColor3Data = try! JSONEncoder().encode(CodableColor(color: color))
+        do {
+            customGradientColor3Data = try JSONEncoder().encode(CodableColor(color: color))
+        } catch {
+            print("Failed to encode gradient color 3: \(error)")
+        }
     }
     
     var body: some View {
@@ -685,113 +730,253 @@ struct VisualSettingsView: View {
 // MARK: - Firework Settings
 
 struct FireworkSettingsView: View {
-    @AppStorage("fireworkDensity") private var fireworkDensity: Double = 0.5
-    @AppStorage("fireworkDuration") private var fireworkDuration: Double = 5.0
-    @AppStorage("fireworkColorScheme") private var fireworkColorScheme: String = "vibrant"
-    @AppStorage("fireworkSoundEffects") private var fireworkSoundEffects: Bool = true
+    @AppStorage("fireworkEnabled") private var fireworkEnabled: Bool = true
+    @AppStorage("fireworkIntensity") private var fireworkIntensity: Double = 0.5
+    // Remove the problematic color encoding - use simple string instead
+    @AppStorage("fireworkColorScheme") private var fireworkColorScheme: String = "red"
+    
+    // Additional firework customization options
+    @AppStorage("fireworkDuration") private var fireworkDuration: Double = 3.0
+    @AppStorage("fireworkParticleCount") private var fireworkParticleCount: Int = 100
+    @AppStorage("fireworkExplosionPattern") private var fireworkExplosionPattern: String = "burst"
+    @AppStorage("fireworkTriggerMode") private var fireworkTriggerMode: String = "manual"
+    @AppStorage("fireworkAutoInterval") private var fireworkAutoInterval: Double = 10.0
+    @AppStorage("fireworkShowLength") private var fireworkShowLength: Double = 5.0
+    @AppStorage("fireworkTrailEnabled") private var fireworkTrailEnabled: Bool = true
+    @AppStorage("fireworkGlowEnabled") private var fireworkGlowEnabled: Bool = true
+    @AppStorage("fireworkSoundEnabled") private var fireworkSoundEnabled: Bool = true
+    @AppStorage("fireworkMultiColor") private var fireworkMultiColor: Bool = false
+    @AppStorage("fireworkGravityAffected") private var fireworkGravityAffected: Bool = true
+    @AppStorage("fireworkFadeSpeed") private var fireworkFadeSpeed: Double = 1.0
+    @AppStorage("fireworkScale") private var fireworkScale: Double = 1.0
+    @AppStorage("fireworkPreset") private var fireworkPreset: String = "classic"
+    
+    // Helper computed property for firework color - simple and fast
+    private var fireworkColor: Color {
+        switch fireworkColorScheme {
+        case "red": return .red
+        case "blue": return .blue
+        case "green": return .green
+        case "yellow": return .yellow
+        case "purple": return .purple
+        case "orange": return .orange
+        case "pink": return .pink
+        default: return .red
+        }
+    }
+    
+    // Helper function for setting firework color - simple and fast
+    private func setFireworkColor(_ color: Color) {
+        // Convert Color to string - fast and simple
+        if color == .red { fireworkColorScheme = "red" }
+        else if color == .blue { fireworkColorScheme = "blue" }
+        else if color == .green { fireworkColorScheme = "green" }
+        else if color == .yellow { fireworkColorScheme = "yellow" }
+        else if color == .purple { fireworkColorScheme = "purple" }
+        else if color == .orange { fireworkColorScheme = "orange" }
+        else if color == .pink { fireworkColorScheme = "pink" }
+        else { fireworkColorScheme = "red" }
+    }
     
     var body: some View {
         ScrollView {
             VStack(spacing: 24) {
-                LiquidGlassSection(title: "Firework Settings", subtitle: "Customize firework effects and behavior", systemImage: "fireworks") {
-                    VStack(spacing: 16) {
-                        SettingsSlider(
-                            title: "Firework Density",
-                            subtitle: "Number of fireworks spawned",
-                            value: $fireworkDensity,
-                            range: 0...1,
-                            step: 0.1,
-                            formatter: { String(format: "%.1f", $0) }
-                        )
-
-                        SettingsSlider(
-                            title: "Duration",
-                            subtitle: "How long fireworks last",
-                            value: $fireworkDuration,
-                            range: 1...10,
-                            step: 1,
-                            formatter: { "\($0)s" }
-                        )
-                        
-                        SettingsToggle(
-                            title: "Sound Effects",
-                            subtitle: "Play sounds during fireworks",
-                            systemImage: "speaker.wave.3",
-                            isOn: $fireworkSoundEffects
-                        )
-                    }
-                }
+                basicControlsSection
                 
-                LiquidGlassSection(title: "Color Schemes", subtitle: "Customize firework color effects", systemImage: "paintbrush") {
-                    VStack(spacing: 16) {
-                        ColorSchemeButton(
-                            title: "Vibrant",
-                            isSelected: fireworkColorScheme == "vibrant"
-                        ) {
-                            fireworkColorScheme = "vibrant"
-                        }
-
-                        ColorSchemeButton(
-                            title: "Pastel",
-                            isSelected: fireworkColorScheme == "pastel"
-                        ) {
-                            fireworkColorScheme = "pastel"
-                        }
-
-                        ColorSchemeButton(
-                            title: "Neon",
-                            isSelected: fireworkColorScheme == "neon"
-                        ) {
-                            fireworkColorScheme = "neon"
-                        }
-
-                        ColorSchemeButton(
-                            title: "Custom",
-                            isSelected: fireworkColorScheme == "custom"
-                        ) {
-                            fireworkColorScheme = "custom"
-                        }
-                    }
+                if fireworkEnabled {
+                    appearanceSection
+                    behaviorSection
                 }
             }
             .padding(.horizontal, 20)
         }
         .navigationTitle("Firework Settings")
-        .navigationBarTitleDisplayMode(.large)
+        .navigationBarTitleDisplayMode(.inline)
     }
-}
-
-struct ColorSchemeButton: View {
-    let title: String
-    let isSelected: Bool
-    let action: () -> Void
     
-    var body: some View {
-        Button(action: action) {
-            HStack {
-                Text(title)
-                    .font(.body)
-                    .fontWeight(.medium)
-                    .foregroundStyle(isSelected ? .white : .primary)
+    // MARK: - View Components
+    
+    private var basicControlsSection: some View {
+        LiquidGlassSection(title: "Basic Controls", subtitle: "Enable and control firework effects", systemImage: "fireworks") {
+            VStack(spacing: 16) {
+                SettingsToggle(
+                    title: "Enable Fireworks",
+                    subtitle: "Turn firework effects on or off",
+                    systemImage: "sparkles",
+                    isOn: $fireworkEnabled
+                )
                 
-                Spacer()
-                
-                if isSelected {
-                    Image(systemName: "checkmark.circle.fill")
-                        .foregroundStyle(.white)
+                if fireworkEnabled {
+                    basicControlsSliders
                 }
             }
-            .padding(12)
-            .background(
-                isSelected ? .blue : .clear,
-                in: RoundedRectangle(cornerRadius: 12)
+        }
+    }
+    
+    private var basicControlsSliders: some View {
+        Group {
+            SettingsSlider(
+                title: "Overall Intensity",
+                subtitle: "Master intensity control",
+                value: $fireworkIntensity,
+                range: 0.1...2.0,
+                step: 0.1,
+                formatter: { String(format: "%.1fx", $0) }
             )
-            .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                    .stroke(isSelected ? .clear : .secondary.opacity(0.3), lineWidth: 1)
+            
+            SettingsSlider(
+                title: "Scale",
+                subtitle: "Size of firework effects",
+                value: $fireworkScale,
+                range: 0.5...3.0,
+                step: 0.1,
+                formatter: { String(format: "%.1fx", $0) }
             )
         }
-        .buttonStyle(PlainButtonStyle())
+    }
+    
+    private var appearanceSection: some View {
+        LiquidGlassSection(title: "Appearance", subtitle: "Customize visual effects and colors", systemImage: "paintpalette") {
+            VStack(spacing: 16) {
+                colorPickerSection
+                appearanceToggles
+                fadeSpeedSlider
+            }
+        }
+    }
+    
+    private var colorPickerSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Primary Color")
+                .font(.headline)
+            HStack {
+                ForEach(["red", "blue", "green", "yellow", "purple", "orange", "pink"], id: \.self) { colorName in
+                    Button {
+                        fireworkColorScheme = colorName
+                    } label: {
+                        Circle()
+                            .fill(getColorFromName(colorName))
+                            .frame(width: 30, height: 30)
+                            .overlay(
+                                Circle()
+                                    .stroke(fireworkColorScheme == colorName ? Color.primary : Color.clear, lineWidth: 2)
+                            )
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+        }
+    }
+    
+    private var appearanceToggles: some View {
+        Group {
+            SettingsToggle(
+                title: "Multi-Color Mode",
+                subtitle: "Use rainbow colors instead of single color",
+                systemImage: "rainbow",
+                isOn: $fireworkMultiColor
+            )
+            
+            SettingsToggle(
+                title: "Particle Trails",
+                subtitle: "Show trailing effects behind particles",
+                systemImage: "line.diagonal",
+                isOn: $fireworkTrailEnabled
+            )
+            
+            SettingsToggle(
+                title: "Glow Effects",
+                subtitle: "Add soft glow around particles",
+                systemImage: "sun.max",
+                isOn: $fireworkGlowEnabled
+            )
+        }
+    }
+    
+    private var fadeSpeedSlider: some View {
+        SettingsSlider(
+            title: "Fade Speed",
+            subtitle: "How quickly particles fade out",
+            value: $fireworkFadeSpeed,
+            range: 0.3...3.0,
+            step: 0.1,
+            formatter: { String(format: "%.1fx", $0) }
+        )
+    }
+    
+    private var behaviorSection: some View {
+        LiquidGlassSection(title: "Behavior", subtitle: "Control timing and physics", systemImage: "timer") {
+            VStack(spacing: 16) {
+                behaviorSliders
+                behaviorToggles
+            }
+        }
+    }
+    
+    private var behaviorSliders: some View {
+        Group {
+            SettingsSlider(
+                title: "Duration",
+                subtitle: "How long fireworks last",
+                value: $fireworkDuration,
+                range: 1.0...8.0,
+                step: 0.5,
+                formatter: { String(format: "%.1f sec", $0) }
+            )
+            
+            SettingsSlider(
+                title: "Show Length",
+                subtitle: "Total duration of firework display",
+                value: $fireworkShowLength,
+                range: 2.0...30.0,
+                step: 1.0,
+                formatter: { String(format: "%.0f sec", $0) }
+            )
+            
+            SettingsSlider(
+                title: "Particle Count",
+                subtitle: "Number of particles per explosion",
+                value: Binding(
+                    get: { Double(fireworkParticleCount) },
+                    set: { fireworkParticleCount = Int($0) }
+                ),
+                range: 25...300,
+                step: 25,
+                formatter: { "\(Int($0))" }
+            )
+        }
+    }
+    
+    private var behaviorToggles: some View {
+        Group {
+            SettingsToggle(
+                title: "Gravity Effects",
+                subtitle: "Particles affected by device gravity",
+                systemImage: "arrow.down.circle",
+                isOn: $fireworkGravityAffected
+            )
+            
+            SettingsToggle(
+                title: "Sound Effects",
+                subtitle: "Play explosion sounds",
+                systemImage: "speaker.wave.2",
+                isOn: $fireworkSoundEnabled
+            )
+        }
+    }
+    
+    // Helper function to get Color from string name
+    private func getColorFromName(_ name: String) -> Color {
+        switch name {
+        case "red": return .red
+        case "blue": return .blue
+        case "green": return .green
+        case "yellow": return .yellow
+        case "purple": return .purple
+        case "orange": return .orange
+        case "pink": return .pink
+        default: return .red
+        }
     }
 }
 
@@ -1242,6 +1427,48 @@ struct GradientPresetButton: View {
                     .foregroundStyle(.primary)
             }
             .padding(12)
+            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(.primary.opacity(0.1), lineWidth: 1)
+            )
+        }
+        .buttonStyle(PlainButtonStyle())
+    }
+}
+
+// MARK: - Firework Customization Supporting Views
+
+struct FireworkPresetButton: View {
+    let title: String
+    let description: String
+    let systemImage: String
+    let action: () -> Void
+    
+    var body: some View {
+        Button(action: action) {
+            VStack(alignment: .leading, spacing: 8) {
+                HStack {
+                    Image(systemName: systemImage)
+                        .font(.title2)
+                        .foregroundStyle(.blue)
+                        .frame(width: 24, height: 24)
+                    
+                    Spacer()
+                }
+                
+                Text(title)
+                    .font(.headline)
+                    .fontWeight(.semibold)
+                    .foregroundStyle(.primary)
+                
+                Text(description)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.leading)
+            }
+            .padding(12)
+            .frame(maxWidth: .infinity, alignment: .leading)
             .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
             .overlay(
                 RoundedRectangle(cornerRadius: 12)
