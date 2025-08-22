@@ -125,7 +125,6 @@ Violations of the code of conduct should be reported to the project maintainers.
 #### Medium Priority
 - New physics effects
 - UI enhancements
-- Additional platforms (visionOS, tvOS)
 - Developer tools and debugging features
 
 #### Low Priority
