@@ -2,7 +2,7 @@
 
 A delightful physics simulation game where you spawn adorable lizard emojis that interact with realistic physics, gravity, and device motion.
 
-Available for **iOS** and **Apple Watch** with platform-optimized experiences.
+Available for **iOS** with an **Apple Watch companion app in development**.
 
 ![Lizard App](Lizard/lizard.png)
 
@@ -18,18 +18,31 @@ Full-featured physics simulation with advanced graphics and controls.
 - **Lizard Spawning**: Tap the main button to spawn individual lizards with random velocities
 - **Rain Mode**: Hold the rain button to continuously spawn multiple lizards
 - **Tilt Controls**: Use device motion to control gravity direction
+- **Advanced Settings**: Comprehensive customization system with 5 categories of settings
 
 ### 🌅 Visual Experience  
 - **Dynamic Weather Backgrounds**: Enhanced time-of-day reactive backgrounds with dynamic weather effects
   - Real-time weather conditions with animated sky transitions
   - Moving clouds with dynamic opacity and layering
   - Animated sun with rays and position tracking
-  - Rain effects with realistic screen raindrops
-  - Enhanced sunrise/sunset transitions
-  - Stars and moon at night with weather interaction
-- **Weather Control System**: Manual weather control with auto/manual mode toggle
-- **Liquid Glass UI**: Modern, translucent button styling with depth effects
-- **Smooth Animations**: 120 FPS performance optimization
+  - Vortex-powered rain effects with realistic screen raindrops and splashes
+  - Enhanced sunrise/sunset transitions with weather interaction
+  - Stars and moon at night with dynamic weather systems
+  - Snow effects with customizable drift and snowflake sizes
+- **Weather Control System**: Advanced weather modes (auto/manual/off) with time-based generation
+- **Liquid Glass UI**: Modern, translucent button styling with customizable depth effects
+- **Smooth Animations**: 120 FPS performance optimization with deferred initialization
+
+### 🎆 Particle Effects (Vortex Framework)
+- **Customizable Fireworks**: Advanced particle system with extensive customization options
+  - Adjustable intensity, particle count, scale, and colors
+  - Trail effects, glow effects, and fade speed control
+  - Gravity-affected particles for realistic motion
+  - Multi-color support and custom animation patterns
+- **Weather Particles**: Vortex-powered rain and snow systems
+  - Realistic rain droplets with splash effects on surfaces
+  - Snow particles with wind drift and size variations
+  - Customizable intensity and visual effects
 
 ### 🎵 Audio & Feedback
 - **Sound Effects**: Audio feedback for lizard spawning
@@ -48,7 +61,13 @@ Full-featured physics simulation with advanced graphics and controls.
 
 ### 🧪 Beta Features
 - **Screenshot Feedback**: Take a screenshot during TestFlight to automatically open feedback composer
-- **Performance Monitoring**: Automatic FPS tracking and optimization
+- **Performance Monitoring**: Automatic FPS tracking and optimization with advanced memory management
+- **Advanced Settings Panel**: Comprehensive settings system with 5 specialized categories:
+  - **Screen Orientation**: Lock device orientation for optimal physics simulation
+  - **Physics Settings**: Control lizard behavior, spawn limits, and performance parameters
+  - **Visual Settings**: Customize appearance, background modes, and UI effects
+  - **Firework Settings**: Extensive particle effect customization and control
+  - **Weather Settings**: Environmental control with rain, snow, and atmospheric effects
 
 ## 🎯 How to Play
 
@@ -56,7 +75,10 @@ Full-featured physics simulation with advanced graphics and controls.
 2. **Rain Mode**: Hold the rain button (🌧️) to continuously spawn lizards
 3. **Tilt Control**: Tilt your device to change gravity direction and watch lizards move
 4. **Stop/Clear**: Use the stop button (🛑) to pause or trash button (🗑️) to clear all lizards
-5. **Game Center**: Track your progress and compete on leaderboards
+5. **Fireworks**: Trigger spectacular particle effects with customizable parameters
+6. **Weather Control**: Adjust weather conditions (auto/manual/off) for enhanced atmosphere
+7. **Settings**: Access comprehensive settings panel for advanced customization
+8. **Game Center**: Track your progress and compete on leaderboards
 
 ## 🔧 Controls
 
@@ -68,7 +90,10 @@ Full-featured physics simulation with advanced graphics and controls.
 | Rain Button Hold | Continuous rain mode |
 | Stop Button | Pause physics aging |
 | Clear Button | Remove all lizards |
+| Settings Button | Access comprehensive settings panel |
+| Fireworks Button | Trigger customizable particle effects |
 | Device Tilt | Control gravity direction |
+| Screenshots | Automatic beta feedback (TestFlight) |
 
 ## 📱 Requirements
 
@@ -78,27 +103,33 @@ Full-featured physics simulation with advanced graphics and controls.
 
 ## 🏗️ Technical Details
 
-- **Framework**: SwiftUI + SpriteKit
-- **Physics**: Custom physics simulation with performance optimization
-- **Audio**: AVFoundation with multi-voice sound pooling
-- **Motion**: CoreMotion for device orientation and gravity
-- **Persistence**: UserDefaults for score tracking
-- **Performance**: Automatic lizard lifecycle management (10-second lifespan)
+- **Framework**: SwiftUI + SpriteKit + Vortex (particle effects)
+- **Physics**: Custom physics simulation with performance optimization and 120 FPS targeting
+- **Audio**: AVFoundation with multi-voice sound pooling and ambient mode support
+- **Motion**: CoreMotion for device orientation and gravity with advanced orientation locking
+- **Persistence**: UserDefaults for comprehensive settings and score tracking
+- **Performance**: Automatic lizard lifecycle management with deferred initialization
+- **Particles**: Vortex framework integration for advanced particle effects (fireworks, rain, snow)
+- **UI**: Liquid glass effects with customizable parameters and TransparentSpriteView integration
 
 ## 🎨 Architecture
 
-- `LizardApp.swift` - Main app entry point and lifecycle management
-- `ContentView.swift` - Primary game UI and controls
-- `LizardScene.swift` - SpriteKit physics simulation scene
+- `LizardApp.swift` - Main app entry point with orientation management and lifecycle
+- `ContentView.swift` - Primary game UI with comprehensive controls and vortex effects
+- `LizardScene.swift` - SpriteKit physics simulation scene with 120 FPS optimization
 - `GameCenterManager.swift` - Game Center integration and leaderboards
-- `DynamicBackgroundView.swift` - Time-based background rendering
-- `SoundPlayer.swift` - Audio management and pooling
-- `BetaFeedbackManager.swift` - TestFlight feedback system
+- `DynamicBackgroundView.swift` - Advanced time-based background with vortex weather effects
+- `SettingsView.swift` - Comprehensive settings system with 5 specialized categories
+- `WeatherControlView.swift` - Advanced weather control with auto/manual modes
+- `SoundPlayer.swift` - Audio management and pooling with ambient mode support
+- `BetaFeedbackManager.swift` - TestFlight feedback system with mail integration
+- `AppConfiguration.swift` - Centralized configuration management system
+- `UIHelpers.swift` - Liquid glass effects and enhanced UI components
 
 ## 🚀 Getting Started
 
 ### Quick Start for Users
-1. **Download**: Get Lizard from the App Store (iPhone and Apple Watch)
+1. **Download**: Get Lizard from the App Store (iPhone, Apple Watch companion coming soon)
 2. **Launch**: Open the app and grant motion permissions for tilt controls
 3. **Play**: Tap the center button to spawn lizards, tilt device to control gravity
 4. **Explore**: Try rain mode, Game Center achievements, and weather effects
@@ -152,10 +183,11 @@ We take your privacy seriously:
 
 ## 🔄 Release Notes
 
-**Current Version**: 1.1.0 - "Weather & Watch"
-- Complete Apple Watch companion app
-- Dynamic weather system with real-time effects
-- Enhanced performance and build system improvements
+**Current Version**: 1.1.0 - "Weather & Enhanced UI"
+- Enhanced weather system with Vortex particle effects
+- Comprehensive settings system with 5 specialized categories  
+- Advanced fireworks with customizable particle systems
+- Improved build system and performance optimizations
 
 See [**CHANGELOG.md**](CHANGELOG.md) for complete release history.
 
@@ -214,10 +246,11 @@ This project is open source. License details coming soon.
 - **Contributors** - Everyone who helps make Lizard better
 
 ### Built With
-- **[SwiftUI](https://developer.apple.com/xcode/swiftui/)** - Modern UI framework
-- **[SpriteKit](https://developer.apple.com/spritekit/)** - 2D game engine and physics
-- **[Game Center](https://developer.apple.com/game-center/)** - Social gaming features
-- **[Core Motion](https://developer.apple.com/documentation/coremotion)** - Device motion sensing
+- **[SwiftUI](https://developer.apple.com/xcode/swiftui/)** - Modern UI framework with liquid glass effects
+- **[SpriteKit](https://developer.apple.com/spritekit/)** - 2D game engine and physics simulation
+- **[Vortex](https://github.com/twostraws/Vortex)** - Advanced particle effects framework for fireworks and weather
+- **[Game Center](https://developer.apple.com/game-center/)** - Social gaming features and leaderboards
+- **[Core Motion](https://developer.apple.com/documentation/coremotion)** - Device motion sensing with orientation management
 
 ---
 
