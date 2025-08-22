@@ -60,13 +60,7 @@ enum AppConfiguration {
         static let rainTimerInterval: TimeInterval = 0.08
     }
     
-    // MARK: - watchOS Specific
-    enum WatchOS {
-        static let maxLizards = 20  // Much lower for watchOS performance
-        static let lizardSize: CGFloat = 30
-        static let animationDuration: TimeInterval = 2.0
-        static let spawnButtonSize: CGFloat = 80
-    }
+
     
     // MARK: - Background Performance
     enum Background {

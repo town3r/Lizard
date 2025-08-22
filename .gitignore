@@ -89,10 +89,7 @@ fastlane/test_output
 
 iOSInjectionProject/
 
-# watchOS build artifacts
-**/LizardWatch.app
-**/LizardWatch WatchKit App.app
-**/LizardWatch WatchKit Extension.appex
+
 
 # Temporary files
 *.tmp
