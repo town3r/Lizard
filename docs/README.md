@@ -38,7 +38,6 @@ Welcome to the comprehensive documentation for Lizard - the delightful iOS and A
 |----------|---------|---------|
 | **[Features Guide](../FEATURES.md)** | Complete feature overview | Current & upcoming features |
 | **[Game Center Setup](GAME_CENTER.md)** | Social gaming features | Achievements & leaderboards |
-| **[watchOS Guide](WATCHOS.md)** | Apple Watch companion | Watch-specific features |
 
 ### 👨‍💻 Developer Documentation
 
@@ -62,9 +61,7 @@ Welcome to the comprehensive documentation for Lizard - the delightful iOS and A
 #### Platform Guides
 | Document | Purpose | Platform |
 |----------|---------|----------|
-| **[watchOS Integration](WATCHOS_INTEGRATION.md)** | Adding watchOS targets | iOS → watchOS |
-| **[iOS vs watchOS](IOS_VS_WATCHOS.md)** | Platform comparison | Cross-platform |
-| **[Design System](DESIGN_SYSTEM.md)** | UI components & style | Both platforms |
+| **[Design System](DESIGN_SYSTEM.md)** | UI components & style | iOS |
 
 #### Advanced Topics
 - **[Performance Optimization](../TECHNICAL.md#performance-engineering)** - Frame rate & memory
@@ -125,15 +122,10 @@ Welcome to the comprehensive documentation for Lizard - the delightful iOS and A
 - **[Building Guide](../BUILDING.md#ios-development)** - iOS development setup
 - **[Performance Guide](../TECHNICAL.md#performance-engineering)** - iOS optimization
 
-#### ⌚ watchOS Focus  
-- **[watchOS Guide](WATCHOS.md)** - Watch-specific features
-- **[Integration Guide](WATCHOS_INTEGRATION.md)** - Adding watchOS targets
-- **[Platform Comparison](IOS_VS_WATCHOS.md)** - iOS vs watchOS differences
-
-#### 🔄 Cross-Platform
-- **[Architecture Overview](../TECHNICAL.md#cross-platform-architecture)** - Shared code patterns
-- **[Developer Guide](../DEVELOPER_GUIDE.md#platform-considerations)** - Platform development
-- **[Code Sharing](../TECHNICAL.md#shared-components)** - Common components
+#### 🔄 Architecture
+- **[Architecture Overview](../TECHNICAL.md#architecture-overview)** - System design patterns
+- **[Developer Guide](../DEVELOPER_GUIDE.md)** - Development workflow
+- **[Code Organization](../TECHNICAL.md#code-components)** - Component structure
 
 ---
 

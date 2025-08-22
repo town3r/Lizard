@@ -23,8 +23,8 @@ Thank you for your interest in contributing to Lizard! This document provides gu
 
 Before contributing, ensure you have:
 
-- **macOS 14.0+** (required for iOS/watchOS development)
-- **Xcode 15.0+** with iOS 18.0+ and watchOS 9.0+ SDKs
+- **macOS 14.0+** (required for iOS development)
+- **Xcode 15.0+** with iOS 18.0+ SDK
 - **Apple Developer Account** (for device testing)
 - **Git** configured with your GitHub account
 - Basic knowledge of **Swift**, **SwiftUI**, and **SpriteKit**
@@ -169,11 +169,6 @@ xcodebuild -project Lizard.xcodeproj -scheme Lizard
 xcodebuild -project Lizard.xcodeproj -scheme Lizard -destination 'platform=iOS Simulator,name=iPhone 15'
 ```
 
-#### watchOS
-```bash
-xcodebuild -project Lizard.xcodeproj -scheme LizardWatch -destination 'platform=watchOS Simulator,name=Apple Watch Series 9 (45mm)'
-```
-
 ### Running Tests
 
 ```bash
@@ -182,9 +177,6 @@ xcodebuild test -project Lizard.xcodeproj -scheme Lizard
 
 # iOS tests only
 xcodebuild test -project Lizard.xcodeproj -scheme Lizard -destination 'platform=iOS Simulator,name=iPhone 15'
-
-# watchOS tests only
-xcodebuild test -project Lizard.xcodeproj -scheme LizardWatch -destination 'platform=watchOS Simulator,name=Apple Watch Series 9 (45mm)'
 ```
 
 ---
@@ -424,13 +416,10 @@ func testMemoryUsage() {
 - [ ] iPhone 15 (current generation)
 - [ ] iPhone 15 Pro Max (large screen)
 - [ ] iPad (if supported)
-- [ ] Apple Watch Series 7+ (watchOS)
 
 #### Platform Testing
 - [ ] iOS 18.0 (minimum version)
 - [ ] iOS 18.1+ (latest available)
-- [ ] watchOS 9.0 (minimum version)
-- [ ] watchOS 10.0+ (latest available)
 
 ---
 
@@ -725,7 +714,7 @@ All contributors are recognized in:
 ### Support Channels
 - **GitHub Issues**: Technical problems and bugs
 - **GitHub Discussions**: Questions and general discussion
-- **Apple Documentation**: iOS/watchOS development resources
+- **Apple Documentation**: iOS development resources
 - **Swift Forums**: Swift language questions
 
 ### Mentorship
