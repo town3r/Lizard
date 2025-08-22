@@ -146,6 +146,7 @@ open Lizard.xcodeproj
 - **[Game Center Setup](docs/GAME_CENTER.md)** - Achievements and leaderboards
 - **[watchOS Guide](docs/WATCHOS.md)** - Apple Watch companion app
 - **[Design System](docs/DESIGN_SYSTEM.md)** - UI components and styling
+- **[Documentation Hub](docs/README.md)** - Complete documentation index and navigation
 
 ## 🛡️ Security & Privacy
 
