@@ -93,6 +93,71 @@ A comprehensive guide to all the features and capabilities in the Lizard iOS phy
 - **Memory Management**: Efficient audio resource cleanup
 - **Format Support**: WAV files for high-quality, low-latency playback
 
+## 🎆 Advanced Particle Effects (Vortex Framework)
+
+### Customizable Fireworks System
+- **Intensity Control**: Adjust particle count and emission rate (0.1 to 2.0)
+- **Particle Count**: Variable particle quantity (50 to 1000 particles)
+- **Scale Adjustment**: Size scaling from 0.5x to 3.0x
+- **Multi-Color Support**: Single color or rainbow particle effects
+- **Trail Effects**: Optional particle trails with customizable length
+- **Glow Effects**: Enhanced visual impact with glow rendering
+- **Fade Speed**: Control particle lifetime and fade-out duration
+- **Gravity Influence**: Physics-affected particles for realistic motion
+
+### Weather Particle Systems
+- **Vortex Rain**: Advanced rain particles with realistic droplet physics
+  - Customizable intensity (0.1 to 1.0)
+  - Screen splash effects on impact
+  - Realistic droplet trajectories and physics
+- **Vortex Snow**: Sophisticated snow particle system
+  - Variable intensity and drift effects
+  - Customizable snowflake sizes (0.5x to 2.0x)
+  - Wind drift simulation for natural movement
+  - Layered particle rendering for depth
+
+## ⚙️ Advanced Settings System
+
+### Screen Orientation Management
+- **Orientation Locking**: Lock device to specific orientations
+- **Portrait Mode**: Standard vertical orientation
+- **Landscape Modes**: Left and right landscape options
+- **Dynamic Switching**: Real-time orientation changes
+- **Physics Adaptation**: Gravity adjusts to locked orientation
+
+### Physics Customization
+- **Lizard Limits**: Adjustable maximum concurrent lizards (50-500)
+- **Spawn Behavior**: Customizable spawn patterns and velocities
+- **Performance Tuning**: FPS optimization and memory management
+- **Gravity Strength**: Variable gravity intensity settings
+
+### Visual Customization
+- **Background Modes**: Choose between dynamic, solid, or gradient backgrounds
+- **Weather Control**: Auto/manual/off weather modes
+- **UI Themes**: Liquid glass effect customization
+- **Animation Settings**: Control animation speed and effects
+
+## 🌦️ Enhanced Weather System
+
+### Weather Modes
+- **Auto Weather**: Time-based weather generation with realistic patterns
+  - Morning: Often clear or partly cloudy conditions
+  - Midday/Afternoon: Varied weather with higher storm probability
+  - Evening/Night: Increased rain and cloud probability
+- **Manual Weather**: User-selected weather conditions
+  - Clear skies with full sun visibility
+  - Partly cloudy with scattered cloud coverage
+  - Cloudy with overcast conditions
+  - Rain with particle effects and sky darkening
+  - Storm with enhanced rain and dramatic sky
+- **Weather Off**: Disable all weather effects for minimal distraction
+
+### Dynamic Sky System
+- **Time-of-Day Integration**: Real-time sky color progression
+- **Weather-Responsive Lighting**: Sky colors adapt to current weather
+- **Cloud Movement**: Animated cloud layers with realistic motion
+- **Precipitation Effects**: Visual rain and snow with particle physics
+
 ## 🏆 Game Center Integration
 
 ### Leaderboards
