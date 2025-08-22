@@ -11,10 +11,6 @@ Available for **iOS** and **Apple Watch** with platform-optimized experiences.
 ### iOS Version
 Full-featured physics simulation with advanced graphics and controls.
 
-### ⌚ Apple Watch Version  
-Simplified companion app optimized for quick interactions and watch hardware.
-See [watchOS documentation](docs/WATCHOS.md) for details.
-
 ## ✨ Features
 
 ### 🎮 Core Gameplay
@@ -124,7 +120,7 @@ open Lizard.xcodeproj
 
 #### Requirements
 - **macOS 14.0+** with **Xcode 15.0+**
-- **iOS 18.0+ SDK** and **watchOS 9.0+ SDK**
+- **iOS 18.0+ SDK**
 - **Apple Developer Account** (for device testing)
 
 ## 📚 Documentation
@@ -144,7 +140,6 @@ open Lizard.xcodeproj
 
 ### Specialized Guides
 - **[Game Center Setup](docs/GAME_CENTER.md)** - Achievements and leaderboards
-- **[watchOS Guide](docs/WATCHOS.md)** - Apple Watch companion app
 - **[Design System](docs/DESIGN_SYSTEM.md)** - UI components and styling
 
 ## 🛡️ Security & Privacy
@@ -213,7 +208,7 @@ This project is open source. License details coming soon.
 ## 🙏 Acknowledgments
 
 ### Special Thanks
-- **Apple Developer Community** - For SwiftUI and watchOS guidance
+- **Apple Developer Community** - For SwiftUI guidance
 - **TestFlight Beta Testers** - Essential feedback for improvements
 - **SpriteKit Community** - Physics simulation techniques
 - **Contributors** - Everyone who helps make Lizard better
@@ -228,4 +223,4 @@ This project is open source. License details coming soon.
 
 *Made with ❤️ for physics simulation enthusiasts*
 
-**Ready to spawn some lizards?** Download Lizard today and experience delightful physics simulation on iOS and Apple Watch! 🦎✨
+**Ready to spawn some lizards?** Download Lizard today and experience delightful physics simulation on iOS! 🦎✨
