@@ -3,15 +3,14 @@
 ## General Questions
 
 ### What is Lizard?
-Lizard is a delightful physics simulation game for iOS and Apple Watch where you spawn adorable lizard emojis that interact with realistic physics, gravity, and device motion. It's designed to be both relaxing and engaging, combining smooth animations with intuitive controls.
+Lizard is a delightful physics simulation game for iOS where you spawn adorable lizard emojis that interact with realistic physics, gravity, and device motion. It's designed to be both relaxing and engaging, combining smooth animations with intuitive controls.
 
 ### What platforms does Lizard support?
 - **iOS**: iPhone and iPad running iOS 18.0 or later
-- **Apple Watch**: watchOS 9.0 or later (companion app)
-- **Cross-Platform**: Progress syncs between devices via Game Center
+- **Game Center**: Progress tracking via Game Center
 
 ### Is Lizard free to play?
-Yes! Lizard is available as a free download with no in-app purchases. All features, including Game Center integration and the watchOS companion app, are included.
+Yes! Lizard is available as a free download with no in-app purchases. All features, including Game Center integration, are included.
 
 ### Does Lizard require an internet connection?
 No, Lizard works completely offline. However, an internet connection is needed for:
@@ -57,7 +56,7 @@ Lizard is optimized for battery efficiency with:
 Game Center integration provides:
 - **Achievements**: Track your lizard spawning milestones
 - **Leaderboards**: Compete with friends and global players
-- **Cross-Device Sync**: Keep progress across iPhone and Apple Watch
+- **Progress Tracking**: Keep track of your statistics
 You can decline Game Center and still enjoy the full game experience.
 
 ## Troubleshooting
@@ -87,26 +86,6 @@ This usually indicates a memory issue. Try:
 3. Try signing out and back in to Game Center
 4. Restart the app
 
-### Lizards appear in wrong location on Apple Watch
-This is typically a display scaling issue. Try:
-1. Restart the watch app
-2. Check if the iPhone app is also running (shouldn't matter, but might help)
-3. Restart your Apple Watch
-
-## Apple Watch Specific
-
-### Do I need my iPhone for the watch app?
-No! The Apple Watch app is completely standalone and doesn't require your iPhone to be nearby or even turned on.
-
-### Why are there fewer lizards on Apple Watch?
-The watch version is optimized for Apple Watch hardware with a limit of 20 concurrent lizards instead of 300 on iPhone. This ensures smooth performance on the smaller, less powerful device.
-
-### Can I use the Digital Crown?
-Currently, the watch app uses touch controls only. Digital Crown support is planned for a future update.
-
-### Does the watch app have achievements?
-Yes! The watch app has its own set of Game Center achievements that are separate from but complement the iPhone achievements.
-
 ## Beta Testing (TestFlight Users)
 
 ### How do I provide feedback?
@@ -114,7 +93,7 @@ Take a screenshot while using the app! This automatically opens the feedback com
 
 ### What information should I include in feedback?
 - What you were doing when the issue occurred
-- Device model and iOS/watchOS version
+- Device model and iOS version
 - Whether the issue is reproducible
 - Screenshots or screen recordings if possible
 
@@ -145,7 +124,7 @@ The FPS (frames per second) counter appears in debug builds to help monitor perf
 - **Game Center**: Connect with other players for community features
 
 ### Are more platforms planned?
-Currently focused on iOS and watchOS. Other platforms may be considered based on user interest and technical feasibility.
+Currently focused on iOS. Other platforms may be considered based on user interest and technical feasibility.
 
 ### Will there be more lizard types?
 Different colored lizards and species with unique physics properties are planned for future updates!

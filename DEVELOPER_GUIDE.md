@@ -22,10 +22,9 @@ Welcome to Lizard development! This guide will help you understand the codebase,
 ### Prerequisites
 
 #### Required Tools
-- **macOS 14.0+** (required for iOS/watchOS development)
+- **macOS 14.0+** (required for iOS development)
 - **Xcode 15.0+** (latest stable recommended)
 - **iOS 18.0+ SDK** (included with Xcode)
-- **watchOS 9.0+ SDK** (included with Xcode)
 - **Apple Developer Account** (for device testing and distribution)
 
 #### Recommended Tools
@@ -61,8 +60,6 @@ Lizard/
 │   ├── SoundPlayer.swift       # Audio system
 │   └── ...                     # Support files
 ├── LizardTests/                # iOS Unit Tests
-├── LizardWatch/                # watchOS App Source
-├── LizardWatchTests/           # watchOS Unit Tests
 ├── docs/                       # Documentation
 └── Lizard.xcodeproj           # Xcode Project
 ```
@@ -71,7 +68,6 @@ Lizard/
 - Build succeeds without errors
 - Unit tests pass (should take ~30 seconds)
 - iOS Simulator launches app successfully
-- watchOS Simulator shows companion app
 
 ---
 
@@ -80,21 +76,18 @@ Lizard/
 ### Xcode Configuration
 
 #### Project Settings
-- **Deployment Target**: iOS 18.0+, watchOS 9.0+
+- **Deployment Target**: iOS 18.0+
 - **Swift Version**: Latest stable (5.9+)
-- **Bundle Identifier**: `com.town3r.lizard` (iOS), `com.town3r.lizard.watchkitapp` (watchOS)
+- **Bundle Identifier**: `com.town3r.lizard`
 - **Code Signing**: Automatic (development), Manual (distribution)
 
 #### Build Targets
 - **Lizard** (iOS): Main application
 - **LizardTests** (iOS): Unit test bundle
-- **LizardWatch** (watchOS): Companion app
-- **LizardWatchTests** (watchOS): Watch test bundle
 
 #### Schemes
 - **Lizard**: Builds and runs iOS app
-- **LizardWatch**: Builds and runs watchOS app
-- **All Tests**: Runs tests for both platforms
+- **All Tests**: Runs iOS tests
 
 ### Development Workflow Setup
 
@@ -124,17 +117,17 @@ git config --local alias.br branch
 
 Lizard uses a **hybrid SwiftUI + SpriteKit architecture** that combines the best of both frameworks:
 
-- **SwiftUI**: UI layout, navigation, controls, and watchOS implementation
+- **SwiftUI**: UI layout, navigation, and controls
 - **SpriteKit**: Physics simulation, particle effects, and high-performance rendering
 - **Singleton Managers**: Shared services for audio, Game Center, and feedback
 
 ### Architecture Diagram
 
 ```
-┌─────────────────┐    ┌─────────────────┐
-│   ContentView   │    │  LizardWatch    │
-│   (SwiftUI)     │    │   (SwiftUI)     │
-└─────────┬───────┘    └─────────────────┘
+┌─────────────────┐
+│   ContentView   │
+│   (SwiftUI)     │
+└─────────┬───────┘
           │
           ▼
 ┌─────────────────┐    ┌─────────────────┐
@@ -156,10 +149,9 @@ Lizard uses a **hybrid SwiftUI + SpriteKit architecture** that combines the best
 - **Notification Communication**: Scene notifies UI of events
 - **State Management**: SwiftUI handles app state, SpriteKit handles physics state
 
-#### Cross-Platform Code Sharing
+#### Code Organization
 - **Shared Managers**: Game Center, configuration, and utilities
-- **Platform-Specific UI**: Separate implementations for iOS/watchOS
-- **Conditional Compilation**: `#if os(iOS)` for platform-specific features
+- **Modular Design**: Clear separation of concerns between components
 
 #### Performance-First Design
 - **Object Pooling**: Reuse physics nodes instead of creating new ones
@@ -552,76 +544,6 @@ func startMotionUpdates() {
 }
 ```
 
-### watchOS-Specific Development
-
-#### Pure SwiftUI Implementation
-```swift
-// watchOS uses SwiftUI animations instead of SpriteKit
-struct LizardWatchView: View {
-    @State private var lizards: [LizardModel] = []
-    
-    var body: some View {
-        ZStack {
-            ForEach(lizards) { lizard in
-                LizardView(lizard: lizard)
-                    .animation(.easeInOut, value: lizard.position)
-            }
-        }
-    }
-}
-```
-
-#### Performance Constraints
-```swift
-// watchOS has much stricter performance limits
-private struct WatchConfig {
-    static let maxLizards = 20  // vs 300 on iOS
-    static let animationDuration = 0.5  // Longer for battery life
-    static let cleanupInterval = 5.0  // More aggressive cleanup
-}
-```
-
-#### Haptic Integration
-```swift
-import WatchKit
-
-func provideFeedback() {
-    WKInterfaceDevice.current().play(.click)
-}
-```
-
-### Cross-Platform Code Sharing
-
-#### Conditional Compilation
-```swift
-#if os(iOS)
-import SpriteKit
-typealias PlatformViewController = UIViewController
-#elseif os(watchOS)
-import WatchKit
-typealias PlatformViewController = WKInterfaceController
-#endif
-```
-
-#### Shared Business Logic
-```swift
-// Platform-agnostic game logic
-struct GameLogic {
-    static func calculateScore(lizards: Int, taps: Int) -> Int {
-        return lizards * 10 + taps * 5
-    }
-    
-    static func shouldUnlockAchievement(_ type: AchievementType, 
-                                      current: Int) -> Bool {
-        switch type {
-        case .first100: return current >= 100
-        case .first500: return current >= 500
-        case .buttonMasher: return current >= 100
-        }
-    }
-}
-```
-
 ---
 
 ## Debugging & Profiling
@@ -791,7 +713,6 @@ xcodebuild test -project Lizard.xcodeproj -scheme Lizard
 - [SpriteKit Documentation](https://developer.apple.com/documentation/spritekit)
 - [Game Center Programming Guide](https://developer.apple.com/documentation/gamekit)
 - [Core Motion Framework](https://developer.apple.com/documentation/coremotion)
-- [watchOS Development](https://developer.apple.com/documentation/watchos-apps)
 
 ### Project Documentation
 - **[BUILDING.md](BUILDING.md)**: Detailed build instructions
