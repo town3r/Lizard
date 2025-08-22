@@ -671,7 +671,6 @@ struct PerformanceConstants {
     static let iPhone8MaxLizards = 150
     static let iPhone12MaxLizards = 250
     static let iPhone14MaxLizards = 300
-    static let watchOSMaxLizards = 20
 }
 ```
 

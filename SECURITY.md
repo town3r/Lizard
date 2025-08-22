@@ -107,7 +107,7 @@ Include in your report:
 - **Input Validation**: Validation of all external inputs
 
 #### Platform Security
-- **Sandboxing**: App runs in iOS/watchOS sandbox environment
+- **Sandboxing**: App runs in iOS sandbox environment
 - **App Store Review**: Distributed through Apple App Store security process
 - **Code Signing**: All releases signed with Apple Developer certificates
 - **Automatic Updates**: Security patches delivered via App Store
@@ -187,18 +187,6 @@ Users have complete control over their data:
 // - No photos access
 ```
 
-### watchOS Application Security
-
-#### Standalone Operation
-- **No iPhone Dependency**: watchOS app operates independently
-- **Local Processing**: All physics calculations performed locally
-- **No Network Communication**: No custom network requests
-
-#### WatchKit Framework Security
-- **Apple's Security Model**: Leverages WatchKit security features
-- **Sandboxed Environment**: Runs in restricted watchOS environment
-- **Digital Crown**: No sensitive data input via crown
-
 ### Code Security Measures
 
 #### Memory Safety
@@ -257,7 +245,7 @@ func loadAudioAsset() {
 - **Full Compliance**: Meets all App Store Review Guidelines
 - **Privacy Requirements**: Complies with Apple's privacy standards
 - **Content Guidelines**: Family-friendly content suitable for all ages
-- **Technical Requirements**: Follows iOS/watchOS development best practices
+- **Technical Requirements**: Follows iOS development best practices
 
 ### Data Protection Regulations
 
@@ -346,7 +334,7 @@ func loadAudioAsset() {
 ## Security Best Practices for Users
 
 ### Device Security
-- **Keep iOS/watchOS Updated**: Install system updates promptly
+- **Keep iOS Updated**: Install system updates promptly
 - **App Store Only**: Download only from official App Store
 - **Device Lock**: Use device passcode/biometric authentication
 - **Backup**: Regular device backups to preserve game progress

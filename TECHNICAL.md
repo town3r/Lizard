@@ -6,24 +6,17 @@ Deep dive into the technical implementation, architecture, and engineering decis
 
 ### Target Platform
 - **iOS Version**: 18.0+ minimum deployment target (updated from 15.0+)
-- **watchOS Version**: 9.0+ for companion app
 - **Architecture**: Universal (ARM64, supports all modern iOS devices)
 - **Orientation**: Portrait primary, landscape supported with adapted controls
 - **Performance**: Optimized for 120 FPS on capable devices (ProMotion support)
 - **Memory**: Efficient resource management for sustained gameplay
 
-### Cross-Platform Architecture
-- **iOS**: Full SpriteKit physics simulation with advanced graphics
-- **watchOS**: Pure SwiftUI implementation optimized for Apple Watch hardware
-- **Shared Code**: Common business logic, Game Center integration, and configuration
-- **Platform Abstraction**: Conditional compilation for platform-specific features
-
 ### Hardware Dependencies
-- **Motion**: Accelerometer and gyroscope for tilt controls (iOS only)
-- **Audio**: Speaker or headphones for sound effects (both platforms)
-- **Display**: Supports all iOS screen sizes and Apple Watch displays
-- **Processor**: Optimized for A-series chips and Apple Watch processors
-- **Haptics**: Taptic Engine (iOS) and Haptic feedback (watchOS)
+- **Motion**: Accelerometer and gyroscope for tilt controls
+- **Audio**: Speaker or headphones for sound effects
+- **Display**: Supports all iOS screen sizes
+- **Processor**: Optimized for A-series chips
+- **Haptics**: Taptic Engine for tactile feedback
 
 ### Performance Targets
 | Platform | Max Lizards | Target FPS | Min FPS | Cleanup Interval |
@@ -31,7 +24,6 @@ Deep dive into the technical implementation, architecture, and engineering decis
 | iOS (A17+) | 300 | 120 | 60 | 10s |
 | iOS (A12-A16) | 300 | 60 | 45 | 10s |
 | iOS (A8-A11) | 200 | 60 | 30 | 8s |
-| watchOS | 20 | 60 | 30 | 5s |
 
 ## 🎯 Architecture Overview
 
@@ -54,42 +46,13 @@ LizardApp (SwiftUI App)
 │   ├── GameCenterManager (Social features)
 │   ├── SoundPlayer (Audio pooling & effects)
 │   └── BetaFeedbackManager (TestFlight feedback)
-├── watchOS Implementation (LizardWatch)
-│   ├── Pure SwiftUI (No SpriteKit dependency)
-│   ├── Simplified Physics (SwiftUI animations)
-│   ├── Haptic Integration (WKInterfaceDevice)
-│   └── Independent Game Center
 └── Shared Components
     ├── AppConfiguration (Centralized constants)
     ├── Utilities (Motion, notifications, helpers)
-    └── Cross-platform logic
+    └── Game logic
 ```
 
 ### Advanced Architectural Patterns
-
-#### Cross-Platform Code Organization
-```swift
-// Platform-specific conditional compilation
-#if os(iOS)
-import SpriteKit
-import CoreMotion
-typealias PlatformSpecificPhysics = SKScene
-#elseif os(watchOS)
-import WatchKit
-typealias PlatformSpecificPhysics = SwiftUIAnimationManager
-#endif
-
-// Shared business logic
-struct GameLogic {
-    static func calculateScore(lizards: Int, taps: Int) -> Int {
-        return lizards * 10 + taps * 5
-    }
-    
-    static func shouldUnlockAchievement(_ type: AchievementType, count: Int) -> Bool {
-        // Cross-platform achievement logic
-    }
-}
-```
 
 #### State Management Architecture
 ```swift
@@ -106,19 +69,6 @@ class GameState: ObservableObject {
                 self?.totalLizards += 1
                 self?.checkAchievements()
             }
-        }
-    }
-}
-
-// watchOS: Pure SwiftUI state management
-struct WatchGameState {
-    @State private var lizards: [LizardViewModel] = []
-    @State private var totalSpawned = 0
-    
-    // SwiftUI animation-driven physics
-    func spawnLizard() {
-        withAnimation(.easeOut(duration: 2.0)) {
-            lizards.append(LizardViewModel.random())
         }
     }
 }

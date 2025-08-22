@@ -5,9 +5,9 @@
 Before diving into specific issues, try these common solutions:
 
 1. **Force close and reopen** the app
-2. **Restart your device** (iPhone/iPad/Apple Watch)
+2. **Restart your device** (iPhone/iPad)
 3. **Check available storage** - ensure at least 100MB free space
-4. **Update to latest iOS/watchOS** version
+4. **Update to latest iOS** version
 5. **Check internet connection** for Game Center features
 
 ---
@@ -39,7 +39,6 @@ Before diving into specific issues, try these common solutions:
    - **iPhone 12 and newer**: Should handle 300 lizards smoothly
    - **iPhone X-11**: Optimal with 200-250 lizards
    - **iPhone 8 and older**: Best with 100-150 lizards
-   - **Apple Watch**: Automatically limited to 20 lizards
 
 5. **Storage cleanup**:
    - Delete unused apps and photos
@@ -62,7 +61,7 @@ Before diving into specific issues, try these common solutions:
 2. **Memory management**:
    - Close all other apps before playing
    - Restart device to clear memory
-   - Check for iOS/watchOS updates
+   - Check for iOS updates
 
 3. **Persistent crashes**:
    - Delete and reinstall the app (saves progress with Game Center)
@@ -223,67 +222,6 @@ Before diving into specific issues, try these common solutions:
 
 ---
 
-## Apple Watch Specific Issues
-
-### Watch App Won't Install
-
-#### Symptoms
-- App appears on iPhone but not on watch
-- "Installing" message persists indefinitely
-- Watch app icon missing from app grid
-
-#### Solutions
-1. **Installation process**:
-   - Open Apple Watch app on iPhone
-   - Go to "Available Apps" section
-   - Find Lizard and tap "Install"
-   - Keep iPhone and watch close during installation
-
-2. **Watch storage**:
-   - Check watch storage in Settings > General > Usage
-   - Delete unused watch apps to free space
-   - Need at least 50MB free for installation
-
-3. **Connectivity issues**:
-   - Ensure watch is connected to iPhone
-   - Check Bluetooth connection
-   - Try restarting both devices
-
-### Watch App Performance Issues
-
-#### Symptoms
-- Lizards move very slowly on watch
-- Unresponsive to touch input
-- App crashes frequently on watch
-
-#### Solutions
-1. **Memory management**:
-   - Close other watch apps before playing
-   - Restart Apple Watch periodically
-   - Avoid playing while other intensive apps are running
-
-2. **Optimization**:
-   - The watch version is limited to 20 lizards for performance
-   - Clear existing lizards before spawning new ones
-   - Use gentle touches rather than aggressive tapping
-
-### Watch/iPhone Sync Issues
-
-#### Symptoms
-- Scores don't match between devices
-- Different achievement progress on each platform
-
-#### Solutions
-1. **Sync manually**:
-   - Open Game Center on both devices
-   - Wait for both to connect to internet
-   - Trigger achievements on the device you prefer
-
-2. **Account verification**:
-   - Ensure both devices signed in to same Apple ID
-   - Check Game Center settings on both devices
-   - Sign out and back in if sync is broken
-
 ---
 
 ## Building & Development Issues
@@ -308,7 +246,7 @@ Before diving into specific issues, try these common solutions:
 
 3. **Target configuration**:
    - Verify all targets are properly configured
-   - Check deployment target settings (iOS 18.0+, watchOS 9.0+)
+   - Check deployment target settings (iOS 18.0+)
    - See [BUILDING.md](BUILDING.md) for detailed instructions
 
 ### Test Failures
@@ -338,8 +276,8 @@ Before diving into specific issues, try these common solutions:
 For persistent issues, gather this information:
 
 1. **Device Information**:
-   - Device model (iPhone 12, Apple Watch Series 7, etc.)
-   - iOS/watchOS version
+   - Device model (iPhone, iPad, etc.)
+   - iOS version
    - Available storage space
    - Other installed apps that might conflict
 

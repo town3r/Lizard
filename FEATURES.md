@@ -284,28 +284,6 @@ Based on community feedback and feature requests:
   - *LiDAR*: Room-scale physics mapping (experimental)
   - *Camera Integration*: AR lizards in real environment
 
-#### watchOS Enhancements
-- **Apple Watch Complications**
-  - *Circular*: Lizard count display on watch face
-  - *Corner*: Quick spawn button access
-  - *Modular*: Detailed stats and quick actions
-
-- **Digital Crown Integration**
-  - *Gravity Control*: Rotate crown to adjust gravity direction
-  - *Zoom*: Crown controls physics simulation zoom level
-  - *Precision Spawning*: Crown for precise lizard placement
-
-- **Advanced Haptics**
-  - *Custom Patterns*: Unique haptic feedback for different actions
-  - *Physics Feedback*: Haptics synchronized with collision events
-  - *Accessibility*: Haptic navigation for VoiceOver users
-
-#### visionOS (Apple Vision Pro) Future
-- **Spatial Computing**
-  - *3D Physics*: True 3D lizard physics in spatial environment
-  - *Hand Tracking*: Gesture-based spawning and interaction
-  - *Room Mapping*: Physics interact with real furniture and walls
-
 ### 🔬 Experimental Features
 
 Features in research and development phase:
@@ -324,9 +302,8 @@ Features in research and development phase:
 
 #### Cross-Platform Features
 - **Universal Clipboard**
-  - *Physics Sharing*: Copy physics state between iOS and watchOS
   - *Configuration Sync*: Settings synchronization via iCloud
-  - *Handoff*: Continue physics simulation across devices
+  - *Cloud Save*: Progress and statistics saved to iCloud
 
 ### 📊 Feature Voting & Feedback
 

@@ -82,7 +82,7 @@ The main screen features:
 #### Manual Control
 - **Stop Button (🛑)**: Pauses aging timer, lizards persist longer
 - **Clear Button (🗑️)**: Instantly removes all lizards from screen
-- **Performance Limiting**: Maximum 300 lizards (iOS) or 20 (watchOS)
+- **Performance Limiting**: Maximum 300 lizards on iOS
 
 ---
 

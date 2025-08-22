@@ -29,12 +29,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Replay System**: Record and playback gameplay sessions
 - **Community Challenges**: Weekly physics puzzles and competitions
 
-#### watchOS Enhancements
-- **Apple Watch Complications**: Quick access from watch face
-- **Standalone Mode**: Full game functionality without iPhone
-- **Advanced Haptics**: Rich tactile feedback patterns
-- **Crown Integration**: Use Digital Crown for precise controls
-
 #### Technical Improvements
 - **Cloud Save**: Cross-device progress synchronization via iCloud
 - **Performance Analytics**: Detailed FPS and memory monitoring
@@ -48,23 +42,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.1.0] - 2025-08-19
 
-### 🚀 Major Feature Update - "Weather & Watch"
+### 🚀 Major Feature Update - "Weather & Enhanced UI"
 
-This release introduces significant new features including a complete watchOS companion app, dynamic weather system, and major build system improvements.
+This release introduces significant new features including a dynamic weather system and major build system improvements.
 
 ### Added
-
-#### 📱 watchOS Companion App
-- **Complete Apple Watch App**: Fully functional companion app with native watchOS implementation
-  - SwiftUI-based interface optimized for small screens
-  - Simplified lizard spawning with smooth animations
-  - Haptic feedback integration using WKInterfaceDevice
-  - Audio feedback with optional sound effects
-  - Performance optimized with 20 concurrent lizard limit
-  - Rate limiting to prevent interaction spam
-- **watchOS GameCenter Integration**: Platform-specific achievements and leaderboards
-- **Cross-Platform Persistence**: Scores sync between iOS and watchOS using @AppStorage
-- **Independent Architecture**: No SpriteKit dependency, pure SwiftUI animations
 
 #### 🌤️ Dynamic Weather System
 - **Real-time Weather Backgrounds**: Enhanced time-of-day reactive backgrounds with dynamic weather effects
@@ -92,25 +74,18 @@ This release introduces significant new features including a complete watchOS co
 #### 📚 Comprehensive Documentation Suite
 - **Technical Architecture Documentation**: Detailed technical guides and API documentation
 - **Build & Development Guide**: Complete build instructions and development workflow
-- **Platform Comparison Guide**: iOS vs watchOS feature comparison and implementation details
 - **Design System Documentation**: UI components, styling guidelines, and design patterns
 - **GameCenter Integration Guide**: Achievement setup and leaderboard configuration
-- **watchOS Integration Guide**: Step-by-step watchOS setup and configuration
 
 ### Fixed
 
 #### 🔧 Major Build System Fixes
 - **Invalid Deployment Target**: Fixed `IPHONEOS_DEPLOYMENT_TARGET` from invalid `26.0` to `18.0`
-- **Missing Xcode Targets**: Added 3 missing targets that were causing 68+ build errors
+- **Missing Xcode Targets**: Added missing targets that were causing build errors
   - `LizardTests` target for iOS unit testing bundle
-  - `LizardWatch` target for watchOS app (watchOS 9.0+)
-  - `LizardWatchTests` target for watchOS unit testing bundle
 - **Target Integration**: Properly integrated all source files into Xcode build system
-- **Cross-Platform Dependencies**: Resolved compilation errors between iOS and watchOS code
-- **Duplicate Code Cleanup**: Removed conflicting watchOS template directories
 
 #### 🐛 Code Quality Improvements
-- **Compilation Errors**: Fixed watchOS references to iOS-only components
 - **Build Configuration**: Proper bundle IDs and deployment targets for all platforms
 - **Project Structure**: Cleaned up project organization and file references
 
@@ -118,8 +93,7 @@ This release introduces significant new features including a complete watchOS co
 
 #### 📱 Platform Requirements Update
 - **iOS**: Updated to require iOS 18.0+ (was iOS 15.0+)
-- **watchOS**: New platform support with watchOS 9.0+ requirement
-- **Enhanced Device Support**: Better support for modern iPhone and Apple Watch devices
+- **Enhanced Device Support**: Better support for modern iPhone devices
 
 #### 🎮 Enhanced Gameplay Experience
 - **Improved Visual Effects**: More sophisticated background animations and weather integration
@@ -130,13 +104,10 @@ This release introduces significant new features including a complete watchOS co
 
 #### Build Targets
 - **Lizard** (iOS): Main application targeting iOS 18.0+
-- **LizardTests** (iOS): Unit tests with comprehensive coverage of core components  
-- **LizardWatch** (watchOS): Companion app targeting watchOS 9.0+
-- **LizardWatchTests** (watchOS): watchOS-specific unit tests
+- **LizardTests** (iOS): Unit tests with comprehensive coverage of core components
 
 #### Performance Optimizations
 - Weather system designed for minimal FPS impact
-- watchOS app optimized for Apple Watch hardware constraints
 - Enhanced memory management with automatic cleanup
 - Improved physics simulation efficiency
 
@@ -155,10 +126,10 @@ This release introduces significant new features including a complete watchOS co
 - **Performance**: Improved frame rates and reduced memory usage
 
 #### For Developers
-- **Build System**: Projects must now use Xcode 15.0+ for watchOS support
+- **Build System**: Projects must now use Xcode 15.0+ for iOS development
 - **iOS Deployment Target**: Update from 15.0+ to 18.0+ in your project settings
 - **New Architecture**: `AppConfiguration.swift` replaces scattered configuration constants
-- **Testing**: New test targets available for both iOS and watchOS platforms
+- **Testing**: New test targets available for iOS platform
 
 #### Breaking Changes
 - **Minimum iOS Version**: Now requires iOS 18.0+ (previously 15.0+)
@@ -167,14 +138,14 @@ This release introduces significant new features including a complete watchOS co
 
 #### Recommended Updates
 1. Update Xcode to 15.0+ for full feature support
-2. Test builds on both iOS Simulator and watchOS Simulator
+2. Test builds on iOS Simulator
 3. Review new documentation for API changes
 4. Consider enabling weather system for enhanced user experience
 
 ### 🏆 Contributors & Acknowledgments
 
 #### Special Thanks
-- **Apple Developer Community**: For comprehensive SwiftUI and watchOS guidance
+- **Apple Developer Community**: For comprehensive SwiftUI guidance
 - **TestFlight Beta Testers**: Essential feedback for weather system refinement
 - **SpriteKit Community**: Physics simulation optimization techniques
 - **Accessibility Testing Team**: Ensuring inclusive user experience
@@ -182,7 +153,7 @@ This release introduces significant new features including a complete watchOS co
 #### Development Team
 - **Architecture Design**: Cross-platform SwiftUI implementation patterns
 - **Performance Engineering**: Memory optimization and FPS monitoring systems
-- **Quality Assurance**: Comprehensive testing across iOS and watchOS platforms
+- **Quality Assurance**: Comprehensive testing across iOS platform
 - **Documentation**: Technical writing and developer experience improvements
 
 #### Open Source Inspiration
@@ -284,7 +255,7 @@ For future releases, use this template:
 
 | Version | Release Date | Key Features |
 |---------|-------------|--------------|
-| 1.1.0   | 2025-08-19  | watchOS companion app, dynamic weather system, build fixes |
+| 1.1.0   | 2025-08-19  | Dynamic weather system, build fixes |
 | 1.0.0   | 2024-01-XX  | Initial release with core physics gameplay |
 
 ## Feedback

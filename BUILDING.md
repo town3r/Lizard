@@ -48,23 +48,8 @@ Lizard/
 │   └── Lizard.entitlements    # Capabilities
 ├── LizardTests/               # iOS unit tests
 │   └── LizardTests.swift
-├── LizardWatch WatchKit App/  # watchOS app source
-│   ├── LizardWatchApp.swift   # watchOS app entry point
-│   ├── ContentView.swift      # Simplified watchOS UI
-│   ├── WatchGameCenterManager.swift # watchOS GameCenter
-│   ├── WatchSoundPlayer.swift # watchOS audio + haptics
-│   ├── Assets.xcassets/       # watchOS icons
-│   ├── Info.plist            # watchOS configuration
-│   ├── LizardWatch.entitlements # watchOS capabilities
-│   └── lizard.wav            # Audio file
-├── LizardWatchTests/         # watchOS unit tests
-│   └── LizardWatchTests.swift
-├── docs/                     # Documentation
-│   ├── WATCHOS.md           # watchOS version details
-│   ├── WATCHOS_INTEGRATION.md # Integration guide
-│   └── ...
-└── scripts/                  # Helper scripts
-    └── watchos-integration-helper.sh
+└── docs/                     # Documentation
+    └── ...
 ```
 
 ### Key Files Explained
@@ -84,16 +69,6 @@ Lizard/
 - **Info.plist**: App metadata, permissions, and capabilities
 - **Lizard.entitlements**: Game Center and motion access permissions
 - **Assets.xcassets**: App icons, launch screen, and image assets
-
-#### watchOS Components
-- **LizardWatchApp.swift**: watchOS app entry point with SwiftUI
-- **WatchGameCenterManager.swift**: Simplified GameCenter for watchOS
-- **WatchSoundPlayer.swift**: Audio system with haptic feedback for watchOS
-- **AnimatedLizard struct**: SwiftUI-based lizard animations for watch
-
-#### Integration Resources
-- **docs/WATCHOS_INTEGRATION.md**: Complete step-by-step integration guide
-- **scripts/watchos-integration-helper.sh**: Pre-integration verification script
 
 ## 🚀 Building the Project
 
@@ -143,23 +118,6 @@ xcodebuild -project Lizard.xcodeproj -scheme Lizard -configuration Release
 - **Purpose**: iOS unit testing
 - **Coverage**: Core iOS functionality validation
 - **Host Application**: Lizard app target
-
-#### watchOS Integration Targets ✅
-The project includes complete watchOS app implementation with integrated targets:
-
-- **LizardWatch Target** ✅:
-  - **Product Name**: LizardWatch
-  - **Bundle Identifier**: `com.town3r.lizard.watchkitapp` 
-  - **Platform**: watchOS 9.0+
-  - **Purpose**: Standalone watchOS lizard simulation app
-  - **Status**: Fully integrated and functional
-
-- **LizardWatchTests Target** ✅:
-  - **Purpose**: watchOS unit testing
-  - **Host Application**: LizardWatch target
-  - **Status**: Integrated with comprehensive test coverage
-
-**🍎 watchOS Integration Complete**: All targets have been successfully integrated into the Xcode project. See `docs/WATCHOS_INTEGRATION_COMPLETE.md` for implementation details.
 
 ## 🧪 Testing
 
@@ -219,47 +177,6 @@ func testNewFeature() {
 - Rapid orientation changes
 - Extreme tilt angles
 - Motion permission handling
-
-## 🍎 watchOS Integration
-
-The project includes complete source code for a watchOS version of Lizard that needs to be integrated into the main Xcode project.
-
-### Quick Start Integration
-
-1. **Run the integration helper**:
-   ```bash
-   ./scripts/watchos-integration-helper.sh
-   ```
-
-2. **Open Xcode and follow the integration guide**:
-   ```bash
-   open Lizard.xcodeproj
-   # Then follow docs/WATCHOS_INTEGRATION.md
-   ```
-
-### Post-Integration Build Commands
-
-After completing the integration in Xcode:
-
-```bash
-# Build all targets
-xcodebuild -project Lizard.xcodeproj -scheme Lizard -configuration Debug
-xcodebuild -project Lizard.xcodeproj -scheme LizardWatch -configuration Debug
-
-# Test all targets
-xcodebuild test -project Lizard.xcodeproj -scheme Lizard -destination 'platform=iOS Simulator,name=iPhone 15'
-xcodebuild test -project Lizard.xcodeproj -scheme LizardWatch -destination 'platform=watchOS Simulator,name=Apple Watch Series 9 (45mm)'
-```
-
-### watchOS Features Included
-
-- **Simplified Physics**: SwiftUI animations instead of SpriteKit
-- **Touch Interaction**: Tap-to-spawn lizards optimized for watch screens
-- **Haptic Feedback**: WKInterfaceDevice integration for tactile responses
-- **GameCenter**: Scaled-down achievements and leaderboards
-- **Performance Optimized**: Limited concurrent animations for watch hardware
-
-📖 **Complete guide**: `docs/WATCHOS_INTEGRATION.md`
 
 ## 🔧 Development Workflow
 
