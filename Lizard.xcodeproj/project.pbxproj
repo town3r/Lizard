@@ -9,13 +9,6 @@
 /* Begin PBXBuildFile section */
 		77E455CAB218441BBEAA1649006E47DE /* LizardTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77E455C3B0B34013B5ACC360006E47DE /* LizardTests.swift */; };
 		88C3DF052E57E3A600A99C38 /* Vortex in Frameworks */ = {isa = PBXBuildFile; productRef = 88C3DF042E57E3A600A99C38 /* Vortex */; };
-		AA1001001234567890123456 /* LizardWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1001011234567890123456 /* LizardWatchApp.swift */; };
-		AA1001021234567890123456 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1001031234567890123456 /* ContentView.swift */; };
-		AA1001041234567890123456 /* WatchGameCenterManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1001051234567890123456 /* WatchGameCenterManager.swift */; };
-		AA1001061234567890123456 /* WatchSoundPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1001071234567890123456 /* WatchSoundPlayer.swift */; };
-		AA1001081234567890123456 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AA1001091234567890123456 /* Assets.xcassets */; };
-		AA100110A234567890123456 /* lizard.wav in Resources */ = {isa = PBXBuildFile; fileRef = AA100111B234567890123456 /* lizard.wav */; };
-		AA100112C234567890123456 /* LizardWatchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100113D234567890123456 /* LizardWatchTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -39,17 +32,8 @@
 		77E455C2BB0244F3B1020954006E47DE /* LizardTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LizardTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		77E455C3B0B34013B5ACC360006E47DE /* LizardTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LizardTests.swift; sourceTree = "<group>"; };
 		88C2337B2E4D1BA4006E47DE /* Lizard.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Lizard.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		AA1001011234567890123456 /* LizardWatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LizardWatchApp.swift; sourceTree = "<group>"; };
-		AA1001031234567890123456 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		AA1001051234567890123456 /* WatchGameCenterManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchGameCenterManager.swift; sourceTree = "<group>"; };
-		AA1001071234567890123456 /* WatchSoundPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchSoundPlayer.swift; sourceTree = "<group>"; };
-		AA1001091234567890123456 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		AA100111B234567890123456 /* lizard.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = lizard.wav; sourceTree = "<group>"; };
-		AA100113D234567890123456 /* LizardWatchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LizardWatchTests.swift; sourceTree = "<group>"; };
-		AA100114E234567890123456 /* LizardWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LizardWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		AA100115F234567890123456 /* LizardWatchTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LizardWatchTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		AA100116G234567890123456 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		AA100117H234567890123456 /* LizardWatch.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = LizardWatch.entitlements; sourceTree = "<group>"; };
+		AA100114E234567890123456 /* LizardWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = LizardWatch.app; path = "/Users/btowne/Library/Mobile Documents/com~apple~CloudDocs/Xcode/Lizard/build/Debug-watchos/LizardWatch.app"; sourceTree = "<absolute>"; };
+		AA100115F234567890123456 /* LizardWatchTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; name = LizardWatchTests.xctest; path = "/Users/btowne/Library/Mobile Documents/com~apple~CloudDocs/Xcode/Lizard/build/Debug-watchos/LizardWatch.app/PlugIns/LizardWatchTests.xctest"; sourceTree = "<absolute>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -112,8 +96,6 @@
 				88C2337D2E4D1BA4006E47DE /* Lizard */,
 				88C2337C2E4D1BA4006E47DE /* Products */,
 				77E455CBBBBB49F3923165D8006E47DE /* LizardTests */,
-				AA100118I234567890123456 /* LizardWatch WatchKit App */,
-				AA100119J234567890123456 /* LizardWatchTests */,
 			);
 			sourceTree = "<group>";
 		};
@@ -122,33 +104,8 @@
 			children = (
 				88C2337B2E4D1BA4006E47DE /* Lizard.app */,
 				77E455C2BB0244F3B1020954006E47DE /* LizardTests.xctest */,
-				AA100114E234567890123456 /* LizardWatch.app */,
-				AA100115F234567890123456 /* LizardWatchTests.xctest */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		AA100118I234567890123456 /* LizardWatch WatchKit App */ = {
-			isa = PBXGroup;
-			children = (
-				AA1001011234567890123456 /* LizardWatchApp.swift */,
-				AA1001031234567890123456 /* ContentView.swift */,
-				AA1001051234567890123456 /* WatchGameCenterManager.swift */,
-				AA1001071234567890123456 /* WatchSoundPlayer.swift */,
-				AA1001091234567890123456 /* Assets.xcassets */,
-				AA100111B234567890123456 /* lizard.wav */,
-				AA100116G234567890123456 /* Info.plist */,
-				AA100117H234567890123456 /* LizardWatch.entitlements */,
-			);
-			path = "LizardWatch WatchKit App";
-			sourceTree = "<group>";
-		};
-		AA100119J234567890123456 /* LizardWatchTests */ = {
-			isa = PBXGroup;
-			children = (
-				AA100113D234567890123456 /* LizardWatchTests.swift */,
-			);
-			path = LizardWatchTests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -298,8 +255,6 @@
 		AA100124O234567890123456 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			files = (
-				AA1001081234567890123456 /* Assets.xcassets in Resources */,
-				AA100110A234567890123456 /* lizard.wav in Resources */,
 			);
 		};
 		AA100129T234567890123456 /* Resources */ = {
@@ -324,16 +279,11 @@
 		AA100122M234567890123456 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			files = (
-				AA1001001234567890123456 /* LizardWatchApp.swift in Sources */,
-				AA1001021234567890123456 /* ContentView.swift in Sources */,
-				AA1001041234567890123456 /* WatchGameCenterManager.swift in Sources */,
-				AA1001061234567890123456 /* WatchSoundPlayer.swift in Sources */,
 			);
 		};
 		AA100127R234567890123456 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			files = (
-				AA100112C234567890123456 /* LizardWatchTests.swift in Sources */,
 			);
 		};
 /* End PBXSourcesBuildPhase section */
