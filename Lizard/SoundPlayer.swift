@@ -51,47 +51,35 @@ final class SoundPlayer: NSObject, @unchecked Sendable {
                 print("⚠️ Failed to create AVAudioPlayer: \(error)")
             }
         }
+        
         isPreloaded = true
+        print("🔊 Audio preloaded: \(name).\(ext) with \(pool.count) voices")
     }
 
-    /// Call once early (optional). We'll lazy-init if you don't.
-    func preload(name: String, ext: String, voices: Int = AppConfiguration.Audio.defaultVoiceCount) {
-        // Store for lazy loading but don't actually load yet
-        currentSoundName = name
-        currentSoundExt = ext
-        
-        // Preload asynchronously to avoid blocking
-        Task { @MainActor in
-            self.ensurePreloaded(name: name, ext: ext, voices: voices)
-        }
-    }
-
+    /// Play a sound with rate limiting - now with lazy loading
     func play(name: String, ext: String) {
-        if pool.isEmpty || currentSoundName != name || currentSoundExt != ext {
-            ensurePreloaded(name: name, ext: ext)
-        }
-
         let now = CACurrentMediaTime()
-        if now - lastPlay < minInterval { return }   // rate limit
+        guard now - lastPlay >= minInterval else { return }
         lastPlay = now
-
-        guard !pool.isEmpty else {
-            print("⚠️ SoundPlayer: No audio players available for \(name).\(ext)")
-            return
-        }
         
-        let p = pool[nextIndex]
+        // Lazy load on first play
+        ensurePreloaded(name: name, ext: ext)
+        
+        guard !pool.isEmpty else { return }
+        
+        let player = pool[nextIndex]
         nextIndex = (nextIndex + 1) % pool.count
-        p.currentTime = 0
         
-        // Add error handling for play
-        if !p.play() {
-            print("⚠️ SoundPlayer: Failed to play \(name).\(ext)")
-        }
+        player.stop()
+        player.currentTime = 0
+        player.play()
     }
-    
-    // MARK: - Memory management
-    
+
+    /// Preload specific sound (now optional - called only if needed)
+    func preload(name: String, ext: String, voices: Int = AppConfiguration.Audio.defaultVoiceCount) {
+        ensurePreloaded(name: name, ext: ext, voices: voices)
+    }
+
     /// Clean up resources when needed
     func cleanup() {
         pool.forEach { $0.stop() }

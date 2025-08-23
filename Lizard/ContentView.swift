@@ -468,18 +468,25 @@ private extension ContentView {
     /// Performs heavy initialization tasks in the background to avoid blocking UI startup
     @MainActor
     private func performDeferredInitialization() {
-        // Start tilt motion after UI is ready
-        scene.startTilt()
-        
-        // Update scene configuration with user settings
+        // Update scene configuration with user settings first (lightweight)
         updateSceneConfiguration()
         
-        // Initialize weather effects based on current settings
+        // Initialize weather effects based on current settings (lightweight)
         scene.refreshWeatherEffects()
         
-        // Initialize GameCenter authentication (heavy operation)
-        GameCenterManager.shared.authenticate(presentingViewController: { topViewController() })
-        GameCenterManager.shared.configureAccessPoint(isActive: false, location: .topTrailing)
+        // Start tilt motion after UI is ready (lightweight)
+        scene.startTilt()
+        
+        // Defer GameCenter authentication to lowest priority to avoid blocking
+        Task.detached(priority: .background) {
+            // Additional delay to ensure UI is fully responsive first
+            try? await Task.sleep(nanoseconds: 500_000_000) // 500ms
+            
+            await MainActor.run {
+                GameCenterManager.shared.authenticate(presentingViewController: { topViewController() })
+                GameCenterManager.shared.configureAccessPoint(isActive: false, location: .topTrailing)
+            }
+        }
     }
 }
 

@@ -68,25 +68,40 @@ final class LizardScene: SKScene {
         addChild(physicsLayer)
         addChild(weatherLayer)
         
-        // Defer heavy initialization to avoid blocking UI
-        Task.detached(priority: .userInitiated) { [weak self] in
+        // Setup minimal FPS overlay immediately for performance monitoring
+        setupBasicFPSOverlay()
+        
+        // Defer ALL heavy initialization to avoid blocking startup
+        Task.detached(priority: .utility) { [weak self] in
+            // Small delay to let UI render first
+            try? await Task.sleep(nanoseconds: 100_000_000) // 100ms
             await self?.performHeavyInitialization(view: view)
         }
     }
     
+    private func setupBasicFPSOverlay() {
+        fpsLabel.fontSize = 12
+        fpsLabel.fontColor = .white
+        fpsLabel.alpha = 0.9
+        fpsLabel.zPosition = 9999
+        fpsLabel.horizontalAlignmentMode = .right
+        fpsLabel.verticalAlignmentMode = .top
+        fpsLabel.isHidden = true  // Start hidden, will be shown after initialization
+        addChild(fpsLabel)
+        layoutFPSOverlay()
+    }
+    
     private func performHeavyInitialization(view: SKView) async {
         await MainActor.run {
-            prepareAssets(on: view)
-            setupFPSOverlay()
             setupNotificationObservers()
+            // Show FPS counter after initialization if enabled
+            fpsLabel.isHidden = !showFPSCounter
             // Initialize weather effects after scene setup is complete
             updateWeatherEffects()
         }
         
-        // Sound preloading happens asynchronously anyway now
-        await MainActor.run {
-            SoundPlayer.shared.preload(name: "lizard", ext: "wav", voices: 6)
-        }
+        // Texture preparation happens lazily now - no preloading
+        // Sound preloading deferred until first use
     }
     
     // MARK: - Notification Observers
@@ -337,10 +352,16 @@ final class LizardScene: SKScene {
             physicsLayer.children.first?.removeFromParent()
         }
 
+        // Lazy texture preparation - only create when first needed
+        if lizardTexture == nil, let view = self.view {
+            prepareAssets(on: view)
+        }
+
         let node: SKSpriteNode
         if let t = lizardTexture {
             node = SKSpriteNode(texture: t, size: CGSize(width: baseLizardSize, height: baseLizardSize))
         } else {
+            // Fallback without texture generation if view is not available
             node = SKSpriteNode(color: .systemGreen, size: CGSize(width: baseLizardSize, height: baseLizardSize))
         }
 
