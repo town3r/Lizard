@@ -182,6 +182,29 @@ final class LizardScene: SKScene {
             playSound: true
         )
     }
+    
+    /// Async version of emitFromCircleCenterRandom for better performance
+    func emitFromCircleCenterRandomAsync(sizeJitter: CGFloat) {
+        guard size != .zero else { return }
+        
+        // Check performance before spawning
+        let tooManyLizards = physicsLayer.children.count >= maxPhysicsLizards - 5
+        let shouldThrottle = consecutiveLowFPSFrames > maxConsecutiveLowFPS / 2
+        
+        if tooManyLizards || shouldThrottle { return }
+        
+        let scale = randomSizeLizards ?
+            CGFloat.random(in: 0.4...1.6) :
+            CGFloat.random(in: max(0.4, 1.0 - sizeJitter)...(1.0 + sizeJitter))
+        
+        spawnLizardAsync(
+            at: CGPoint(x: size.width/2, y: size.height * 0.55),
+            impulse: CGVector(dx: CGFloat.random(in: -90...90),
+                              dy: CGFloat.random(in: 120...220)),
+            scale: scale,
+            playSound: true
+        )
+    }
 
     func rainOnce() {
         for _ in 0..<rainIntensity { rainStep() }
@@ -390,6 +413,103 @@ final class LizardScene: SKScene {
 
         body.applyImpulse(impulse)
 
+        node.run(.sequence([
+            .wait(forDuration: lifetime),
+            .fadeOut(withDuration: 0.25),
+            .run { [weak self] in
+                self?.updateLizardCount()
+            },
+            .removeFromParent()
+        ]))
+    }
+    
+    /// Async version of spawnLizard for better performance
+    private func spawnLizardAsync(at point: CGPoint,
+                                  impulse: CGVector,
+                                  scale: CGFloat,
+                                  playSound: Bool) {
+        
+        // Perform expensive operations on background thread
+        Task.detached(priority: .userInitiated) { [weak self] in
+            guard let self = self else { return }
+            
+            // Pre-calculate physics properties off main thread
+            let radius = (self.baseLizardSize * 0.45) * scale
+            let physicsProperties = PhysicsProperties(
+                radius: radius,
+                mass: 0.08,
+                restitution: 0.25,
+                friction: 0.8,
+                linearDamping: 0.1,
+                impulse: impulse
+            )
+            
+            // Switch back to main thread only for scene modifications
+            await MainActor.run {
+                self.createLizardNode(at: point, scale: scale, playSound: playSound, physicsProperties: physicsProperties)
+            }
+        }
+    }
+    
+    /// Helper struct for pre-calculated physics properties
+    private struct PhysicsProperties {
+        let radius: CGFloat
+        let mass: CGFloat
+        let restitution: CGFloat
+        let friction: CGFloat
+        let linearDamping: CGFloat
+        let impulse: CGVector
+    }
+    
+    /// Creates the lizard node with pre-calculated physics properties
+    private func createLizardNode(at point: CGPoint,
+                                  scale: CGFloat,
+                                  playSound: Bool,
+                                  physicsProperties: PhysicsProperties) {
+        
+        if playSound { SoundPlayer.shared.play(name: "lizard", ext: "wav") }
+        
+        if physicsLayer.children.count >= maxPhysicsLizards {
+            physicsLayer.children.first?.removeFromParent()
+        }
+        
+        // Lazy texture preparation - only create when first needed
+        if lizardTexture == nil, let view = self.view {
+            prepareAssets(on: view)
+        }
+        
+        let node: SKSpriteNode
+        if let t = lizardTexture {
+            node = SKSpriteNode(texture: t, size: CGSize(width: baseLizardSize, height: baseLizardSize))
+        } else {
+            // Fallback without texture generation if view is not available
+            node = SKSpriteNode(color: .systemGreen, size: CGSize(width: baseLizardSize, height: baseLizardSize))
+        }
+        
+        node.name = "lizard"
+        node.setScale(scale)
+        node.position = point
+        node.zPosition = 1
+        node.speed = agingPaused ? 0 : 1
+        physicsLayer.addChild(node)
+        updateLizardCount()
+        
+        // 🔔 Notify UI
+        onSpawn?() // direct callback to ContentView
+        NotificationCenter.default.post(name: .lizardSpawned, object: nil) // optional for any other listeners
+        
+        // Apply pre-calculated physics properties
+        let body = SKPhysicsBody(circleOfRadius: physicsProperties.radius)
+        body.affectedByGravity = true
+        body.usesPreciseCollisionDetection = false
+        body.mass = physicsProperties.mass
+        body.restitution = physicsProperties.restitution
+        body.friction = physicsProperties.friction
+        body.linearDamping = physicsProperties.linearDamping
+        node.physicsBody = body
+        
+        body.applyImpulse(physicsProperties.impulse)
+        
         node.run(.sequence([
             .wait(forDuration: lifetime),
             .fadeOut(withDuration: 0.25),
