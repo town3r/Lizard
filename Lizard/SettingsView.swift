@@ -49,6 +49,15 @@ struct SettingsView: View {
                             )
                         }
                         
+                        NavigationLink(destination: AudioSettingsView()) {
+                            SettingsCategoryRow(
+                                title: "Audio Settings",
+                                subtitle: "Sound effects and audio controls",
+                                systemImage: "speaker.wave.2",
+                                color: .pink
+                            )
+                        }
+                        
                         NavigationLink(destination: VisualSettingsView()) {
                             SettingsCategoryRow(
                                 title: "Visual Settings",
@@ -278,6 +287,93 @@ struct PhysicsSettingsView: View {
             .padding(.horizontal, 20)
         }
         .navigationTitle("Physics Settings")
+        .navigationBarTitleDisplayMode(.large)
+    }
+}
+
+// MARK: - Audio Settings
+
+struct AudioSettingsView: View {
+    @AppStorage("soundEffectsEnabled") private var soundEffectsEnabled: Bool = true
+    @AppStorage("lizardSoundEnabled") private var lizardSoundEnabled: Bool = true
+    @AppStorage("thunderSoundEnabled") private var thunderSoundEnabled: Bool = true
+    @AppStorage("soundVolume") private var soundVolume: Double = 1.0
+    
+    var body: some View {
+        ScrollView {
+            VStack(spacing: 24) {
+                LiquidGlassSection(title: "Sound Effects", subtitle: "Control game audio and sound effects", systemImage: "speaker.wave.2") {
+                    VStack(spacing: 16) {
+                        SettingsToggle(
+                            title: "Sound Effects",
+                            subtitle: "Enable or disable all sound effects",
+                            systemImage: "speaker.wave.3",
+                            isOn: $soundEffectsEnabled
+                        )
+                        
+                        if soundEffectsEnabled {
+                            Divider()
+                                .padding(.vertical, 8)
+                            
+                            SettingsToggle(
+                                title: "Lizard Sounds",
+                                subtitle: "Play sound when lizards spawn",
+                                systemImage: "lizard",
+                                isOn: $lizardSoundEnabled
+                            )
+                            
+                            SettingsToggle(
+                                title: "Thunder Sounds",
+                                subtitle: "Play thunder during storms",
+                                systemImage: "cloud.bolt",
+                                isOn: $thunderSoundEnabled
+                            )
+                            
+                            SettingsSlider(
+                                title: "Volume",
+                                subtitle: "Overall sound effect volume",
+                                value: $soundVolume,
+                                range: 0...1,
+                                step: 0.05,
+                                formatter: { String(format: "%.0f%%", $0 * 100) }
+                            )
+                        }
+                    }
+                }
+                
+                LiquidGlassSection(title: "Audio Info", subtitle: "Current audio configuration", systemImage: "info.circle") {
+                    VStack(spacing: 16) {
+                        PerformanceInfoRow(
+                            title: "Sound Effects",
+                            value: soundEffectsEnabled ? "Enabled" : "Disabled",
+                            systemImage: soundEffectsEnabled ? "checkmark.circle" : "xmark.circle"
+                        )
+                        
+                        if soundEffectsEnabled {
+                            PerformanceInfoRow(
+                                title: "Lizard Sounds",
+                                value: lizardSoundEnabled ? "On" : "Off",
+                                systemImage: lizardSoundEnabled ? "speaker.wave.2" : "speaker.slash"
+                            )
+                            
+                            PerformanceInfoRow(
+                                title: "Volume Level",
+                                value: String(format: "%.0f%%", soundVolume * 100),
+                                systemImage: "speaker.wave.1"
+                            )
+                        }
+                        
+                        Text("Sound effects enhance the gameplay experience with audio feedback when lizards spawn and during weather events.")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .multilineTextAlignment(.center)
+                            .padding(.top, 8)
+                    }
+                }
+            }
+            .padding(.horizontal, 20)
+        }
+        .navigationTitle("Audio Settings")
         .navigationBarTitleDisplayMode(.large)
     }
 }

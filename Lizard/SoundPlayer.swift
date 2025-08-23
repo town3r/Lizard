@@ -56,8 +56,27 @@ final class SoundPlayer: NSObject, @unchecked Sendable {
         print("🔊 Audio preloaded: \(name).\(ext) with \(pool.count) voices")
     }
 
-    /// Play a sound with rate limiting - now with lazy loading
+    /// Play a sound with rate limiting and settings check - now with lazy loading
     func play(name: String, ext: String) {
+        // Check audio settings first
+        let soundEffectsEnabled = UserDefaults.standard.bool(forKey: "soundEffectsEnabled")
+        let lizardSoundEnabled = UserDefaults.standard.bool(forKey: "lizardSoundEnabled")
+        let thunderSoundEnabled = UserDefaults.standard.bool(forKey: "thunderSoundEnabled")
+        let soundVolume = UserDefaults.standard.double(forKey: "soundVolume")
+        
+        // Default values if not set
+        let effectsEnabled = UserDefaults.standard.object(forKey: "soundEffectsEnabled") != nil ? soundEffectsEnabled : true
+        let lizardEnabled = UserDefaults.standard.object(forKey: "lizardSoundEnabled") != nil ? lizardSoundEnabled : true
+        let thunderEnabled = UserDefaults.standard.object(forKey: "thunderSoundEnabled") != nil ? thunderSoundEnabled : true
+        let volume = UserDefaults.standard.object(forKey: "soundVolume") != nil ? soundVolume : 1.0
+        
+        // Return early if sound effects are disabled
+        guard effectsEnabled else { return }
+        
+        // Check specific sound type settings
+        if name == "lizard" && !lizardEnabled { return }
+        if name == "thunder" && !thunderEnabled { return }
+        
         let now = CACurrentMediaTime()
         guard now - lastPlay >= minInterval else { return }
         lastPlay = now
@@ -72,6 +91,7 @@ final class SoundPlayer: NSObject, @unchecked Sendable {
         
         player.stop()
         player.currentTime = 0
+        player.volume = Float(volume)
         player.play()
     }
 

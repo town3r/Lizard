@@ -429,12 +429,15 @@ final class LizardScene: SKScene {
                                   scale: CGFloat,
                                   playSound: Bool) {
         
+        // Capture main actor-isolated values before detached task
+        let lizardSize = self.baseLizardSize
+        
         // Perform expensive operations on background thread
         Task.detached(priority: .userInitiated) { [weak self] in
             guard let self = self else { return }
             
             // Pre-calculate physics properties off main thread
-            let radius = (self.baseLizardSize * 0.45) * scale
+            let radius = (lizardSize * 0.45) * scale
             let physicsProperties = PhysicsProperties(
                 radius: radius,
                 mass: 0.08,

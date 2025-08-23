@@ -25,6 +25,12 @@ struct ContentView: View {
     @AppStorage("weatherAutoMode") private var weatherAutoMode: Bool = true
     @AppStorage("manualWeatherCondition") private var manualWeatherCondition: String = "clear"
 
+    // Audio settings - observe changes to update sound behavior
+    @AppStorage("soundEffectsEnabled") private var soundEffectsEnabled: Bool = true
+    @AppStorage("lizardSoundEnabled") private var lizardSoundEnabled: Bool = true
+    @AppStorage("thunderSoundEnabled") private var thunderSoundEnabled: Bool = true
+    @AppStorage("soundVolume") private var soundVolume: Double = 1.0
+
     @State private var isPressingMain = false
     @State private var spewTimer: Timer?
     @State private var rainTimer: Timer?
@@ -270,14 +276,16 @@ private extension ContentView {
                     }
                 }
                 
-                // Sound playback - already has rate limiting built-in
-                SoundPlayer.shared.play(name: "lizard", ext: "wav")
+                // Sound playback - needs to be on main actor
+                await MainActor.run {
+                    SoundPlayer.shared.play(name: "lizard", ext: "wav")
+                }
             }
             
             // GameCenter reporting - can be async as it's not time-critical
             Task.detached(priority: .utility) {
                 await MainActor.run {
-                    reportScoresIfReady()
+                    self.reportScoresIfReady()
                 }
             }
         } label: {
