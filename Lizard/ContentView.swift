@@ -4,6 +4,7 @@ import AVFoundation
 import GameKit
 import Combine
 import UIKit // For app lifecycle notifications
+import QuartzCore // For CACurrentMediaTime
 
 struct ContentView: View {
     @Environment(\.colorScheme) private var colorScheme
@@ -419,7 +420,10 @@ private extension ContentView {
         scene.setAgingPaused(false)
         spewTimer = Timer.scheduledTimer(withTimeInterval: Config.spewTimerInterval, repeats: true) { _ in
             Task { @MainActor in
-                scene.emitFromCircleCenterRandom(sizeJitter: Config.sizeJitterHold)
+                // Use async version for better performance during continuous spawning
+                if scene.currentFPS >= 30 {
+                    scene.emitFromCircleCenterRandomAsync(sizeJitter: Config.sizeJitterHold)
+                }
                 SoundPlayer.shared.play(name: "lizard", ext: "wav")
             }
         }

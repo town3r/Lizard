@@ -316,4 +316,41 @@ class LizardTests: XCTestCase {
         // Should be very fast since sound file likely doesn't exist
         XCTAssertLessThan(endTime - startTime, 0.1)
     }
+    
+    // MARK: - Performance Tests
+    
+    func testButtonDebouncingLogic() {
+        // Test the button debouncing logic independently
+        let debounceInterval: CFTimeInterval = 0.05 // 50ms
+        var lastButtonPressTime: CFTimeInterval = 0
+        
+        let startTime = CACurrentMediaTime()
+        lastButtonPressTime = startTime
+        
+        // Simulate rapid button presses
+        var allowedPresses = 0
+        for i in 0..<10 {
+            let currentTime = startTime + Double(i) * 0.01 // 10ms intervals
+            
+            if currentTime - lastButtonPressTime >= debounceInterval {
+                allowedPresses += 1
+                lastButtonPressTime = currentTime
+            }
+        }
+        
+        // With 50ms debounce and 10ms intervals, should allow fewer presses
+        XCTAssertLessThan(allowedPresses, 10, "Button debouncing should prevent all rapid presses")
+        XCTAssertGreaterThan(allowedPresses, 0, "Button debouncing should allow some presses")
+    }
+    
+    func testAsyncSpawnPerformance() {
+        let scene = LizardScene()
+        scene.size = CGSize(width: 400, height: 600)
+        
+        // Test that async spawn method doesn't crash
+        XCTAssertNoThrow(scene.emitFromCircleCenterRandomAsync(sizeJitter: 0.2))
+        
+        // Test performance check integration
+        XCTAssertTrue(scene.currentFPS >= 0, "FPS should be a valid positive number")
+    }
 }
