@@ -194,7 +194,7 @@ struct DynamicBackgroundView: View {
 // MARK: - Weather System
 
 internal enum WeatherCondition: CaseIterable {
-    case none, clear, partlyCloudy, cloudy, rain, storm, winter
+    case none, clear, partlyCloudy, cloudy, rain, storm
     
     var cloudCoverage: Double {
         switch self {
@@ -204,7 +204,6 @@ internal enum WeatherCondition: CaseIterable {
         case .cloudy: return 0.8
         case .rain: return 0.9
         case .storm: return 1.0
-        case .winter: return 0.7
         }
     }
     
@@ -216,7 +215,6 @@ internal enum WeatherCondition: CaseIterable {
         case .cloudy: return 0.3
         case .rain: return 0.1
         case .storm: return 0.05
-        case .winter: return 0.4
         }
     }
     
@@ -228,7 +226,6 @@ internal enum WeatherCondition: CaseIterable {
         case .cloudy: return "Cloudy"
         case .rain: return "Rain"
         case .storm: return "Storm"
-        case .winter: return "Snow"
         }
     }
     
@@ -240,7 +237,6 @@ internal enum WeatherCondition: CaseIterable {
         case .cloudy: return "cloud.fill"
         case .rain: return "cloud.rain.fill"
         case .storm: return "cloud.bolt.rain.fill"
-        case .winter: return "cloud.snow.fill"
         }
     }
 }
@@ -454,8 +450,6 @@ private struct CloudLayerView: View {
                 return Color(.systemGray2)
             case .storm:
                 return Color(.systemGray)
-            case .winter:
-                return Color(.white)
             }
         }()
         
@@ -568,8 +562,6 @@ private struct SunView: View {
             return Color(red: 1.0, green: 0.9, blue: 0.7)
         case .cloudy, .rain, .storm:
             return Color(red: 0.9, green: 0.85, blue: 0.75)
-        case .winter:
-            return Color(red: 0.8, green: 0.9, blue: 1.0)
         }
     }
 }
@@ -1028,18 +1020,6 @@ private struct EnhancedHillsLayerView: View {
     }
 
     private func hillColors(t: Double, weather: WeatherCondition, scheme: ColorScheme) -> [Color] {
-        // Winter/snow colors - white hills with slight blue tint
-        let winterLight = [
-            Color(red: 0.95, green: 0.96, blue: 0.98),  // Nearly white with cool tint
-            Color(red: 0.90, green: 0.92, blue: 0.95),  // Slightly darker white
-            Color(red: 0.85, green: 0.88, blue: 0.92)   // Deeper snow shadow
-        ]
-        let winterDark = [
-            Color(red: 0.80, green: 0.82, blue: 0.85),  // Dark mode snow
-            Color(red: 0.75, green: 0.77, blue: 0.80),  // Darker snow
-            Color(red: 0.70, green: 0.72, blue: 0.75)   // Deepest snow shadow
-        ]
-        
         // Regular green hills
         let light = [
             Color(red: 0.36, green: 0.76, blue: 0.38),
@@ -1052,15 +1032,11 @@ private struct EnhancedHillsLayerView: View {
             Color(red: 0.12, green: 0.28, blue: 0.14)
         ]
         
-        // Use winter colors when snowing
-        let baseLight = weather == .winter ? winterLight : light
-        let baseDark = weather == .winter ? winterDark : dark
-        
         let bias: Double = (scheme == .dark) ? 0.40 : 0.15
         let w = clamp(t * 0.9 + bias * 0.1, 0, 1)
-        let weatherDarkening = weather == .winter ? 1.0 : (1.0 - (weather.cloudCoverage * 0.2))
+        let weatherDarkening = 1.0 - (weather.cloudCoverage * 0.2)
         
-        return zip(baseDark, baseLight).map { darkColor, lightColor in
+        return zip(dark, light).map { darkColor, lightColor in
             let mixedColor = mix(darkColor, lightColor, weight: w)
             let components = mixedColor.components
             return Color(
@@ -1155,134 +1131,4 @@ private extension Color {
         return (0, 0, 0, 1)
         #endif
     }
-}
-
-private struct SeededRandom {
-    private var state: UInt64
-    init(_ seed: UInt64) { self.state = seed &* 0x9E3779B97F4A7C15 }
-
-    mutating func next() -> UInt64 {
-        state &+= 0x9E3779B97F4A7C15
-        var z = state
-        z = (z ^ (z >> 30)) &* 0xBF58476D1CE4E5B9
-        z = (z ^ (z >> 27)) &* 0x94D049BB133111EB
-        return z ^ (z >> 31)
-    }
-
-    mutating func nextDouble() -> Double {
-        Double(next() & 0x1FFFFFFFFFFFFF) / Double(0x20000000000000)
-    }
-
-    mutating func nextDouble(in range: ClosedRange<Double>) -> Double {
-        range.lowerBound + (range.upperBound - range.lowerBound) * nextDouble()
-    }
-}
-
-// MARK: - Snow Effects
-
-private struct SnowEffectView: View {
-    let intensity: Double
-    let animationOffset: CGFloat
-    
-    private static let snowFlakes: [SnowFlake] = {
-        var rng = SeededRandom(789)
-        return (0..<150).map { _ in
-            SnowFlake(
-                x: rng.nextDouble(),
-                speed: rng.nextDouble(in: 0.3...0.8),
-                size: rng.nextDouble(in: 2...6),
-                opacity: rng.nextDouble(in: 0.4...0.9),
-                drift: rng.nextDouble(in: -1...1),
-                rotation: rng.nextDouble(in: 0...360)
-            )
-        }
-    }()
-    
-    var body: some View {
-        Canvas { ctx, size in
-            for flake in Self.snowFlakes.prefix(Int(Double(Self.snowFlakes.count) * intensity)) {
-                // Base falling motion
-                let speed = flake.speed * 2
-                let fallY = (animationOffset * CGFloat(speed)).truncatingRemainder(dividingBy: size.height + 200) - 100
-                
-                // Add drift for natural movement
-                let driftOffset = sin(Double(animationOffset * 0.01 + CGFloat(flake.x * 10))) * CGFloat(flake.drift) * 15
-                let finalX = flake.x * size.width + driftOffset
-                let finalY = fallY
-                
-                let snowflakeSize = CGFloat(flake.size)
-                
-                // Draw snowflake
-                let center = CGPoint(x: finalX, y: finalY)
-                drawSnowflake(
-                    ctx: ctx,
-                    center: center,
-                    size: snowflakeSize,
-                    opacity: flake.opacity * intensity,
-                    rotation: flake.rotation + Double(animationOffset * 0.5)
-                )
-            }
-        }
-        .allowsHitTesting(false)
-    }
-    
-    private func drawSnowflake(ctx: GraphicsContext, center: CGPoint, size: CGFloat, opacity: Double, rotation: Double) {
-        let halfSize = size / 2
-        
-        // Create snowflake path with 6 spokes
-        var path = Path()
-        
-        for i in 0..<6 {
-            let angle = Double(i) * 60.0 + rotation
-            let radians = angle * .pi / 180.0
-            
-            let endX = center.x + cos(radians) * halfSize
-            let endY = center.y + sin(radians) * halfSize
-            
-            path.move(to: center)
-            path.addLine(to: CGPoint(x: endX, y: endY))
-            
-            // Add small perpendicular lines for snowflake details
-            let detailSize = halfSize * 0.3
-            let detailAngle1 = radians + .pi / 4
-            let detailAngle2 = radians - .pi / 4
-            
-            let detail1X = endX - cos(detailAngle1) * detailSize
-            let detail1Y = endY - sin(detailAngle1) * detailSize
-            let detail2X = endX - cos(detailAngle2) * detailSize
-            let detail2Y = endY - sin(detailAngle2) * detailSize
-            
-            path.move(to: CGPoint(x: endX, y: endY))
-            path.addLine(to: CGPoint(x: detail1X, y: detail1Y))
-            path.move(to: CGPoint(x: endX, y: endY))
-            path.addLine(to: CGPoint(x: detail2X, y: detail2Y))
-        }
-        
-        ctx.stroke(
-            path,
-            with: .color(.white.opacity(opacity)),
-            lineWidth: 1
-        )
-        
-        // Add a small center dot
-        let centerRect = CGRect(
-            x: center.x - 1,
-            y: center.y - 1,
-            width: 2,
-            height: 2
-        )
-        ctx.fill(
-            Path(ellipseIn: centerRect),
-            with: .color(.white.opacity(opacity * 0.8))
-        )
-    }
-}
-
-private struct SnowFlake {
-    let x: Double
-    let speed: Double
-    let size: Double
-    let opacity: Double
-    let drift: Double
-    let rotation: Double
 }

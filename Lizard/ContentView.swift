@@ -19,13 +19,10 @@ struct ContentView: View {
     @AppStorage("randomSizeLizards") private var randomSizeLizards: Bool = false
     @AppStorage("backgroundType") private var backgroundType: String = "dynamic"
     
-    // Weather settings - observe changes to trigger snow vortex effects
+    // Weather settings - observe changes to trigger weather effects
     @AppStorage("weatherOffMode") private var weatherOffMode: Bool = false
     @AppStorage("weatherAutoMode") private var weatherAutoMode: Bool = true
     @AppStorage("manualWeatherCondition") private var manualWeatherCondition: String = "clear"
-    @AppStorage("vortexSnowIntensity") private var vortexSnowIntensity: Double = 0.6
-    @AppStorage("vortexSnowFlakeSize") private var vortexSnowFlakeSize: Double = 1.0
-    @AppStorage("vortexSnowDriftEnabled") private var vortexSnowDriftEnabled: Bool = true
 
     @State private var isPressingMain = false
     @State private var spewTimer: Timer?
@@ -156,7 +153,7 @@ struct ContentView: View {
                     }
                 }
             }
-            // Weather settings observers - trigger snow vortex effects when settings change
+            // Weather settings observers - trigger weather effects when settings change
             .onChange(of: weatherOffMode) { _, _ in
                 Task { @MainActor in
                     scene.refreshWeatherEffects()
@@ -168,21 +165,6 @@ struct ContentView: View {
                 }
             }
             .onChange(of: manualWeatherCondition) { _, _ in
-                Task { @MainActor in
-                    scene.refreshWeatherEffects()
-                }
-            }
-            .onChange(of: vortexSnowIntensity) { _, _ in
-                Task { @MainActor in
-                    scene.refreshWeatherEffects()
-                }
-            }
-            .onChange(of: vortexSnowFlakeSize) { _, _ in
-                Task { @MainActor in
-                    scene.refreshWeatherEffects()
-                }
-            }
-            .onChange(of: vortexSnowDriftEnabled) { _, _ in
                 Task { @MainActor in
                     scene.refreshWeatherEffects()
                 }
@@ -235,7 +217,7 @@ private extension ContentView {
     
     // HUD settings icon at top right, positioned below the FPS counter
     var topRightHUD: some View {
-        VStack(alignment: .trailing, spacing: 8) {
+        VStack(alignment: .trailing, spacing: 9) {
             // Settings control button positioned below where FPS counter appears
             Button {
                 showSettings.toggle()

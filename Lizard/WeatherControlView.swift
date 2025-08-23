@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-/// Weather control panel for adjusting weather conditions and vortex effects
+/// Weather control panel for adjusting weather conditions
 struct WeatherControlView: View {
     @Environment(\.dismiss) private var dismiss
     
@@ -19,11 +19,6 @@ struct WeatherControlView: View {
     // Vortex rain settings
     @AppStorage("vortexRainIntensity") private var vortexRainIntensity: Double = 0.7
     @AppStorage("vortexSplashEnabled") private var vortexSplashEnabled: Bool = true
-    
-    // Vortex snow settings
-    @AppStorage("vortexSnowIntensity") private var vortexSnowIntensity: Double = 0.6
-    @AppStorage("vortexSnowDriftEnabled") private var vortexSnowDriftEnabled: Bool = true
-    @AppStorage("vortexSnowFlakeSize") private var vortexSnowFlakeSize: Double = 1.0
     
     private var manualWeatherCondition: WeatherCondition {
         get { WeatherConditionUtility.condition(from: manualWeatherConditionRaw) }
@@ -65,30 +60,6 @@ struct WeatherControlView: View {
                         }
                         
                         Toggle("Storm Splash Effects", isOn: $vortexSplashEnabled)
-                    }
-                    
-                    Section("Snow Vortex Effects") {
-                        VStack(alignment: .leading, spacing: 8) {
-                            HStack {
-                                Text("Snow Intensity")
-                                Spacer()
-                                Text("\(Int(vortexSnowIntensity * 100))%")
-                                    .foregroundColor(.secondary)
-                            }
-                            Slider(value: $vortexSnowIntensity, in: 0.1...1.0, step: 0.1)
-                        }
-                        
-                        VStack(alignment: .leading, spacing: 8) {
-                            HStack {
-                                Text("Snowflake Size")
-                                Spacer()
-                                Text("\(Int(vortexSnowFlakeSize * 100))%")
-                                    .foregroundColor(.secondary)
-                            }
-                            Slider(value: $vortexSnowFlakeSize, in: 0.5...2.0, step: 0.1)
-                        }
-                        
-                        Toggle("Snow Drift Effects", isOn: $vortexSnowDriftEnabled)
                     }
                     
                     Section("Weather Effects Preview") {
@@ -142,20 +113,6 @@ struct WeatherControlView: View {
                         .foregroundColor(.blue)
                 }
             }
-            
-            if condition == .winter {
-                Text("Snow: \(Int(vortexSnowIntensity * 100))%")
-                    .font(.caption2)
-                    .foregroundColor(.secondary)
-                Text("Size: \(Int(vortexSnowFlakeSize * 100))%")
-                    .font(.caption2)
-                    .foregroundColor(.secondary)
-                if vortexSnowDriftEnabled {
-                    Text("+ Drift")
-                        .font(.caption2)
-                        .foregroundColor(.cyan)
-                }
-            }
         }
         .padding(12)
         .background(
@@ -193,8 +150,6 @@ struct WeatherControlView: View {
             return .blue
         case .storm:
             return .purple
-        case .winter:
-            return .cyan
         }
     }
 }

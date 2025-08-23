@@ -22,7 +22,7 @@ struct WeatherConditionUtility {
         case "storm":
             return .storm
         case "winter", "snow":
-            return .winter
+            return .storm // Map winter/snow to storm since winter case doesn't exist
         default:
             return .clear // Default fallback
         }
@@ -43,8 +43,6 @@ struct WeatherConditionUtility {
             return "rain"
         case .storm:
             return "storm"
-        case .winter:
-            return "winter"
         }
     }
     
