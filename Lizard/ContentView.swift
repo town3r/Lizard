@@ -44,6 +44,10 @@ struct ContentView: View {
     
     // Beta feedback integration
     @State private var showBetaFeedback = false
+    
+    // Button debouncing for performance
+    @State private var lastButtonPressTime: CFTimeInterval = 0
+    private let buttonDebounceInterval: CFTimeInterval = 0.05 // 50ms debounce
 
     // MARK: Configuration
     private struct Config {
@@ -247,11 +251,34 @@ private extension ContentView {
     // Center circle button for spawning a lizard with iOS 26 liquid glass effect
     func centerButton(size: CGSize) -> some View {
         Button {
+            // Button debouncing for performance
+            let currentTime = CACurrentMediaTime()
+            guard currentTime - lastButtonPressTime >= buttonDebounceInterval else { return }
+            lastButtonPressTime = currentTime
+            
+            // Immediate UI feedback - keep these on main thread for responsiveness
             mainButtonTaps += 1
             scene.setAgingPaused(false)
-            scene.emitFromCircleCenterRandom(sizeJitter: Config.sizeJitterSingle)
-            SoundPlayer.shared.play(name: "lizard", ext: "wav")
-            reportScoresIfReady()
+            
+            // Move expensive operations to background to prevent UI blocking
+            Task.detached(priority: .userInitiated) {
+                // Check FPS before spawning to prevent performance degradation
+                await MainActor.run {
+                    if scene.currentFPS >= 30 { // Lower threshold than normal to be more permissive
+                        scene.emitFromCircleCenterRandomAsync(sizeJitter: Config.sizeJitterSingle)
+                    }
+                }
+                
+                // Sound playback - already has rate limiting built-in
+                SoundPlayer.shared.play(name: "lizard", ext: "wav")
+            }
+            
+            // GameCenter reporting - can be async as it's not time-critical
+            Task.detached(priority: .utility) {
+                await MainActor.run {
+                    reportScoresIfReady()
+                }
+            }
         } label: {
             ZStack {
                 // Main iOS 26 liquid glass circle
