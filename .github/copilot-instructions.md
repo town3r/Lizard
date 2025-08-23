@@ -19,7 +19,7 @@ Always reference these instructions first and fallback to search or bash command
 - **Archive for Distribution**: `⌘+Shift+B` in Xcode for TestFlight/App Store builds
 
 ### Testing
-- **Run Unit Tests**: `⌘+U` in Xcode OR `xcodebuild test -project Lizard.xcodeproj -scheme Lizard -destination 'platform=iOS Simulator,name=iPhone 15'`
+- **Run Unit Tests**: `⌘+U` in Xcode OR `xcodebuild test -project Lizard.xcodeproj -scheme Lizard -destination 'platform=iOS Simulator,name=iPhone 16 Pro Max,OS=26.0'`
 - **Test Duration**: Unit tests run in 10-15 seconds. NEVER CANCEL - set timeout to 2+ minutes.
 - **Test Coverage**: Tests cover SoundPlayer, GameCenterManager, LizardScene, BetaFeedbackManager, and gravity transformations
 

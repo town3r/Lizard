@@ -4,7 +4,6 @@ import AVFoundation
 import GameKit
 import Combine
 import UIKit // For app lifecycle notifications
-import Vortex
 
 struct ContentView: View {
     @Environment(\.colorScheme) private var colorScheme
@@ -19,6 +18,14 @@ struct ContentView: View {
     @AppStorage("rainIntensity") private var rainIntensity: Int = 15
     @AppStorage("randomSizeLizards") private var randomSizeLizards: Bool = false
     @AppStorage("backgroundType") private var backgroundType: String = "dynamic"
+    
+    // Weather settings - observe changes to trigger snow vortex effects
+    @AppStorage("weatherOffMode") private var weatherOffMode: Bool = false
+    @AppStorage("weatherAutoMode") private var weatherAutoMode: Bool = true
+    @AppStorage("manualWeatherCondition") private var manualWeatherCondition: String = "clear"
+    @AppStorage("vortexSnowIntensity") private var vortexSnowIntensity: Double = 0.6
+    @AppStorage("vortexSnowFlakeSize") private var vortexSnowFlakeSize: Double = 1.0
+    @AppStorage("vortexSnowDriftEnabled") private var vortexSnowDriftEnabled: Bool = true
 
     @State private var isPressingMain = false
     @State private var spewTimer: Timer?
@@ -38,35 +45,8 @@ struct ContentView: View {
     @State private var totalButtonTaps = 0
     @State private var gameScene = LizardScene()
     
-    // Firework state variables
-    @State private var showVortexFireworks = false
-    @State private var vortexFireworksDismissTimer: Timer?
-    
-    // Dynamic Island vortex fireworks state
-    @State private var dynamicIslandVortexSystem: VortexSystem?
-    @State private var dynamicIslandFireworks = false
-    
     // Beta feedback integration
     @State private var showBetaFeedback = false
-    
-    // Firework customization settings
-    @AppStorage("fireworkDensity") private var fireworkDensity: Double = 0.5
-    @AppStorage("fireworkDuration") private var fireworkDuration: Double = 5.0
-    @AppStorage("fireworkShowLength") private var fireworkShowLength: Double = 5.0
-    @AppStorage("fireworkColorScheme") private var fireworkColorScheme: String = "vibrant"
-    @AppStorage("fireworkSoundEnabled") private var fireworkSoundEnabled: Bool = true
-    
-    // Add the missing comprehensive firework settings
-    @AppStorage("fireworkEnabled") private var fireworkEnabled: Bool = true
-    @AppStorage("fireworkIntensity") private var fireworkIntensity: Double = 0.5
-    @AppStorage("fireworkParticleCount") private var fireworkParticleCount: Int = 100
-    @AppStorage("fireworkExplosionPattern") private var fireworkExplosionPattern: String = "burst"
-    @AppStorage("fireworkTrailEnabled") private var fireworkTrailEnabled: Bool = true
-    @AppStorage("fireworkGlowEnabled") private var fireworkGlowEnabled: Bool = true
-    @AppStorage("fireworkMultiColor") private var fireworkMultiColor: Bool = false
-    @AppStorage("fireworkGravityAffected") private var fireworkGravityAffected: Bool = true
-    @AppStorage("fireworkFadeSpeed") private var fireworkFadeSpeed: Double = 1.0
-    @AppStorage("fireworkScale") private var fireworkScale: Double = 1.0
 
     // MARK: Configuration
     private struct Config {
@@ -114,32 +94,6 @@ struct ContentView: View {
                 topRightHUD
                 bottomBar
                 centerButton(size: size)
-                
-                // Vortex fireworks overlay with user customization
-                if showVortexFireworks && fireworkEnabled {
-                    CustomizableVortexFireworks(
-                        intensity: fireworkIntensity,
-                        particleCount: fireworkParticleCount,
-                        scale: fireworkScale,
-                        multiColor: fireworkMultiColor,
-                        trailEnabled: fireworkTrailEnabled,
-                        glowEnabled: fireworkGlowEnabled,
-                        fadeSpeed: fireworkFadeSpeed,
-                        gravityAffected: fireworkGravityAffected
-                    )
-                    .ignoresSafeArea()
-                    .allowsHitTesting(false)
-                    .onTapGesture {
-                        // Allow tap to dismiss fireworks
-                        withAnimation(.easeOut(duration: 1.0)) {
-                            showVortexFireworks = false
-                        }
-                    }
-                    .transition(.asymmetric(
-                        insertion: .scale(scale: 0.3).combined(with: .opacity).animation(.easeOut(duration: 0.8)),
-                        removal: .scale(scale: 1.5).combined(with: .opacity).animation(.easeIn(duration: 0.5))
-                    ))
-                }
             }
             .onAppear {
                 // Essential scene setup first for immediate UI response
@@ -200,6 +154,37 @@ struct ContentView: View {
                     @unknown default:
                         break
                     }
+                }
+            }
+            // Weather settings observers - trigger snow vortex effects when settings change
+            .onChange(of: weatherOffMode) { _, _ in
+                Task { @MainActor in
+                    scene.refreshWeatherEffects()
+                }
+            }
+            .onChange(of: weatherAutoMode) { _, _ in
+                Task { @MainActor in
+                    scene.refreshWeatherEffects()
+                }
+            }
+            .onChange(of: manualWeatherCondition) { _, _ in
+                Task { @MainActor in
+                    scene.refreshWeatherEffects()
+                }
+            }
+            .onChange(of: vortexSnowIntensity) { _, _ in
+                Task { @MainActor in
+                    scene.refreshWeatherEffects()
+                }
+            }
+            .onChange(of: vortexSnowFlakeSize) { _, _ in
+                Task { @MainActor in
+                    scene.refreshWeatherEffects()
+                }
+            }
+            .onChange(of: vortexSnowDriftEnabled) { _, _ in
+                Task { @MainActor in
+                    scene.refreshWeatherEffects()
                 }
             }
         }
@@ -271,7 +256,7 @@ private extension ContentView {
         .padding(.trailing, 12)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
         .sheet(isPresented: $showSettings) {
-            SettingsView(onFireworksTrigger: triggerVortexFireworks)
+            SettingsView()
                 .presentationDetents([.medium, .large])
                 .presentationDragIndicator(.visible)
         }
@@ -303,23 +288,6 @@ private extension ContentView {
                     .padding(20)
                     .scaleEffect(isPressingMain ? 0.95 : 1.0)
                     .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isPressingMain)
-                
-                // Vortex magic circle effect - positioned behind button, larger radius
-                if isPressingMain {
-                    VortexView(.magic.makeUniqueCopy()) {
-                        Image(systemName: "sparkles")
-                            .font(.system(size: 20))
-                            .foregroundStyle(.white)
-                            .blendMode(.plusLighter)
-                            .tag("sparkle")
-                    }
-                    .frame(width: Config.centerButtonSize * 1.5, height: Config.centerButtonSize * 1.5)
-                    .allowsHitTesting(false)
-                    .transition(.asymmetric(
-                        insertion: .scale(scale: 0.8).combined(with: .opacity).animation(.easeOut(duration: 0.3)),
-                        removal: .scale(scale: 1.2).combined(with: .opacity).animation(.easeIn(duration: 0.2))
-                    ))
-                }
             }
         }
         .frame(width: Config.centerButtonSize, height: Config.centerButtonSize)
@@ -410,14 +378,8 @@ private extension ContentView {
     
     func updateButtonVisibility() {
         withAnimation(.spring(response: Config.buttonAnimationDuration, dampingFraction: 0.8)) {
-            // Don't show buttons during firework shows for clean viewing
-            if showVortexFireworks {
-                showStopButton = false
-                showTrashButton = false
-            } else {
-                showStopButton = isRaining
-                showTrashButton = lizardCount > 0
-            }
+            showStopButton = isRaining
+            showTrashButton = lizardCount > 0
         }
     }
     
@@ -428,14 +390,11 @@ private extension ContentView {
         // Create a new work item
         let workItem = DispatchWorkItem {
             withAnimation(.easeInOut(duration: Config.buttonAnimationDuration)) {
-                // Don't hide buttons during firework shows - let firework logic control visibility
-                if !self.showVortexFireworks {
-                    if !self.isRaining {
-                        self.showStopButton = false
-                    }
-                    if self.lizardCount == 0 {
-                        self.showTrashButton = false
-                    }
+                if !self.isRaining {
+                    self.showStopButton = false
+                }
+                if self.lizardCount == 0 {
+                    self.showTrashButton = false
                 }
             }
         }
@@ -522,60 +481,6 @@ private extension ContentView {
         #endif
     }
     
-    // MARK: - Firework Show Logic
-    
-    // Trigger the Vortex fireworks show
-    func triggerVortexFireworks() {
-        // Cancel any existing dismiss timer
-        vortexFireworksDismissTimer?.invalidate()
-        vortexFireworksDismissTimer = nil
-        
-        // Hide buttons during firework show for clean viewing
-        withAnimation(.easeOut(duration: 0.5)) {
-            showStopButton = false
-            showTrashButton = false
-        }
-        
-        // Double haptic feedback when show is about to start
-        let impactFeedback = UIImpactFeedbackGenerator(style: .heavy)
-        impactFeedback.impactOccurred()
-        
-        // Second haptic feedback after a brief delay
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            impactFeedback.impactOccurred()
-        }
-        
-        // Play audio feedback only if sound effects are enabled
-        if fireworkSoundEnabled {
-            SoundPlayer.shared.play(name: "lizard", ext: "wav")
-        }
-        
-        // Show fireworks with dramatic animation
-        withAnimation(.easeOut(duration: 0.8)) {
-            showVortexFireworks = true
-        }
-        
-        // Auto-dismiss fireworks after user-configured duration
-        let dismissDelay = fireworkShowLength
-        vortexFireworksDismissTimer = Timer.scheduledTimer(withTimeInterval: dismissDelay, repeats: false) { _ in
-            Task { @MainActor in
-                withAnimation(.easeIn(duration: 1.0)) {
-                    showVortexFireworks = false
-                }
-                vortexFireworksDismissTimer = nil
-                
-                // Restore button visibility after firework show ends
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                    updateButtonVisibility()
-                }
-            }
-        }
-        
-        if let timer = vortexFireworksDismissTimer {
-            RunLoop.main.add(timer, forMode: .common)
-        }
-    }
-    
     // MARK: - Deferred Initialization
     
     /// Performs heavy initialization tasks in the background to avoid blocking UI startup
@@ -586,6 +491,9 @@ private extension ContentView {
         
         // Update scene configuration with user settings
         updateSceneConfiguration()
+        
+        // Initialize weather effects based on current settings
+        scene.refreshWeatherEffects()
         
         // Initialize GameCenter authentication (heavy operation)
         GameCenterManager.shared.authenticate(presentingViewController: { topViewController() })
@@ -925,262 +833,5 @@ struct iOS26LiquidGlassCircle: View {
                 .blur(radius: 1.5)
                 .padding(-2)
         }
-    }
-}
-
-// MARK: - Vortex Magic Circle Component
-
-private struct VortexMagicCircle: View {
-    @State private var rotation: Double = 0
-    @State private var particleRotations: [Double] = []
-    
-    // Vortex configuration constants
-    private let vortexCircleCount: Int = 3
-    private let vortexBaseRadius: CGFloat = 160
-    private let vortexRadiusSpacing: CGFloat = 30
-    private let vortexRotationSpeed: TimeInterval = 2.0
-    private let vortexParticleCount: Int = 12
-    
-    var body: some View {
-        ZStack {
-            // Multiple concentric magic circles
-            ForEach(0..<vortexCircleCount, id: \.self) { index in
-                let radius = vortexBaseRadius + CGFloat(index) * vortexRadiusSpacing
-                let reverseRotation = index % 2 == 0
-                
-                MagicCircleRing(
-                    radius: radius,
-                    rotation: reverseRotation ? -rotation : rotation,
-                    opacity: 1.0 - (Double(index) * 0.2)
-                )
-            }
-            
-            // Floating magical particles around the circles
-            ForEach(0..<vortexParticleCount, id: \.self) { index in
-                MagicalParticle(
-                    index: index,
-                    totalParticles: vortexParticleCount,
-                    baseRadius: vortexBaseRadius * 1.2,
-                    rotation: particleRotations.indices.contains(index) ? particleRotations[index] : 0
-                )
-            }
-        }
-        .onAppear {
-            setupParticleRotations()
-            startRotationAnimation()
-        }
-    }
-    
-    private func setupParticleRotations() {
-        particleRotations = (0..<vortexParticleCount).map { index in
-            Double.random(in: 0...360) + Double(index) * (360.0 / Double(vortexParticleCount))
-        }
-    }
-    
-    private func startRotationAnimation() {
-        withAnimation(.linear(duration: vortexRotationSpeed).repeatForever(autoreverses: false)) {
-            rotation = 360
-        }
-        
-        // Animate each particle with slight variation
-        for index in 0..<vortexParticleCount {
-            let delay = Double(index) * 0.1
-            let speed = vortexRotationSpeed * Double.random(in: 0.8...1.2)
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-                withAnimation(.linear(duration: speed).repeatForever(autoreverses: false)) {
-                    if particleRotations.indices.contains(index) {
-                        particleRotations[index] += 360
-                    }
-                }
-            }
-        }
-    }
-}
-
-private struct MagicCircleRing: View {
-    let radius: CGFloat
-    let rotation: Double
-    let opacity: Double
-    @Environment(\.colorScheme) private var colorScheme
-    
-    var body: some View {
-        ZStack {
-            // Outer mystical glow ring
-            Circle()
-                .stroke(
-                    AngularGradient(
-                        colors: [
-                            .purple.opacity(0.8),
-                            .blue.opacity(0.6),
-                            .cyan.opacity(0.8),
-                            .purple.opacity(0.6),
-                            .pink.opacity(0.8),
-                            .purple.opacity(0.8)
-                        ],
-                        center: .center
-                    ),
-                    lineWidth: 3
-                )
-                .frame(width: radius * 2, height: radius * 2)
-                .blur(radius: 2)
-            
-            // Inner precise magic circle with runes
-            Circle()
-                .stroke(
-                    AngularGradient(
-                        colors: [
-                            .white.opacity(0.9),
-                            .cyan.opacity(0.7),
-                            .purple.opacity(0.8),
-                            .white.opacity(0.6),
-                            .blue.opacity(0.9),
-                            .white.opacity(0.9)
-                        ],
-                        center: .center
-                    ),
-                    lineWidth: 2
-                )
-                .frame(width: radius * 2, height: radius * 2)
-            
-            // Mystical energy dots around the circle
-            ForEach(0..<8, id: \.self) { dotIndex in
-                Circle()
-                    .fill(
-                        RadialGradient(
-                            colors: [
-                                .white,
-                                .cyan.opacity(0.8),
-                                .clear
-                            ],
-                            center: .center,
-                            startRadius: 0,
-                            endRadius: 4
-                        )
-                    )
-                    .frame(width: 6, height: 6)
-                    .offset(y: -radius)
-                    .rotationEffect(.degrees(Double(dotIndex) * 45))
-            }
-        }
-        .rotationEffect(.degrees(rotation))
-        .opacity(opacity)
-        .shadow(color: .purple.opacity(0.5), radius: 8, x: 0, y: 0)
-        .shadow(color: .cyan.opacity(0.3), radius: 12, x: 0, y: 0)
-    }
-}
-
-private struct MagicalParticle: View {
-    let index: Int
-    let totalParticles: Int
-    let baseRadius: CGFloat
-    let rotation: Double
-    
-    private var angleOffset: Double {
-        Double(index) * (360.0 / Double(totalParticles))
-    }
-    
-    private var radiusVariation: CGFloat {
-        baseRadius + CGFloat.random(in: -20...40)
-    }
-    
-    var body: some View {
-        Circle()
-            .fill(
-                RadialGradient(
-                    colors: [
-                        .white,
-                        particleColor.opacity(0.8),
-                        .clear
-                    ],
-                    center: .center,
-                    startRadius: 0,
-                    endRadius: 6
-                )
-            )
-            .frame(width: particleSize, height: particleSize)
-            .offset(y: -radiusVariation)
-            .rotationEffect(.degrees(rotation + angleOffset))
-            .opacity(particleOpacity)
-            .shadow(color: particleColor.opacity(0.6), radius: 4, x: 0, y: 0)
-    }
-    
-    private var particleColor: Color {
-        let colors: [Color] = [.purple, .cyan, .blue, .pink, .white]
-        return colors[index % colors.count]
-    }
-    
-    private var particleSize: CGFloat {
-        CGFloat.random(in: 4...8)
-    }
-    
-    private var particleOpacity: Double {
-        Double.random(in: 0.6...1.0)
-    }
-}
-
-// MARK: - Customizable Vortex Fireworks Component
-
-struct CustomizableVortexFireworks: View {
-    let intensity: Double
-    let particleCount: Int
-    let scale: Double
-    let multiColor: Bool
-    let trailEnabled: Bool
-    let glowEnabled: Bool
-    let fadeSpeed: Double
-    let gravityAffected: Bool
-    
-    var body: some View {
-        VortexView(createCustomVortexSystem()) {
-            // Let VortexView handle all particle rendering internally
-            // Remove manual particle creation to avoid performance issues
-        }
-        .scaleEffect(scale)
-    }
-    
-    private func createCustomVortexSystem() -> VortexSystem {
-        // Create a new fireworks system and modify its properties
-        var system = VortexSystem.fireworks.makeUniqueCopy()
-        
-        // Apply intensity scaling with reasonable limits
-        let clampedIntensity = min(max(intensity, 0.1), 2.0) // Clamp between 0.1 and 2.0
-        let clampedParticleCount = min(max(particleCount, 10), 150) // Clamp between 10 and 150
-        
-        // Configure birth rate based on particle count and intensity
-        system.birthRate = Double(clampedParticleCount) * clampedIntensity * 0.5
-        
-        // Apply speed scaling
-        system.speed = clampedIntensity * 150
-        system.speedVariation = clampedIntensity * 75
-        
-        // Apply fade speed with reasonable bounds
-        let clampedFadeSpeed = min(max(fadeSpeed, 0.2), 3.0)
-        system.lifespan = TimeInterval(2.5 / clampedFadeSpeed)
-        system.lifespanVariation = TimeInterval(1.0 / clampedFadeSpeed)
-        
-        // Apply scale with reasonable bounds
-        let clampedScale = min(max(scale, 0.3), 2.0)
-        system.size = clampedScale * 15
-        system.sizeVariation = clampedScale * 8
-        
-        // Configure colors using the correct VortexSystem.Color format
-        if multiColor {
-            // Use a predefined array of VortexSystem.Color values for multi-color fireworks
-            system.colors = .random([
-                VortexSystem.Color(red: 1.0, green: 0.0, blue: 0.0),  // Red
-                VortexSystem.Color(red: 0.0, green: 0.0, blue: 1.0),  // Blue
-                VortexSystem.Color(red: 0.0, green: 1.0, blue: 0.0),  // Green
-                VortexSystem.Color(red: 1.0, green: 1.0, blue: 0.0),  // Yellow
-                VortexSystem.Color(red: 1.0, green: 0.0, blue: 1.0),  // Purple
-                VortexSystem.Color(red: 1.0, green: 0.5, blue: 0.0),  // Orange
-                VortexSystem.Color(red: 1.0, green: 0.7, blue: 0.8)   // Pink
-            ])
-        } else {
-            // Use single white color for classic fireworks
-            system.colors = .single(VortexSystem.Color(red: 1.0, green: 1.0, blue: 1.0))
-        }
-        
-        return system
     }
 }

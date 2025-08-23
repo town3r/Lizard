@@ -1,533 +1,533 @@
 // !$*UTF8*$!
 {
-    archiveVersion = 1;
-    classes = {
-    };
-    objectVersion = 90;
-    objects = {
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 90;
+	objects = {
 
 /* Begin PBXBuildFile section */
-        77E455CAB218441BBEAA1649006E47DE /* LizardTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77E455C3B0B34013B5ACC360006E47DE /* LizardTests.swift */; };
-        88C3DF052E57E3A600A99C38 /* Vortex in Frameworks */ = {isa = PBXBuildFile; productRef = 88C3DF042E57E3A600A99C38 /* Vortex */; };
+		77E455CAB218441BBEAA1649006E47DE /* LizardTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77E455C3B0B34013B5ACC360006E47DE /* LizardTests.swift */; };
+		88C3DF052E57E3A600A99C38 /* Vortex in Frameworks */ = {isa = PBXBuildFile; productRef = 88C3DF042E57E3A600A99C38 /* Vortex */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-        77E455CDB6F1444297D1B4E9006E47DE /* PBXContainerItemProxy */ = {
-            isa = PBXContainerItemProxy;
-            containerPortal = 88C233732E4D1BA4006E47DE /* Project object */;
-            proxyType = 1;
-            remoteGlobalIDString = 88C2337A2E4D1BA4006E47DE;
-            remoteInfo = Lizard;
-        };
+		77E455CDB6F1444297D1B4E9006E47DE /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 88C233732E4D1BA4006E47DE /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 88C2337A2E4D1BA4006E47DE;
+			remoteInfo = Lizard;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-        77E455C2BB0244F3B1020954006E47DE /* LizardTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LizardTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-        77E455C3B0B34013B5ACC360006E47DE /* LizardTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LizardTests.swift; sourceTree = "<group>"; };
-        88C2337B2E4D1BA4006E47DE /* Lizard.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Lizard.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		77E455C2BB0244F3B1020954006E47DE /* LizardTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LizardTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		77E455C3B0B34013B5ACC360006E47DE /* LizardTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LizardTests.swift; sourceTree = "<group>"; };
+		88C2337B2E4D1BA4006E47DE /* Lizard.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Lizard.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-        88C233FE2E4F6EB6006E47DE /* Exceptions for "Lizard" folder in "Lizard" target */ = {
-            isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-            membershipExceptions = (
-                Info.plist,
-            );
-            target = 88C2337A2E4D1BA4006E47DE /* Lizard */;
-        };
+		88C233FE2E4F6EB6006E47DE /* Exceptions for "Lizard" folder in "Lizard" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 88C2337A2E4D1BA4006E47DE /* Lizard */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-        88C2337D2E4D1BA4006E47DE /* Lizard */ = {
-            isa = PBXFileSystemSynchronizedRootGroup;
-            exceptions = (
-                88C233FE2E4F6EB6006E47DE /* Exceptions for "Lizard" folder in "Lizard" target */,
-            );
-            path = Lizard;
-            sourceTree = "<group>";
-        };
+		88C2337D2E4D1BA4006E47DE /* Lizard */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				88C233FE2E4F6EB6006E47DE /* Exceptions for "Lizard" folder in "Lizard" target */,
+			);
+			path = Lizard;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
-        77E455C8B4294D668A452CE3006E47DE /* Frameworks */ = {
-            isa = PBXFrameworksBuildPhase;
-            files = (
-            );
-        };
-        88C233782E4D1BA4006E47DE /* Frameworks */ = {
-            isa = PBXFrameworksBuildPhase;
-            files = (
-                88C3DF052E57E3A600A99C38 /* Vortex in Frameworks */,
-            );
-        };
+		77E455C8B4294D668A452CE3006E47DE /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
+			);
+		};
+		88C233782E4D1BA4006E47DE /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
+				88C3DF052E57E3A600A99C38 /* Vortex in Frameworks */,
+			);
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-        77E455CBBBBB49F3923165D8006E47DE /* LizardTests */ = {
-            isa = PBXGroup;
-            children = (
-                77E455C3B0B34013B5ACC360006E47DE /* LizardTests.swift */,
-            );
-            path = LizardTests;
-            sourceTree = "<group>";
-        };
-        88C233722E4D1BA4006E47DE = {
-            isa = PBXGroup;
-            children = (
-                88C2337D2E4D1BA4006E47DE /* Lizard */,
-                88C2337C2E4D1BA4006E47DE /* Products */,
-                77E455CBBBBB49F3923165D8006E47DE /* LizardTests */,
-            );
-            sourceTree = "<group>";
-        };
-        88C2337C2E4D1BA4006E47DE /* Products */ = {
-            isa = PBXGroup;
-            children = (
-                88C2337B2E4D1BA4006E47DE /* Lizard.app */,
-                77E455C2BB0244F3B1020954006E47DE /* LizardTests.xctest */,
-            );
-            name = Products;
-            sourceTree = "<group>";
-        };
+		77E455CBBBBB49F3923165D8006E47DE /* LizardTests */ = {
+			isa = PBXGroup;
+			children = (
+				77E455C3B0B34013B5ACC360006E47DE /* LizardTests.swift */,
+			);
+			path = LizardTests;
+			sourceTree = "<group>";
+		};
+		88C233722E4D1BA4006E47DE = {
+			isa = PBXGroup;
+			children = (
+				88C2337D2E4D1BA4006E47DE /* Lizard */,
+				88C2337C2E4D1BA4006E47DE /* Products */,
+				77E455CBBBBB49F3923165D8006E47DE /* LizardTests */,
+			);
+			sourceTree = "<group>";
+		};
+		88C2337C2E4D1BA4006E47DE /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				88C2337B2E4D1BA4006E47DE /* Lizard.app */,
+				77E455C2BB0244F3B1020954006E47DE /* LizardTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-        77E455C1BFAA4F198AE820CC006E47DE /* LizardTests */ = {
-            isa = PBXNativeTarget;
-            buildConfigurationList = 77E455C4B42C44A9810BB903006E47DE /* Build configuration list for PBXNativeTarget "LizardTests" */;
-            buildPhases = (
-                77E455C7BF8E4FA4952D75A8006E47DE /* Sources */,
-                77E455C8B4294D668A452CE3006E47DE /* Frameworks */,
-                77E455C9BD234549903E0B48006E47DE /* Resources */,
-            );
-            buildRules = (
-            );
-            dependencies = (
-                77E455CCBAA940F4AECF42D4006E47DE /* PBXTargetDependency */,
-            );
-            name = LizardTests;
-            productName = LizardTests;
-            productReference = 77E455C2BB0244F3B1020954006E47DE /* LizardTests.xctest */;
-            productType = "com.apple.product-type.bundle.unit-test";
-        };
-        88C2337A2E4D1BA4006E47DE /* Lizard */ = {
-            isa = PBXNativeTarget;
-            buildConfigurationList = 88C233882E4D1BA5006E47DE /* Build configuration list for PBXNativeTarget "Lizard" */;
-            buildPhases = (
-                88C233772E4D1BA4006E47DE /* Sources */,
-                88C233782E4D1BA4006E47DE /* Frameworks */,
-                88C233792E4D1BA4006E47DE /* Resources */,
-            );
-            buildRules = (
-            );
-            fileSystemSynchronizedGroups = (
-                88C2337D2E4D1BA4006E47DE /* Lizard */,
-            );
-            name = Lizard;
-            packageProductDependencies = (
-                88C3DF042E57E3A600A99C38 /* Vortex */,
-            );
-            productName = Lizard;
-            productReference = 88C2337B2E4D1BA4006E47DE /* Lizard.app */;
-            productType = "com.apple.product-type.application";
-        };
+		77E455C1BFAA4F198AE820CC006E47DE /* LizardTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 77E455C4B42C44A9810BB903006E47DE /* Build configuration list for PBXNativeTarget "LizardTests" */;
+			buildPhases = (
+				77E455C7BF8E4FA4952D75A8006E47DE /* Sources */,
+				77E455C8B4294D668A452CE3006E47DE /* Frameworks */,
+				77E455C9BD234549903E0B48006E47DE /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				77E455CCBAA940F4AECF42D4006E47DE /* PBXTargetDependency */,
+			);
+			name = LizardTests;
+			productName = LizardTests;
+			productReference = 77E455C2BB0244F3B1020954006E47DE /* LizardTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		88C2337A2E4D1BA4006E47DE /* Lizard */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 88C233882E4D1BA5006E47DE /* Build configuration list for PBXNativeTarget "Lizard" */;
+			buildPhases = (
+				88C233772E4D1BA4006E47DE /* Sources */,
+				88C233782E4D1BA4006E47DE /* Frameworks */,
+				88C233792E4D1BA4006E47DE /* Resources */,
+			);
+			buildRules = (
+			);
+			fileSystemSynchronizedGroups = (
+				88C2337D2E4D1BA4006E47DE /* Lizard */,
+			);
+			name = Lizard;
+			packageProductDependencies = (
+				88C3DF042E57E3A600A99C38 /* Vortex */,
+			);
+			productName = Lizard;
+			productReference = 88C2337B2E4D1BA4006E47DE /* Lizard.app */;
+			productType = "com.apple.product-type.application";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-        88C233732E4D1BA4006E47DE /* Project object */ = {
-            isa = PBXProject;
-            attributes = {
-                BuildIndependentTargetsInParallel = 1;
-                LastSwiftUpdateCheck = 2600;
-                LastUpgradeCheck = 2600;
-                TargetAttributes = {
-                    77E455C1BFAA4F198AE820CC006E47DE = {
-                        CreatedOnToolsVersion = 26.0;
-                        TestTargetID = 88C2337A2E4D1BA4006E47DE;
-                    };
-                    88C2337A2E4D1BA4006E47DE = {
-                        88E455C1B3FE4DFE908AC995006E47DE = {
-                            CreatedOnToolsVersion = 26.0;
-                        };
-                        99E455C1B80D4A72BEA7D03C006E47DE = {
-                            CreatedOnToolsVersion = 26.0;
-                            TestTargetID = 88E455C1B3FE4DFE908AC995006E47DE;
-                        };
-                        CreatedOnToolsVersion = 26.0;
-                    };
-                };
-            };
-            buildConfigurationList = 88C233762E4D1BA4006E47DE /* Build configuration list for PBXProject "Lizard" */;
-            developmentRegion = en;
-            hasScannedForEncodings = 0;
-            knownRegions = (
-                en,
-                Base,
-            );
-            mainGroup = 88C233722E4D1BA4006E47DE;
-            minimizedProjectReferenceProxies = 1;
-            packageReferences = (
-                88C3DF032E57E3A600A99C38 /* XCRemoteSwiftPackageReference "Vortex" */,
-            );
-            preferredProjectObjectVersion = 90;
-            productRefGroup = 88C2337C2E4D1BA4006E47DE /* Products */;
-            projectDirPath = "";
-            projectRoot = "";
-            targets = (
-                88C2337A2E4D1BA4006E47DE /* Lizard */,
-                77E455C1BFAA4F198AE820CC006E47DE /* LizardTests */,
-            );
-        };
+		88C233732E4D1BA4006E47DE /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2600;
+				LastUpgradeCheck = 2600;
+				TargetAttributes = {
+					77E455C1BFAA4F198AE820CC006E47DE = {
+						CreatedOnToolsVersion = 26.0;
+						TestTargetID = 88C2337A2E4D1BA4006E47DE;
+					};
+					88C2337A2E4D1BA4006E47DE = {
+						88E455C1B3FE4DFE908AC995006E47DE = {
+							CreatedOnToolsVersion = 26.0;
+						};
+						99E455C1B80D4A72BEA7D03C006E47DE = {
+							CreatedOnToolsVersion = 26.0;
+							TestTargetID = 88E455C1B3FE4DFE908AC995006E47DE;
+						};
+						CreatedOnToolsVersion = 26.0;
+					};
+				};
+			};
+			buildConfigurationList = 88C233762E4D1BA4006E47DE /* Build configuration list for PBXProject "Lizard" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 88C233722E4D1BA4006E47DE;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				88C3DF032E57E3A600A99C38 /* XCRemoteSwiftPackageReference "Vortex" */,
+			);
+			preferredProjectObjectVersion = 90;
+			productRefGroup = 88C2337C2E4D1BA4006E47DE /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				88C2337A2E4D1BA4006E47DE /* Lizard */,
+				77E455C1BFAA4F198AE820CC006E47DE /* LizardTests */,
+			);
+		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-        77E455C9BD234549903E0B48006E47DE /* Resources */ = {
-            isa = PBXResourcesBuildPhase;
-            files = (
-            );
-        };
-        88C233792E4D1BA4006E47DE /* Resources */ = {
-            isa = PBXResourcesBuildPhase;
-            files = (
-            );
-        };
+		77E455C9BD234549903E0B48006E47DE /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			files = (
+			);
+		};
+		88C233792E4D1BA4006E47DE /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			files = (
+			);
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-        77E455C7BF8E4FA4952D75A8006E47DE /* Sources */ = {
-            isa = PBXSourcesBuildPhase;
-            files = (
-                77E455CAB218441BBEAA1649006E47DE /* LizardTests.swift in Sources */,
-            );
-        };
-        88C233772E4D1BA4006E47DE /* Sources */ = {
-            isa = PBXSourcesBuildPhase;
-            files = (
-            );
-        };
+		77E455C7BF8E4FA4952D75A8006E47DE /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+				77E455CAB218441BBEAA1649006E47DE /* LizardTests.swift in Sources */,
+			);
+		};
+		88C233772E4D1BA4006E47DE /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+			);
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-        77E455CCBAA940F4AECF42D4006E47DE /* PBXTargetDependency */ = {
-            isa = PBXTargetDependency;
-            target = 88C2337A2E4D1BA4006E47DE /* Lizard */;
-            targetProxy = 77E455CDB6F1444297D1B4E9006E47DE /* PBXContainerItemProxy */;
-        };
+		77E455CCBAA940F4AECF42D4006E47DE /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 88C2337A2E4D1BA4006E47DE /* Lizard */;
+			targetProxy = 77E455CDB6F1444297D1B4E9006E47DE /* PBXContainerItemProxy */;
+		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-        77E455C5BC994AA7897F6CE7006E47DE /* Debug configuration for PBXNativeTarget "LizardTests" */ = {
-            isa = XCBuildConfiguration;
-            buildSettings = {
-                BUNDLE_LOADER = "$(TEST_HOST)";
-                CODE_SIGN_STYLE = Automatic;
-                CURRENT_PROJECT_VERSION = 21;
-                DEVELOPMENT_TEAM = K72T734R56;
-                GENERATE_INFOPLIST_FILE = YES;
-                IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-                LD_RUNPATH_SEARCH_PATHS = (
-                    "$(inherited)",
-                    "@executable_path/Frameworks",
-                    "@loader_path/Frameworks",
-                );
-                MARKETING_VERSION = 1.0;
-                PRODUCT_BUNDLE_IDENTIFIER = com.town3r.lizard.tests;
-                PRODUCT_NAME = "$(TARGET_NAME)";
-                SWIFT_EMIT_LOC_STRINGS = NO;
-                SWIFT_VERSION = 6.0;
-                TARGETED_DEVICE_FAMILY = "1,2";
-                TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Lizard.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Lizard";
-            };
-            name = Debug;
-        };
-        77E455C6B3C544119C6F2F61006E47DE /* Release configuration for PBXNativeTarget "LizardTests" */ = {
-            isa = XCBuildConfiguration;
-            buildSettings = {
-                BUNDLE_LOADER = "$(TEST_HOST)";
-                CODE_SIGN_STYLE = Automatic;
-                CURRENT_PROJECT_VERSION = 21;
-                DEVELOPMENT_TEAM = K72T734R56;
-                GENERATE_INFOPLIST_FILE = YES;
-                IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-                LD_RUNPATH_SEARCH_PATHS = (
-                    "$(inherited)",
-                    "@executable_path/Frameworks",
-                    "@loader_path/Frameworks",
-                );
-                MARKETING_VERSION = 1.0;
-                PRODUCT_BUNDLE_IDENTIFIER = com.town3r.lizard.tests;
-                PRODUCT_NAME = "$(TARGET_NAME)";
-                SWIFT_EMIT_LOC_STRINGS = NO;
-                SWIFT_VERSION = 6.0;
-                TARGETED_DEVICE_FAMILY = "1,2";
-                TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Lizard.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Lizard";
-            };
-            name = Release;
-        };
-        88C233862E4D1BA5006E47DE /* Debug configuration for PBXProject "Lizard" */ = {
-            isa = XCBuildConfiguration;
-            buildSettings = {
-                ALWAYS_SEARCH_USER_PATHS = NO;
-                ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
-                CLANG_ANALYZER_NONNULL = YES;
-                CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-                CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
-                CLANG_ENABLE_MODULES = YES;
-                CLANG_ENABLE_OBJC_ARC = YES;
-                CLANG_ENABLE_OBJC_WEAK = YES;
-                CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
-                CLANG_WARN_BOOL_CONVERSION = YES;
-                CLANG_WARN_COMMA = YES;
-                CLANG_WARN_CONSTANT_CONVERSION = YES;
-                CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
-                CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-                CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-                CLANG_WARN_EMPTY_BODY = YES;
-                CLANG_WARN_ENUM_CONVERSION = YES;
-                CLANG_WARN_INFINITE_RECURSION = YES;
-                CLANG_WARN_INT_CONVERSION = YES;
-                CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
-                CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
-                CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
-                CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-                CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
-                CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
-                CLANG_WARN_STRICT_PROTOTYPES = YES;
-                CLANG_WARN_SUSPICIOUS_MOVE = YES;
-                CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-                CLANG_WARN_UNREACHABLE_CODE = YES;
-                CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-                COPY_PHASE_STRIP = NO;
-                DEBUG_INFORMATION_FORMAT = dwarf;
-                DEVELOPMENT_TEAM = K72T734R56;
-                ENABLE_STRICT_OBJC_MSGSEND = YES;
-                ENABLE_TESTABILITY = YES;
-                ENABLE_USER_SCRIPT_SANDBOXING = YES;
-                GCC_C_LANGUAGE_STANDARD = gnu17;
-                GCC_DYNAMIC_NO_PIC = NO;
-                GCC_NO_COMMON_BLOCKS = YES;
-                GCC_OPTIMIZATION_LEVEL = 0;
-                GCC_PREPROCESSOR_DEFINITIONS = (
-                    "DEBUG=1",
-                    "$(inherited)",
-                );
-                GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-                GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
-                GCC_WARN_UNDECLARED_SELECTOR = YES;
-                GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-                GCC_WARN_UNUSED_FUNCTION = YES;
-                GCC_WARN_UNUSED_VARIABLE = YES;
-                IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-                LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-                MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
-                MTL_FAST_MATH = YES;
-                ONLY_ACTIVE_ARCH = YES;
-                SDKROOT = iphoneos;
-                SUPPORTED_PLATFORMS = "iphonesimulator iphoneos macosx";
-                SUPPORTS_MACCATALYST = YES;
-                SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
-                SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-                SWIFT_VERSION = 6.0;
-            };
-            name = Debug;
-        };
-        88C233872E4D1BA5006E47DE /* Release configuration for PBXProject "Lizard" */ = {
-            isa = XCBuildConfiguration;
-            buildSettings = {
-                ALWAYS_SEARCH_USER_PATHS = NO;
-                ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
-                CLANG_ANALYZER_NONNULL = YES;
-                CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-                CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
-                CLANG_ENABLE_MODULES = YES;
-                CLANG_ENABLE_OBJC_ARC = YES;
-                CLANG_ENABLE_OBJC_WEAK = YES;
-                CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
-                CLANG_WARN_BOOL_CONVERSION = YES;
-                CLANG_WARN_COMMA = YES;
-                CLANG_WARN_CONSTANT_CONVERSION = YES;
-                CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
-                CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-                CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-                CLANG_WARN_EMPTY_BODY = YES;
-                CLANG_WARN_ENUM_CONVERSION = YES;
-                CLANG_WARN_INFINITE_RECURSION = YES;
-                CLANG_WARN_INT_CONVERSION = YES;
-                CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
-                CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
-                CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
-                CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-                CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
-                CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
-                CLANG_WARN_STRICT_PROTOTYPES = YES;
-                CLANG_WARN_SUSPICIOUS_MOVE = YES;
-                CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-                CLANG_WARN_UNREACHABLE_CODE = YES;
-                CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-                COPY_PHASE_STRIP = NO;
-                DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-                DEVELOPMENT_TEAM = K72T734R56;
-                ENABLE_NS_ASSERTIONS = NO;
-                ENABLE_STRICT_OBJC_MSGSEND = YES;
-                ENABLE_USER_SCRIPT_SANDBOXING = YES;
-                GCC_C_LANGUAGE_STANDARD = gnu17;
-                GCC_NO_COMMON_BLOCKS = YES;
-                GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-                GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
-                GCC_WARN_UNDECLARED_SELECTOR = YES;
-                GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-                GCC_WARN_UNUSED_FUNCTION = YES;
-                GCC_WARN_UNUSED_VARIABLE = YES;
-                IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-                LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-                MTL_ENABLE_DEBUG_INFO = NO;
-                MTL_FAST_MATH = YES;
-                SDKROOT = iphoneos;
-                SUPPORTED_PLATFORMS = "iphonesimulator iphoneos macosx";
-                SUPPORTS_MACCATALYST = YES;
-                SWIFT_COMPILATION_MODE = wholemodule;
-                SWIFT_VERSION = 6.0;
-                VALIDATE_PRODUCT = YES;
-            };
-            name = Release;
-        };
-        88C233892E4D1BA5006E47DE /* Debug configuration for PBXNativeTarget "Lizard" */ = {
-            isa = XCBuildConfiguration;
-            buildSettings = {
-                ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-                ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-                ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
-                CLANG_USE_OPTIMIZATION_PROFILE = YES;
-                CODE_SIGN_ENTITLEMENTS = Lizard/Lizard.entitlements;
-                CODE_SIGN_STYLE = Automatic;
-                CURRENT_PROJECT_VERSION = 1;
-                DEVELOPMENT_TEAM = K72T734R56;
-                ENABLE_PREVIEWS = YES;
-                GENERATE_INFOPLIST_FILE = YES;
-                INFOPLIST_FILE = Lizard/Info.plist;
-                INFOPLIST_KEY_CFBundleDisplayName = Lizard;
-                INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.simulation-games";
-                INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-                INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-                INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-                INFOPLIST_KEY_UIStatusBarHidden = YES;
-                INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-                IPHONEOS_DEPLOYMENT_TARGET = 17.6;
-                LD_RUNPATH_SEARCH_PATHS = (
-                    "$(inherited)",
-                    "@executable_path/Frameworks",
-                );
-                MACOSX_DEPLOYMENT_TARGET = 14.6;
-                MARKETING_VERSION = 1.2;
-                PRODUCT_BUNDLE_IDENTIFIER = com.town3r.lizard;
-                PRODUCT_NAME = "$(TARGET_NAME)";
-                REGISTER_APP_GROUPS = YES;
-                STRING_CATALOG_GENERATE_SYMBOLS = YES;
-                SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-                SUPPORTS_MACCATALYST = NO;
-                SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
-                SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
-                SWIFT_APPROACHABLE_CONCURRENCY = YES;
-                SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
-                SWIFT_EMIT_LOC_STRINGS = YES;
-                SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-                SWIFT_VERSION = 6.0;
-                TARGETED_DEVICE_FAMILY = "1,2";
-            };
-            name = Debug;
-        };
-        88C2338A2E4D1BA5006E47DE /* Release configuration for PBXNativeTarget "Lizard" */ = {
-            isa = XCBuildConfiguration;
-            buildSettings = {
-                ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-                ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-                ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
-                CLANG_USE_OPTIMIZATION_PROFILE = YES;
-                CODE_SIGN_ENTITLEMENTS = Lizard/Lizard.entitlements;
-                CODE_SIGN_STYLE = Automatic;
-                CURRENT_PROJECT_VERSION = 1;
-                DEVELOPMENT_TEAM = K72T734R56;
-                ENABLE_PREVIEWS = YES;
-                GENERATE_INFOPLIST_FILE = YES;
-                INFOPLIST_FILE = Lizard/Info.plist;
-                INFOPLIST_KEY_CFBundleDisplayName = Lizard;
-                INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.simulation-games";
-                INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-                INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-                INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-                INFOPLIST_KEY_UIStatusBarHidden = YES;
-                INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-                IPHONEOS_DEPLOYMENT_TARGET = 17.6;
-                LD_RUNPATH_SEARCH_PATHS = (
-                    "$(inherited)",
-                    "@executable_path/Frameworks",
-                );
-                MACOSX_DEPLOYMENT_TARGET = 14.6;
-                MARKETING_VERSION = 1.2;
-                PRODUCT_BUNDLE_IDENTIFIER = com.town3r.lizard;
-                PRODUCT_NAME = "$(TARGET_NAME)";
-                REGISTER_APP_GROUPS = YES;
-                STRING_CATALOG_GENERATE_SYMBOLS = YES;
-                SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-                SUPPORTS_MACCATALYST = NO;
-                SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
-                SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
-                SWIFT_APPROACHABLE_CONCURRENCY = YES;
-                SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
-                SWIFT_EMIT_LOC_STRINGS = YES;
-                SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-                SWIFT_VERSION = 6.0;
-                TARGETED_DEVICE_FAMILY = "1,2";
-            };
-            name = Release;
-        };
+		77E455C5BC994AA7897F6CE7006E47DE /* Debug configuration for PBXNativeTarget "LizardTests" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 21;
+				DEVELOPMENT_TEAM = K72T734R56;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.town3r.lizard.tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Lizard.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Lizard";
+			};
+			name = Debug;
+		};
+		77E455C6B3C544119C6F2F61006E47DE /* Release configuration for PBXNativeTarget "LizardTests" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 21;
+				DEVELOPMENT_TEAM = K72T734R56;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.town3r.lizard.tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Lizard.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Lizard";
+			};
+			name = Release;
+		};
+		88C233862E4D1BA5006E47DE /* Debug configuration for PBXProject "Lizard" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = K72T734R56;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos macosx";
+				SUPPORTS_MACCATALYST = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		88C233872E4D1BA5006E47DE /* Release configuration for PBXProject "Lizard" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = K72T734R56;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos macosx";
+				SUPPORTS_MACCATALYST = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_VERSION = 6.0;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		88C233892E4D1BA5006E47DE /* Debug configuration for PBXNativeTarget "Lizard" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
+				CLANG_USE_OPTIMIZATION_PROFILE = YES;
+				CODE_SIGN_ENTITLEMENTS = Lizard/Lizard.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = K72T734R56;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Lizard/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Lizard;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.simulation-games";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UIStatusBarHidden = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.6;
+				MARKETING_VERSION = 1.2;
+				PRODUCT_BUNDLE_IDENTIFIER = com.town3r.lizard;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		88C2338A2E4D1BA5006E47DE /* Release configuration for PBXNativeTarget "Lizard" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
+				CLANG_USE_OPTIMIZATION_PROFILE = YES;
+				CODE_SIGN_ENTITLEMENTS = Lizard/Lizard.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = K72T734R56;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Lizard/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Lizard;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.simulation-games";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UIStatusBarHidden = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.6;
+				MARKETING_VERSION = 1.2;
+				PRODUCT_BUNDLE_IDENTIFIER = com.town3r.lizard;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-        77E455C4B42C44A9810BB903006E47DE /* Build configuration list for PBXNativeTarget "LizardTests" */ = {
-            isa = XCConfigurationList;
-            buildConfigurations = (
-                77E455C5BC994AA7897F6CE7006E47DE /* Debug configuration for PBXNativeTarget "LizardTests" */,
-                77E455C6B3C544119C6F2F61006E47DE /* Release configuration for PBXNativeTarget "LizardTests" */,
-            );
-            defaultConfigurationName = Release;
-        };
-        88C233762E4D1BA4006E47DE /* Build configuration list for PBXProject "Lizard" */ = {
-            isa = XCConfigurationList;
-            buildConfigurations = (
-                88C233862E4D1BA5006E47DE /* Debug configuration for PBXProject "Lizard" */,
-                88C233872E4D1BA5006E47DE /* Release configuration for PBXProject "Lizard" */,
-            );
-            defaultConfigurationName = Release;
-        };
-        88C233882E4D1BA5006E47DE /* Build configuration list for PBXNativeTarget "Lizard" */ = {
-            isa = XCConfigurationList;
-            buildConfigurations = (
-                88C233892E4D1BA5006E47DE /* Debug configuration for PBXNativeTarget "Lizard" */,
-                88C2338A2E4D1BA5006E47DE /* Release configuration for PBXNativeTarget "Lizard" */,
-            );
-            defaultConfigurationName = Release;
-        };
+		77E455C4B42C44A9810BB903006E47DE /* Build configuration list for PBXNativeTarget "LizardTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				77E455C5BC994AA7897F6CE7006E47DE /* Debug configuration for PBXNativeTarget "LizardTests" */,
+				77E455C6B3C544119C6F2F61006E47DE /* Release configuration for PBXNativeTarget "LizardTests" */,
+			);
+			defaultConfigurationName = Release;
+		};
+		88C233762E4D1BA4006E47DE /* Build configuration list for PBXProject "Lizard" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				88C233862E4D1BA5006E47DE /* Debug configuration for PBXProject "Lizard" */,
+				88C233872E4D1BA5006E47DE /* Release configuration for PBXProject "Lizard" */,
+			);
+			defaultConfigurationName = Release;
+		};
+		88C233882E4D1BA5006E47DE /* Build configuration list for PBXNativeTarget "Lizard" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				88C233892E4D1BA5006E47DE /* Debug configuration for PBXNativeTarget "Lizard" */,
+				88C2338A2E4D1BA5006E47DE /* Release configuration for PBXNativeTarget "Lizard" */,
+			);
+			defaultConfigurationName = Release;
+		};
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-        88C3DF032E57E3A600A99C38 /* XCRemoteSwiftPackageReference "Vortex" */ = {
-            isa = XCRemoteSwiftPackageReference;
-            repositoryURL = "https://github.com/twostraws/Vortex";
-            requirement = {
-                kind = upToNextMajorVersion;
-                minimumVersion = 1.0.3;
-            };
-        };
+		88C3DF032E57E3A600A99C38 /* XCRemoteSwiftPackageReference "Vortex" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/twostraws/Vortex";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.3;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-        88C3DF042E57E3A600A99C38 /* Vortex */ = {
-            isa = XCSwiftPackageProductDependency;
-            package = 88C3DF032E57E3A600A99C38 /* XCRemoteSwiftPackageReference "Vortex" */;
-            productName = Vortex;
-        };
+		88C3DF042E57E3A600A99C38 /* Vortex */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 88C3DF032E57E3A600A99C38 /* XCRemoteSwiftPackageReference "Vortex" */;
+			productName = Vortex;
+		};
 /* End XCSwiftPackageProductDependency section */
-    };
-    rootObject = 88C233732E4D1BA4006E47DE /* Project object */;
+	};
+	rootObject = 88C233732E4D1BA4006E47DE /* Project object */;
 }

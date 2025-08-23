@@ -22,7 +22,13 @@ final class LizardScene: SKScene {
 
     // MARK: Nodes/Assets
     private let physicsLayer = SKNode()
+    private let weatherLayer = SKNode()
     private var lizardTexture: SKTexture?
+    
+    // MARK: Weather Effects
+    private var snowVortexEmitters: [SKEmitterNode] = []
+    private var currentWeatherCondition: WeatherCondition = .clear
+    private var weatherTimer: Timer?
 
     // MARK: Debug overlay and performance tracking
     private let fpsLabel = SKLabelNode(fontNamed: "Menlo")
@@ -61,6 +67,7 @@ final class LizardScene: SKScene {
         physicsBody?.categoryBitMask = 0x1 << 1
 
         addChild(physicsLayer)
+        addChild(weatherLayer)
         
         // Defer heavy initialization to avoid blocking UI
         Task.detached(priority: .userInitiated) { [weak self] in
@@ -443,5 +450,224 @@ final class LizardScene: SKScene {
             return .portrait
         }
         return windowScene.interfaceOrientation
+    }
+    
+    // MARK: - Weather Effects
+    
+    enum WeatherCondition {
+        case clear
+        case snow
+        case rain
+    }
+    
+    func setWeatherCondition(_ condition: WeatherCondition) {
+        currentWeatherCondition = condition
+        
+        // Remove existing snow vortex emitters
+        for emitter in snowVortexEmitters {
+            emitter.removeFromParent()
+        }
+        snowVortexEmitters.removeAll()
+        
+        switch condition {
+        case .clear:
+            // Clear weather: no effects
+            weatherLayer.removeAllChildren()
+            
+        case .snow:
+            // Snowy weather: add snow vortex particle systems
+            addSnowVortexes(count: 3)
+            weatherLayer.isHidden = false
+            
+        case .rain:
+            // Rainy weather: implement rain effect (not yet available)
+            weatherLayer.isHidden = true
+        }
+    }
+    
+    private func addSnowVortexes(count: Int) {
+        for _ in 0..<count {
+            let vortex = SKEmitterNode(fileNamed: "SnowVortex.sks")!
+            vortex.position = CGPoint(x: size.width / 2, y: size.height)
+            vortex.zPosition = 0
+            vortex.targetNode = self
+            weatherLayer.addChild(vortex)
+            snowVortexEmitters.append(vortex)
+        }
+    }
+    
+    /// Call this method when weather settings change
+    func refreshWeatherEffects() {
+        updateWeatherEffects()
+    }
+    
+    /// Updates weather effects based on current weather condition and user settings
+    func updateWeatherEffects() {
+        let weatherOffMode = UserDefaults.standard.bool(forKey: "weatherOffMode")
+        let weatherAutoMode = UserDefaults.standard.bool(forKey: "weatherAutoMode")
+        let manualWeatherCondition = UserDefaults.standard.string(forKey: "manualWeatherCondition") ?? "clear"
+        
+        // Remove existing weather effects
+        clearWeatherEffects()
+        
+        // Early exit if weather is disabled
+        if weatherOffMode {
+            return
+        }
+        
+        // Determine current weather condition
+        let currentCondition: String
+        if weatherAutoMode {
+            // Auto mode: use system weather or random
+            currentCondition = "clear" // Default for now, could integrate with actual weather API
+        } else {
+            currentCondition = manualWeatherCondition
+        }
+        
+        // Apply appropriate weather effects
+        switch currentCondition.lowercased() {
+        case "winter", "snow":
+            addSnowVortexEffects()
+        case "rain":
+            addRainVortexEffects()
+        case "storm":
+            addStormVortexEffects()
+        default:
+            // Clear weather - no additional effects needed
+            break
+        }
+    }
+    
+    private func clearWeatherEffects() {
+        // Remove all snow vortex emitters
+        for emitter in snowVortexEmitters {
+            emitter.removeFromParent()
+        }
+        snowVortexEmitters.removeAll()
+        
+        // Remove all other weather effects
+        weatherLayer.removeAllChildren()
+    }
+    
+    private func addSnowVortexEffects() {
+        let intensity = UserDefaults.standard.double(forKey: "vortexSnowIntensity")
+        let flakeSize = UserDefaults.standard.double(forKey: "vortexSnowFlakeSize")
+        let driftEnabled = UserDefaults.standard.bool(forKey: "vortexSnowDriftEnabled")
+        
+        // Use default values if settings are not configured
+        let safeIntensity = intensity > 0 ? intensity : 0.6
+        let safeFlakeSize = flakeSize > 0 ? flakeSize : 1.0
+        
+        // Create multiple snow vortex emitters for a more dynamic effect
+        let emitterCount = max(1, Int(safeIntensity * 5)) // 1-5 emitters based on intensity
+        
+        for i in 0..<emitterCount {
+            let emitter = createSnowVortexEmitter(
+                intensity: safeIntensity,
+                flakeSize: safeFlakeSize,
+                driftEnabled: driftEnabled,
+                index: i,
+                totalEmitters: emitterCount
+            )
+            
+            weatherLayer.addChild(emitter)
+            snowVortexEmitters.append(emitter)
+        }
+    }
+    
+    private func createSnowVortexEmitter(intensity: Double, flakeSize: Double, driftEnabled: Bool, index: Int, totalEmitters: Int) -> SKEmitterNode {
+        let emitter = SKEmitterNode()
+        
+        // Position emitters across the top of the screen
+        let xPosition = (CGFloat(index + 1) / CGFloat(totalEmitters + 1)) * size.width
+        emitter.position = CGPoint(x: xPosition, y: size.height + 50)
+        emitter.zPosition = -1 // Behind lizards but in front of background
+        
+        // Configure snow particle properties
+        emitter.particleTexture = createSnowflakeTexture(size: flakeSize)
+        emitter.particleBirthRate = CGFloat(intensity * 50) // 5-50 particles per second
+        emitter.numParticlesToEmit = 0 // Continuous emission
+        emitter.particleLifetime = 8.0
+        emitter.particleLifetimeRange = 2.0
+        
+        // Emission area and angle
+        emitter.emissionAngle = .pi / 2 // Downward
+        emitter.emissionAngleRange = .pi / 6 // Slight spread
+        emitter.particlePosition = CGPoint(x: 0, y: 0)
+        emitter.particlePositionRange = CGVector(dx: 100, dy: 20)
+        
+        // Particle movement
+        emitter.particleSpeed = 30
+        emitter.particleSpeedRange = 20
+        emitter.xAcceleration = driftEnabled ? CGFloat.random(in: -20...20) : 0
+        emitter.yAcceleration = -9.8 // Gravity effect
+        
+        // Visual properties
+        emitter.particleSize = CGSize(width: 4 * flakeSize, height: 4 * flakeSize)
+        emitter.particleAlpha = 0.8
+        emitter.particleAlphaRange = 0.3
+        emitter.particleAlphaSpeed = -0.1
+        
+        // Rotation for swirling effect
+        emitter.particleRotation = 0
+        emitter.particleRotationRange = .pi * 2
+        emitter.particleRotationSpeed = driftEnabled ? .pi / 4 : .pi / 8
+        
+        // Color blend - white snow with slight blue tint
+        emitter.particleColorBlendFactor = 1.0
+        emitter.particleColor = SKColor.white
+        emitter.particleColorSequence = nil
+        
+        // Add vortex-like motion if drift is enabled
+        if driftEnabled {
+            let vortexAction = SKAction.sequence([
+                SKAction.moveBy(x: 50, y: 0, duration: 2.0),
+                SKAction.moveBy(x: -100, y: 0, duration: 4.0),
+                SKAction.moveBy(x: 50, y: 0, duration: 2.0)
+            ])
+            emitter.run(SKAction.repeatForever(vortexAction))
+        }
+        
+        return emitter
+    }
+    
+    private func createSnowflakeTexture(size: Double) -> SKTexture? {
+        let renderer = UIGraphicsImageRenderer(size: CGSize(width: 8, height: 8))
+        let image = renderer.image { context in
+            let ctx = context.cgContext
+            ctx.setFillColor(UIColor.white.cgColor)
+            ctx.setStrokeColor(UIColor.white.cgColor)
+            ctx.setLineWidth(0.5)
+            
+            let center = CGPoint(x: 4, y: 4)
+            let radius: CGFloat = 3
+            
+            // Draw simple snowflake pattern
+            for i in 0..<6 {
+                let angle = Double(i) * .pi / 3
+                let endX = center.x + cos(angle) * radius
+                let endY = center.y + sin(angle) * radius
+                
+                ctx.move(to: center)
+                ctx.addLine(to: CGPoint(x: endX, y: endY))
+                ctx.strokePath()
+            }
+            
+            // Center dot
+            ctx.fillEllipse(in: CGRect(x: 3.5, y: 3.5, width: 1, height: 1))
+        }
+        
+        return SKTexture(image: image)
+    }
+    
+    private func addRainVortexEffects() {
+        // Implement rain vortex effects (placeholder for now)
+        // This would create rain particle emitters similar to snow but with different properties
+    }
+    
+    private func addStormVortexEffects() {
+        // Implement storm vortex effects combining rain with lightning
+        addRainVortexEffects()
+        // Add lightning effects, etc.
     }
 }
