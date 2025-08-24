@@ -25,7 +25,7 @@ struct LizardApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            MainTabView()
                 .preferredColorScheme(nil) // Allow system color scheme
                 .onReceive(NotificationCenter.default.publisher(for: UIApplication.willTerminateNotification)) { _ in
                     // Clean up resources when app terminates
