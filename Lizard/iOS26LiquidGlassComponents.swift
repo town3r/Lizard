@@ -7,6 +7,119 @@
 
 import SwiftUI
 
+// MARK: - Animated Tab Icon Component
+
+struct AnimatedTabIcon: View {
+    let systemImage: String
+    let title: String
+    let isSelected: Bool
+    let animationType: MainTabView.AnimationType
+    
+    @State private var animationScale: CGFloat = 1.0
+    @State private var animationRotation: Double = 0.0
+    @State private var animationOpacity: Double = 1.0
+    @State private var pulseTimer: Timer?
+    
+    var body: some View {
+        VStack(spacing: 4) {
+            Image(systemName: systemImage)
+                .font(.system(size: 20, weight: .medium))
+                .scaleEffect(animationScale)
+                .rotationEffect(.degrees(animationRotation))
+                .opacity(animationOpacity)
+                .animation(.easeInOut(duration: 0.3), value: isSelected)
+            
+            Text(title)
+                .font(.system(size: 10, weight: .medium))
+                .scaleEffect(isSelected ? 1.05 : 1.0)
+                .animation(.easeInOut(duration: 0.3), value: isSelected)
+        }
+        .onChange(of: isSelected) { _, newValue in
+            if newValue {
+                performAnimation()
+            } else {
+                resetAnimation()
+            }
+        }
+        .onAppear {
+            if isSelected {
+                performAnimation()
+            }
+        }
+        .onDisappear {
+            stopContinuousAnimations()
+        }
+    }
+    
+    private func performAnimation() {
+        switch animationType {
+        case .bounce:
+            withAnimation(.spring(response: 0.6, dampingFraction: 0.8, blendDuration: 0)) {
+                animationScale = 1.2
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                withAnimation(.spring(response: 0.4, dampingFraction: 0.6, blendDuration: 0)) {
+                    animationScale = 1.0
+                }
+            }
+            
+        case .rotateScale:
+            withAnimation(.easeInOut(duration: 0.4)) {
+                animationScale = 1.15
+                animationRotation = 15
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                withAnimation(.easeInOut(duration: 0.3)) {
+                    animationRotation = 0
+                    animationScale = 1.0
+                }
+            }
+            
+        case .pulse:
+            startPulseAnimation()
+            
+        case .spin:
+            withAnimation(.easeInOut(duration: 0.6)) {
+                animationRotation = 360
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+                animationRotation = 0
+            }
+        }
+    }
+    
+    @MainActor
+    private func startPulseAnimation() {
+        pulseTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
+            Task { @MainActor in
+                withAnimation(.easeInOut(duration: 0.5)) {
+                    animationScale = 1.1
+                    animationOpacity = 0.7
+                }
+                try? await Task.sleep(nanoseconds: 500_000_000) // 0.5 seconds
+                withAnimation(.easeInOut(duration: 0.5)) {
+                    animationScale = 1.0
+                    animationOpacity = 1.0
+                }
+            }
+        }
+    }
+    
+    private func resetAnimation() {
+        stopContinuousAnimations()
+        withAnimation(.easeInOut(duration: 0.2)) {
+            animationScale = 1.0
+            animationRotation = 0.0
+            animationOpacity = 1.0
+        }
+    }
+    
+    private func stopContinuousAnimations() {
+        pulseTimer?.invalidate()
+        pulseTimer = nil
+    }
+}
+
 // MARK: - iOS 26 Liquid Glass Button Component
 
 struct iOS26LiquidGlassButton: View {
@@ -57,17 +170,20 @@ struct iOS26LiquidGlassButton: View {
                         .font(font)
                 }
             }
-            .foregroundStyle(style == .primary ? .primary : .secondary)
-            .padding(.vertical, 16)
-            .frame(maxWidth: width == nil ? .infinity : width)
+            .frame(maxWidth: width)
+            .padding(.horizontal, 20)
+            .padding(.vertical, 12)
+            .background(
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(.ultraThinMaterial)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(Color.primary.opacity(0.1), lineWidth: 1)
+                    )
+            )
         }
-        .buttonStyle(.plain)
-        .background {
-            iOS26LiquidGlass(isPressed: isPressed, size: .medium)
-        }
-        .scaleEffect(isPressed ? 0.96 : 1.0)
+        .scaleEffect(isPressed ? 0.95 : 1.0)
         .offset(jitterOffset)
-        .animation(.spring(response: 0.3, dampingFraction: 0.8), value: isPressed)
         .simultaneousGesture(
             DragGesture(minimumDistance: 0)
                 .onChanged { _ in isPressed = true }
@@ -78,29 +194,20 @@ struct iOS26LiquidGlassButton: View {
                 startJittering()
             }
         }
-        .onChange(of: isJittering) { _, newValue in
-            if newValue {
-                startJittering()
-            } else {
-                stopJittering()
-            }
-        }
         .onDisappear {
             stopJittering()
         }
+        .animation(.easeInOut(duration: 0.1), value: isPressed)
     }
     
+    @MainActor
     private func startJittering() {
-        jitterTimer?.invalidate()
-
         jitterTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { _ in
             Task { @MainActor in
-                guard isJittering else { return }
-
-                withAnimation(.easeInOut(duration: 0.1)) {
+                withAnimation(.linear(duration: 0.1)) {
                     jitterOffset = CGSize(
-                        width: Double.random(in: -2.0...2.0),
-                        height: Double.random(in: -2.0...2.0)
+                        width: Double.random(in: -2...2),
+                        height: Double.random(in: -2...2)
                     )
                 }
             }
@@ -110,8 +217,7 @@ struct iOS26LiquidGlassButton: View {
     private func stopJittering() {
         jitterTimer?.invalidate()
         jitterTimer = nil
-        
-        withAnimation(.easeOut(duration: 0.2)) {
+        withAnimation(.easeInOut(duration: 0.2)) {
             jitterOffset = .zero
         }
     }

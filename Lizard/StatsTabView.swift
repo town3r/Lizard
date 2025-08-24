@@ -380,45 +380,6 @@ struct LeaderboardRow: View {
     }
 }
 
-// MARK: - Liquid Glass Section Component
-
-struct LiquidGlassSection<Content: View>: View {
-    let title: String
-    let subtitle: String
-    let systemImage: String
-    @ViewBuilder let content: Content
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            // Section Header
-            HStack(spacing: 12) {
-                Image(systemName: systemImage)
-                    .font(.title2)
-                    .foregroundStyle(.blue)
-                
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(title)
-                        .font(.headline)
-                        .fontWeight(.bold)
-                    
-                    Text(subtitle)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-                
-                Spacer()
-            }
-            
-            // Section Content
-            content
-        }
-        .padding(20)
-        .background {
-            iOS26LiquidGlass(isPressed: false, size: .large)
-        }
-    }
-}
-
 #Preview {
     StatsTabView()
 }

@@ -4,6 +4,9 @@ import AVFoundation
 import UIKit
 import Combine
 
+// MARK: - Notification Names
+nonisolated(unsafe) private let orientationLockChangedNotification = Notification.Name("orientationLockChanged")
+
 @main
 struct LizardApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
@@ -20,6 +23,13 @@ struct LizardApp: App {
         // Configure audio session asynchronously to avoid blocking startup
         Task.detached(priority: .background) {
             await Self.configureAudioSessionAsync()
+        }
+        
+        // Move sound preloading to background to prevent startup blocking
+        Task.detached(priority: .background) {
+            await MainActor.run {
+                SoundPlayer.shared.preload(name: "lizard", ext: "wav", voices: 3)
+            }
         }
     }
 
@@ -82,7 +92,7 @@ class OrientationManager: ObservableObject {
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(orientationLockChanged),
-            name: .orientationLockChanged,
+            name: orientationLockChangedNotification,
             object: nil
         )
 
@@ -140,9 +150,4 @@ class OrientationManager: ObservableObject {
     deinit {
         NotificationCenter.default.removeObserver(self)
     }
-}
-
-// MARK: - Notification Extension
-extension Notification.Name {
-    nonisolated(unsafe) static let orientationLockChanged = Notification.Name("orientationLockChanged")
 }

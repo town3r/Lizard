@@ -67,7 +67,7 @@ struct SettingsView: View {
                             )
                         }
                         
-                        NavigationLink(destination: WeatherSettingsView()) {
+                        NavigationLink(destination: WeatherControlSettingsView()) {
                             SettingsCategoryRow(
                                 title: "Weather Settings",
                                 subtitle: "Rain and environment",
@@ -792,7 +792,7 @@ struct VisualSettingsView: View {
 
 // MARK: - Weather Settings
 
-struct WeatherSettingsView: View {
+struct WeatherControlSettingsView: View {
     @AppStorage("weatherAutoMode") private var weatherAutoMode: Bool = true
     @AppStorage("weatherOffMode") private var weatherOffMode: Bool = false
     @AppStorage("manualWeatherCondition") private var manualWeatherConditionRaw: String = "clear"

@@ -1,14 +1,14 @@
 //
-//  WeatherTabView.swift
+//  WeatherSettingsView.swift
 //  Lizard
 //
-//  Weather controls tab with iOS 26 liquid glass styling
+//  Weather settings view with iOS 26 liquid glass styling
 //
 
 import SwiftUI
 
-/// Weather tab for controlling weather conditions and visual effects
-struct WeatherTabView: View {
+/// Weather settings view for controlling weather conditions and visual effects
+struct WeatherSettingsView: View {
     @Environment(\.colorScheme) private var colorScheme
     
     // Weather mode settings
@@ -25,28 +25,26 @@ struct WeatherTabView: View {
     }
     
     var body: some View {
-        NavigationView {
-            ScrollView {
-                VStack(spacing: 24) {
-                    // Weather Mode Section
-                    weatherModeSection
-                    
-                    // Weather Effects Section
-                    if !weatherOffMode {
-                        weatherEffectsSection
-                    }
-                    
-                    // Weather Preview Section
-                    weatherPreviewSection
-                    
-                    Spacer(minLength: 100)
+        ScrollView {
+            VStack(spacing: 24) {
+                // Weather Mode Section
+                weatherModeSection
+                
+                // Weather Effects Section
+                if !weatherOffMode {
+                    weatherEffectsSection
                 }
-                .padding(.horizontal, 20)
-                .padding(.top, 16)
+                
+                // Weather Preview Section
+                weatherPreviewSection
+                
+                Spacer(minLength: 100)
             }
-            .navigationTitle("Weather")
-            .navigationBarTitleDisplayMode(.large)
+            .padding(.horizontal, 20)
+            .padding(.top, 16)
         }
+        .navigationTitle("Weather Settings")
+        .navigationBarTitleDisplayMode(.large)
     }
     
     // MARK: - Weather Mode Section
@@ -241,5 +239,7 @@ struct WeatherTabView: View {
 }
 
 #Preview {
-    WeatherTabView()
+    NavigationView {
+        WeatherSettingsView()
+    }
 }

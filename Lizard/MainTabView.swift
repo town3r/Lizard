@@ -12,19 +12,36 @@ struct MainTabView: View {
     @State private var selectedTab: Tab = .physics
     
     enum Tab: String, CaseIterable {
-        case physics = "Physics"
-        case settings = "Settings"
+        case physics = "Main"
         case stats = "Stats"
-        case weather = "Weather"
+        case background = "Background"
+        case settings = "Settings"
         
         var systemImage: String {
             switch self {
-            case .physics: return "ball.circle.fill"
-            case .settings: return "gearshape.fill"
+            case .physics: return "lizard.fill"
             case .stats: return "trophy.fill"
-            case .weather: return "cloud.rain.fill"
+            case .background: return "photo.fill"
+            case .settings: return "gearshape.fill"
             }
         }
+        
+        // Animation properties for each tab
+        var animationType: AnimationType {
+            switch self {
+            case .physics: return .bounce
+            case .stats: return .rotateScale
+            case .background: return .pulse
+            case .settings: return .spin
+            }
+        }
+    }
+    
+    enum AnimationType {
+        case bounce
+        case rotateScale
+        case pulse
+        case spin
     }
     
     var body: some View {
@@ -32,33 +49,52 @@ struct MainTabView: View {
             // Physics Tab - Main lizard physics simulation
             PhysicsTabView()
                 .tabItem {
-                    Label(Tab.physics.rawValue, systemImage: Tab.physics.systemImage)
+                    AnimatedTabIcon(
+                        systemImage: Tab.physics.systemImage,
+                        title: Tab.physics.rawValue,
+                        isSelected: selectedTab == .physics,
+                        animationType: Tab.physics.animationType
+                    )
                 }
                 .tag(Tab.physics)
-            
-            // Settings Tab - App configuration and preferences
-            SettingsTabView()
-                .tabItem {
-                    Label(Tab.settings.rawValue, systemImage: Tab.settings.systemImage)
-                }
-                .tag(Tab.settings)
             
             // Stats Tab - Game Center leaderboards and achievements
             StatsTabView()
                 .tabItem {
-                    Label(Tab.stats.rawValue, systemImage: Tab.stats.systemImage)
+                    AnimatedTabIcon(
+                        systemImage: Tab.stats.systemImage,
+                        title: Tab.stats.rawValue,
+                        isSelected: selectedTab == .stats,
+                        animationType: Tab.stats.animationType
+                    )
                 }
                 .tag(Tab.stats)
             
-            // Weather Tab - Weather controls and visual effects
-            WeatherTabView()
+            // Background Tab - Visual effects and dynamic backgrounds
+            BackgroundTabView()
                 .tabItem {
-                    Label(Tab.weather.rawValue, systemImage: Tab.weather.systemImage)
+                    AnimatedTabIcon(
+                        systemImage: Tab.background.systemImage,
+                        title: Tab.background.rawValue,
+                        isSelected: selectedTab == .background,
+                        animationType: Tab.background.animationType
+                    )
                 }
-                .tag(Tab.weather)
+                .tag(Tab.background)
+
+            // Settings Tab - App configuration and preferences
+            SettingsTabView()
+                .tabItem {
+                    AnimatedTabIcon(
+                        systemImage: Tab.settings.systemImage,
+                        title: Tab.settings.rawValue,
+                        isSelected: selectedTab == .settings,
+                        animationType: Tab.settings.animationType
+                    )
+                }
+                .tag(Tab.settings)
         }
         .tabViewStyle(.automatic)
-        // Enhanced tab bar styling with liquid glass effects
         .preferredColorScheme(nil)
         .onAppear {
             configureTabBarAppearance()
