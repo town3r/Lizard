@@ -32,7 +32,7 @@ xcode-select -p
 - **Build via Xcode**: `⌘+B` in Xcode 
 - **Build via Command Line**: `xcodebuild -project Lizard.xcodeproj -scheme Lizard -configuration Debug`
 - **Build Time**: Clean build takes 30-60 seconds. **NEVER CANCEL - set timeout to 300+ seconds (5+ minutes).**
-- **Run in Simulator**: `⌘+R` in Xcode OR `xcodebuild -project Lizard.xcodeproj -scheme Lizard -configuration Debug -destination 'platform=iOS Simulator,name=iPhone 15'`
+- **Run in Simulator**: `⌘+R` in Xcode OR `xcodebuild -project Lizard.xcodeproj -scheme Lizard -configuration Debug -destination 'platform=iOS Simulator,name=iPhone 16 Pro Max,OS=26.0'`
 - **Archive for Distribution**: `⌘+Shift+B` in Xcode for TestFlight/App Store builds - takes 2-3 minutes. **NEVER CANCEL - set timeout to 600+ seconds (10+ minutes).**
 
 ### Clean Build Process  
@@ -46,7 +46,7 @@ xcodebuild clean -project Lizard.xcodeproj && xcodebuild -project Lizard.xcodepr
 
 ### Testing
 - **Run Unit Tests via Xcode**: `⌘+U` in Xcode
-- **Run Unit Tests via Command Line**: `xcodebuild test -project Lizard.xcodeproj -scheme Lizard -destination 'platform=iOS Simulator,name=iPhone 15,OS=latest'`
+- **Run Unit Tests via Command Line**: `xcodebuild test -project Lizard.xcodeproj -scheme Lizard -destination 'platform=iOS Simulator,name=iPhone 16 Pro Max,OS=26.0'`
 - **Test Duration**: Unit tests run in 10-15 seconds. **NEVER CANCEL - set timeout to 120+ seconds (2+ minutes).**
 - **Test Coverage**: Tests cover SoundPlayer, GameCenterManager, LizardScene, BetaFeedbackManager, and gravity transformations
 - **Available Test Targets**: Lizard (main), LizardTests (unit tests)
@@ -72,7 +72,7 @@ xcodebuild -project Lizard.xcodeproj -scheme Lizard -configuration Debug -dry-ru
 - **Clean Build Folder**: `⌘+Shift+K` in Xcode OR `xcodebuild clean -project Lizard.xcodeproj`
 - **Build for Device**: Requires Apple Developer account and provisioning profile
 - **Simulator Testing**: Preferred for development - supports all app features except actual device motion
-- **Test Multiple Simulators**: iPhone SE (small screen), iPhone 15 (current), iPhone 15 Pro Max (large screen)
+- **Test Multiple Simulators**: iPhone SE (small screen), iPhone 16 (current), iPhone 16 Pro Max (large screen)
 
 ### Troubleshooting Build Issues
 ```bash
@@ -93,7 +93,7 @@ xcrun simctl erase all
 **ALWAYS perform these validation steps after making changes - REQUIRED for complete validation:**
 
 1. **Basic App Launch**:
-   - Launch app in iOS Simulator (use iPhone 15 simulator)
+   - Launch app in iOS Simulator (use iPhone 16 Pro Max simulator)
    - Verify splash screen loads within 3-5 seconds
    - Check that main UI appears with lizard button
 
@@ -243,7 +243,7 @@ LizardTests/
 - **Code signing issues**: Check Apple Developer account and certificates in Xcode > Preferences > Accounts
 - **Missing provisioning profile**: Download from Apple Developer portal, ensure bundle ID matches
 - **Simulator not found**: Install additional simulators in Xcode > Preferences > Components
-- **Invalid deployment target**: Ensure iOS 18.0+ in project settings (not 26.0 which doesn't exist)
+- **Invalid deployment target**: Ensure iOS 18.0+ in project settings 
 - **Clean derived data**: `rm -rf ~/Library/Developer/Xcode/DerivedData` then rebuild
 
 ### Runtime Issues  
@@ -255,7 +255,7 @@ LizardTests/
 
 ### Testing Issues
 - **Unit tests failing**: Check that audio files (`lizard.wav`) and assets are available in bundle
-- **Simulator crashes**: Try different simulator device types (iPhone 15, iPhone SE)
+- **Simulator crashes**: Try different simulator device types (iPhone 16, iPhone SE)
 - **GameCenter tests failing**: Some features require device testing, simulator has limitations
 - **Test timeout**: Increase timeout values, tests may take longer on slower machines
 
@@ -321,10 +321,10 @@ xcodebuild clean -project Lizard.xcodeproj
 xcodebuild -project Lizard.xcodeproj -scheme Lizard -configuration Debug
 
 # Run tests - NEVER CANCEL, takes 10-15 seconds, timeout 120+ seconds  
-xcodebuild test -project Lizard.xcodeproj -scheme Lizard -destination 'platform=iOS Simulator,name=iPhone 15,OS=latest'
+xcodebuild test -project Lizard.xcodeproj -scheme Lizard -destination 'platform=iOS Simulator,name=iPhone 16 Pro Max,OS=26.0'
 
 # Build for simulator - NEVER CANCEL, takes 15-45 seconds
-xcodebuild -project Lizard.xcodeproj -scheme Lizard -configuration Debug -destination 'platform=iOS Simulator,name=iPhone 15,OS=latest'
+xcodebuild -project Lizard.xcodeproj -scheme Lizard -configuration Debug -destination 'platform=iOS Simulator,name=iPhone 16 Pro Max,OS=26.0'
 
 # Check for build warnings
 xcodebuild -project Lizard.xcodeproj -scheme Lizard -configuration Debug | grep warning
@@ -336,7 +336,7 @@ xcodebuild -project Lizard.xcodeproj -scheme Lizard -configuration Debug | grep 
 xcodebuild clean -project Lizard.xcodeproj && xcodebuild -project Lizard.xcodeproj -scheme Lizard -configuration Debug
 
 # 2. Run tests - NEVER CANCEL, timeout 120+ seconds
-xcodebuild test -project Lizard.xcodeproj -scheme Lizard -destination 'platform=iOS Simulator,name=iPhone 15,OS=latest'
+xcodebuild test -project Lizard.xcodeproj -scheme Lizard -destination 'platform=iOS Simulator,name=iPhone 16 Pro Max,OS=26.0'
 
 # 3. Check for warnings
 xcodebuild -project Lizard.xcodeproj -scheme Lizard | grep warning
