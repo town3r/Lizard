@@ -209,14 +209,10 @@ struct WeatherTabView: View {
             return .orange
         case .cloudy:
             return .gray
-        case .rainy:
+        case .rain:
             return .blue
-        case .stormy:
+        case .storm:
             return .purple
-        case .snowy:
-            return .cyan
-        case .foggy:
-            return .secondary
         case .none:
             return .clear
         }
@@ -230,14 +226,10 @@ struct WeatherTabView: View {
             return "Mix of sun and clouds with pleasant atmosphere"
         case .cloudy:
             return "Overcast sky with soft, diffused lighting"
-        case .rainy:
+        case .rain:
             return "Light to moderate rain with water effects"
-        case .stormy:
+        case .storm:
             return "Heavy rain with lightning and thunder"
-        case .snowy:
-            return "Snowfall with winter atmospheric effects"
-        case .foggy:
-            return "Reduced visibility with misty atmosphere"
         case .none:
             return "No weather effects"
         }
