@@ -37,6 +37,11 @@ final class LizardScene: SKScene {
     private var consecutiveLowFPSFrames = 0
     private let lowFPSThreshold: Double = AppConfiguration.Performance.lowFPSThreshold
     private let maxConsecutiveLowFPS = AppConfiguration.Performance.maxConsecutiveLowFPS
+    
+    // MARK: Background adaptation for FPS counter
+    private var backgroundType: String = "dynamic"
+    private var isDarkMode: Bool = false
+    
     private var showFPSCounter: Bool {
         UserDefaults.standard.bool(forKey: "showFPSCounter")
     }
@@ -80,11 +85,11 @@ final class LizardScene: SKScene {
     }
     
     private func setupBasicFPSOverlay() {
-        fpsLabel.fontSize = 12
-        fpsLabel.fontColor = .white
+        fpsLabel.fontSize = 10  // Changed from 12 to 10pt as required
+        fpsLabel.fontColor = .white  // Will be updated dynamically based on background
         fpsLabel.alpha = 0.9
         fpsLabel.zPosition = 9999
-        fpsLabel.horizontalAlignmentMode = .right
+        fpsLabel.horizontalAlignmentMode = .left  // Changed from .right for left positioning
         fpsLabel.verticalAlignmentMode = .top
         fpsLabel.isHidden = true  // Start hidden, will be shown after initialization
         addChild(fpsLabel)
@@ -148,6 +153,13 @@ final class LizardScene: SKScene {
     func setAgingPaused(_ paused: Bool) {
         agingPaused = paused
         physicsLayer.children.forEach { $0.speed = paused ? 0 : 1 }
+    }
+    
+    /// Update background information for FPS counter color adaptation
+    func updateBackgroundInfo(backgroundType: String, isDarkMode: Bool) {
+        self.backgroundType = backgroundType
+        self.isDarkMode = isDarkMode
+        updateFPSCounterColor()
     }
 
     func emitBurstFromCenter(countRange: ClosedRange<Int>) {
@@ -534,11 +546,11 @@ final class LizardScene: SKScene {
 
     // MARK: FPS overlay
     private func setupFPSOverlay() {
-        fpsLabel.fontSize = 12
-        fpsLabel.fontColor = .white
+        fpsLabel.fontSize = 10  // Changed from 12 to 10pt as required
+        fpsLabel.fontColor = .white  // Will be updated dynamically based on background
         fpsLabel.alpha = 0.9
         fpsLabel.zPosition = 9999
-        fpsLabel.horizontalAlignmentMode = .right
+        fpsLabel.horizontalAlignmentMode = .left  // Changed from .right for left positioning
         fpsLabel.verticalAlignmentMode = .top
         fpsLabel.isHidden = !showFPSCounter  // Initially hidden based on user setting
         addChild(fpsLabel)
@@ -546,7 +558,42 @@ final class LizardScene: SKScene {
     }
 
     private func layoutFPSOverlay() {
-        fpsLabel.position = CGPoint(x: size.width - 15, y: size.height - 40)
+        // Position FPS counter in top-left corner, below the HUD counters
+        // Account for safe area (16pt padding) + HUD height (~60pt) + spacing (8pt)
+        fpsLabel.position = CGPoint(x: 20, y: size.height - 100)
+        
+        // Update color based on background type and color scheme
+        updateFPSCounterColor()
+    }
+    
+    /// Update FPS counter color based on background type and color scheme
+    private func updateFPSCounterColor() {
+        let color: SKColor
+        
+        switch backgroundType {
+        case "solid":
+            // For solid backgrounds: use contrasting colors based on color scheme
+            color = isDarkMode ? .white : .black
+            
+        case "gradient":
+            // For gradient backgrounds: use high contrast with shadow outline
+            color = .white
+            // Add shadow/outline effect for better readability
+            fpsLabel.fontColor = color
+            // Note: SKLabelNode doesn't have built-in shadow, but white on gradient usually works well
+            return
+            
+        case "dynamic":
+            // For dynamic backgrounds: use high contrast colors
+            // Dynamic backgrounds can vary greatly, so use white with high alpha for better visibility
+            color = .white
+            
+        default:
+            // Default fallback
+            color = .white
+        }
+        
+        fpsLabel.fontColor = color
     }
 
     override func update(_ currentTime: TimeInterval) {
