@@ -87,105 +87,82 @@ struct ContentView: View {
     var body: some View {
         GeometryReader { proxy in
             let size = proxy.size
-            ZStack {
-                // Background switching based on user preference
-                backgroundView
-                    .ignoresSafeArea()
-                
-                // Game content with TransparentSpriteView
-                TransparentSpriteView(scene: scene, preferredFPS: 120)
-                    .ignoresSafeArea()
-                    .allowsHitTesting(false)
+            configuredMainView(size: size)
+        }
+    }
+    
+    // MARK: - Main Content View Components
+    
+    /// Main content stack with all game UI components
+    private func mainContentView(size: CGSize) -> some View {
+        ZStack {
+            // Background switching based on user preference
+            backgroundView
+                .ignoresSafeArea()
+            
+            // Game content with TransparentSpriteView
+            TransparentSpriteView(scene: scene, preferredFPS: 120)
+                .ignoresSafeArea()
+                .allowsHitTesting(false)
 
-                topLeftHUD
-                bottomBar
-                centerButton(size: size)
+            topLeftHUD
+            bottomBar
+            centerButton(size: size)
+        }
+    }
+    
+    /// Main view with all modifiers applied
+    private func configuredMainView(size: CGSize) -> some View {
+        mainContentView(size: size)
+            .onAppear { handleViewAppear(size: size) }
+            .onDisappear { handleViewDisappear() }
+            .onReceive(NotificationCenter.default.publisher(for: .lizardSpawned)) { _ in handleLizardSpawned() }
+            .modifier(SizeChangeModifier(size: size, scene: scene))
+            .modifier(ColorSchemeChangeModifier(colorScheme: colorScheme, backgroundType: backgroundType, scene: scene))
+            .modifier(BackgroundTypeChangeModifier(backgroundType: backgroundType, colorScheme: colorScheme, scene: scene))
+            .modifier(ScenePhaseChangeModifier(scenePhase: scenePhase, scene: scene, stopSpewHold: stopSpewHold, stopRainHold: stopRainHold))
+            .modifier(WeatherSettingsChangeModifier(weatherOffMode: weatherOffMode, weatherAutoMode: weatherAutoMode, manualWeatherCondition: manualWeatherCondition, scene: scene))
+    }
+    
+    // MARK: - Event Handlers
+    
+    /// Handles view appearance with essential scene setup
+    private func handleViewAppear(size: CGSize) {
+        // Essential scene setup first for immediate UI response
+        scene.scaleMode = .resizeFill
+        scene.size = size
+        scene.backgroundColor = .clear
+        
+        // Set up scene callbacks immediately for UI responsiveness
+        scene.onLizardCountChange = { count in
+            Task { @MainActor in
+                lizardCount = count
+                updateButtonVisibility()
             }
-            .onAppear {
-                // Essential scene setup first for immediate UI response
-                scene.scaleMode = .resizeFill
-                scene.size = size
-                scene.backgroundColor = .clear
-                
-                // Set up scene callbacks immediately for UI responsiveness
-                scene.onLizardCountChange = { count in
-                    Task { @MainActor in
-                        lizardCount = count
-                        updateButtonVisibility()
-                    }
-                }
-                
-                // Defer heavy initialization to background to avoid blocking UI
-                Task.detached(priority: .userInitiated) {
-                    await MainActor.run {
-                        performDeferredInitialization()
-                    }
-                }
+        }
+        
+        // Defer heavy initialization to background to avoid blocking UI
+        Task.detached(priority: .userInitiated) {
+            await MainActor.run {
+                performDeferredInitialization()
             }
-            .onChange(of: size) { _, newSize in
-                Task { @MainActor in
-                    scene.size = newSize
-                }
-            }
-            .onChange(of: colorScheme) { _, _ in
-                Task { @MainActor in
-                    scene.backgroundColor = .clear
-                    // Update FPS counter color when color scheme changes
-                    scene.updateBackgroundInfo(backgroundType: backgroundType, isDarkMode: colorScheme == .dark)
-                }
-            }
-            .onChange(of: backgroundType) { _, _ in
-                Task { @MainActor in
-                    // Update FPS counter color when background type changes
-                    scene.updateBackgroundInfo(backgroundType: backgroundType, isDarkMode: colorScheme == .dark)
-                }
-            }
-            .onDisappear {
-                Task { @MainActor in
-                    scene.stopTilt()
-                    stopSpewHold()
-                    stopRainHold()
-                }
-            }
-            .onReceive(NotificationCenter.default.publisher(for: .lizardSpawned)) { _ in
-                Task { @MainActor in
-                    totalSpawned += 1
-                    reportScoresIfReady()
-                }
-            }
-            .onChange(of: scenePhase) { _, newPhase in
-                Task { @MainActor in
-                    switch newPhase {
-                    case .background:
-                        scene.setAgingPaused(true)
-                        stopSpewHold()
-                        stopRainHold()
-                    case .active:
-                        break
-                    case .inactive:
-                        stopSpewHold()
-                        stopRainHold()
-                    @unknown default:
-                        break
-                    }
-                }
-            }
-            // Weather settings observers - trigger weather effects when settings change
-            .onChange(of: weatherOffMode) { _, _ in
-                Task { @MainActor in
-                    scene.refreshWeatherEffects()
-                }
-            }
-            .onChange(of: weatherAutoMode) { _, _ in
-                Task { @MainActor in
-                    scene.refreshWeatherEffects()
-                }
-            }
-            .onChange(of: manualWeatherCondition) { _, _ in
-                Task { @MainActor in
-                    scene.refreshWeatherEffects()
-                }
-            }
+        }
+    }
+    
+    /// Handles view disappearance cleanup
+    private func handleViewDisappear() {
+        Task { @MainActor in
+            scene.stopTilt()
+            stopSpewHold()
+            stopRainHold()
+        }
+    }
+    
+    /// Handles lizard spawned notifications
+    private func handleLizardSpawned() {
+        Task { @MainActor in
+            totalSpawned += 1
+            reportScoresIfReady()
         }
     }
     
@@ -201,6 +178,110 @@ struct ContentView: View {
         default:
             DynamicBackgroundView()
         }
+    }
+}
+
+// MARK: - View Modifiers for Event Handling
+
+/// Handles size changes for the scene
+private struct SizeChangeModifier: ViewModifier {
+    let size: CGSize
+    let scene: LizardScene
+    
+    func body(content: Content) -> some View {
+        content.onChange(of: size) { _, newSize in
+            Task { @MainActor in
+                scene.size = newSize
+            }
+        }
+    }
+}
+
+/// Handles color scheme changes
+private struct ColorSchemeChangeModifier: ViewModifier {
+    let colorScheme: ColorScheme
+    let backgroundType: String
+    let scene: LizardScene
+    
+    func body(content: Content) -> some View {
+        content.onChange(of: colorScheme) { _, _ in
+            Task { @MainActor in
+                scene.backgroundColor = .clear
+                // Update FPS counter color when color scheme changes
+                scene.updateBackgroundInfo(backgroundType: backgroundType, isDarkMode: colorScheme == .dark)
+            }
+        }
+    }
+}
+
+/// Handles background type changes
+private struct BackgroundTypeChangeModifier: ViewModifier {
+    let backgroundType: String
+    let colorScheme: ColorScheme
+    let scene: LizardScene
+    
+    func body(content: Content) -> some View {
+        content.onChange(of: backgroundType) { _, _ in
+            Task { @MainActor in
+                // Update FPS counter color when background type changes
+                scene.updateBackgroundInfo(backgroundType: backgroundType, isDarkMode: colorScheme == .dark)
+            }
+        }
+    }
+}
+
+/// Handles scene phase changes (app lifecycle)
+private struct ScenePhaseChangeModifier: ViewModifier {
+    let scenePhase: ScenePhase
+    let scene: LizardScene
+    let stopSpewHold: () -> Void
+    let stopRainHold: () -> Void
+    
+    func body(content: Content) -> some View {
+        content.onChange(of: scenePhase) { _, newPhase in
+            Task { @MainActor in
+                switch newPhase {
+                case .background:
+                    scene.setAgingPaused(true)
+                    stopSpewHold()
+                    stopRainHold()
+                case .active:
+                    break
+                case .inactive:
+                    stopSpewHold()
+                    stopRainHold()
+                @unknown default:
+                    break
+                }
+            }
+        }
+    }
+}
+
+/// Handles weather settings changes
+private struct WeatherSettingsChangeModifier: ViewModifier {
+    let weatherOffMode: Bool
+    let weatherAutoMode: Bool
+    let manualWeatherCondition: String
+    let scene: LizardScene
+    
+    func body(content: Content) -> some View {
+        content
+            .onChange(of: weatherOffMode) { _, _ in
+                Task { @MainActor in
+                    scene.refreshWeatherEffects()
+                }
+            }
+            .onChange(of: weatherAutoMode) { _, _ in
+                Task { @MainActor in
+                    scene.refreshWeatherEffects()
+                }
+            }
+            .onChange(of: manualWeatherCondition) { _, _ in
+                Task { @MainActor in
+                    scene.refreshWeatherEffects()
+                }
+            }
     }
 }
 
