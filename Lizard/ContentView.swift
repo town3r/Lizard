@@ -44,7 +44,6 @@ struct ContentView: View {
     
     // MARK: - State Management
     
-    @State private var showSettings = false
     @State private var totalLizardsSpawned = 0
     @State private var totalButtonTaps = 0
     @State private var gameScene = LizardScene()
@@ -99,7 +98,6 @@ struct ContentView: View {
                     .allowsHitTesting(false)
 
                 topLeftHUD
-                topRightHUD
                 bottomBar
                 centerButton(size: size)
             }
@@ -199,7 +197,7 @@ struct ContentView: View {
 }
 
 private extension ContentView {
-    // HUD counters at top left with iOS 26 liquid glass styling and single settings button
+    // HUD counters at top left with iOS 26 liquid glass styling and stable positioning
     var topLeftHUD: some View {
         VStack(alignment: .leading, spacing: 8) {
             // Counter display
@@ -221,38 +219,10 @@ private extension ContentView {
                 GameCenterManager.shared.presentLeaderboards()
             }
         }
-        .padding(.top, 12)
-        .padding(.leading, 12)
+        .padding(.top, 16) // Increased from 12 for better safe area clearance
+        .padding(.leading, 16) // Increased from 12 for consistent spacing
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-    }
-    
-    // HUD settings icon at top right, positioned below the FPS counter
-    var topRightHUD: some View {
-        VStack(alignment: .trailing, spacing: 9) {
-            // Settings control button positioned below where FPS counter appears
-            Button {
-                showSettings.toggle()
-            } label: {
-                Image(systemName: "gearshape.fill")
-                    .font(.system(size: 20, weight: .medium))
-                    .foregroundStyle(.primary)
-                    .padding(10)
-                    .background {
-                        iOS26LiquidGlass(isPressed: false, size: .small)
-                    }
-            }
-            .buttonStyle(.plain)
-            .accessibilityLabel("Settings")
-            .accessibilityHint("Tap to open settings")
-        }
-        .padding(.top, 14)
-        .padding(.trailing, 12)
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
-        .sheet(isPresented: $showSettings) {
-            SettingsView()
-                .presentationDetents([.medium, .large])
-                .presentationDragIndicator(.visible)
-        }
+        .fixedSize() // Prevents dynamic resizing that could cause positioning shifts
     }
     
     // Center circle button for spawning a lizard with iOS 26 liquid glass effect
