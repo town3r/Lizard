@@ -233,73 +233,108 @@ private extension ContentView {
         .fixedSize() // Prevents dynamic resizing that could cause positioning shifts
     }
     
-    // Center circle button for spawning a lizard with iOS 26 liquid glass effect
-    func centerButton(size: CGSize) -> some View {
-        Button {
-            // Button debouncing for performance
-            let currentTime = CACurrentMediaTime()
-            guard currentTime - lastButtonPressTime >= buttonDebounceInterval else { return }
-            lastButtonPressTime = currentTime
-            
-            // Immediate UI feedback - keep these on main thread for responsiveness
-            mainButtonTaps += 1
-            scene.setAgingPaused(false)
-            
-            // Move expensive operations to background to prevent UI blocking
-            Task.detached(priority: .userInitiated) {
-                // Check FPS before spawning to prevent performance degradation
-                await MainActor.run {
-                    if scene.currentFPS >= 30 { // Lower threshold than normal to be more permissive
-                        scene.emitFromCircleCenterRandomAsync(sizeJitter: Config.sizeJitterSingle)
-                    }
-                }
-                
-                // Sound playback - needs to be on main actor
-                await MainActor.run {
-                    SoundPlayer.shared.play(name: "lizard", ext: "wav")
-                }
-            }
-            
-            // GameCenter reporting - can be async as it's not time-critical
-            Task.detached(priority: .utility) {
-                await MainActor.run {
-                    self.reportScoresIfReady()
+    // MARK: - Center Button Action Handlers
+    
+    /// Handles the main button tap action with debouncing and async operations
+    private func handleMainButtonTap() {
+        // Button debouncing for performance
+        let currentTime = CACurrentMediaTime()
+        guard currentTime - lastButtonPressTime >= buttonDebounceInterval else { return }
+        lastButtonPressTime = currentTime
+        
+        // Immediate UI feedback - keep these on main thread for responsiveness
+        mainButtonTaps += 1
+        scene.setAgingPaused(false)
+        
+        // Move expensive operations to background to prevent UI blocking
+        performAsyncSpawnOperations()
+        
+        // GameCenter reporting - can be async as it's not time-critical
+        performAsyncGameCenterReporting()
+    }
+    
+    /// Performs spawn-related operations asynchronously
+    private func performAsyncSpawnOperations() {
+        Task.detached(priority: .userInitiated) {
+            // Check FPS before spawning to prevent performance degradation
+            await MainActor.run {
+                if scene.currentFPS >= 30 { // Lower threshold than normal to be more permissive
+                    scene.emitFromCircleCenterRandomAsync(sizeJitter: Config.sizeJitterSingle)
                 }
             }
-        } label: {
-            ZStack {
-                // Main iOS 26 liquid glass circle
-                Circle()
-                    .fill(.clear)
-                    .background {
-                        iOS26LiquidGlassCircle(isPressed: isPressingMain)
-                    }
-                
-                // Lizard image with enhanced styling
-                Image("lizard")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: Config.lizardImageSize, height: Config.lizardImageSize)
-                    .clipShape(Circle())
-                    .padding(20)
-                    .scaleEffect(isPressingMain ? 0.95 : 1.0)
-                    .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isPressingMain)
+            
+            // Sound playback - needs to be on main actor
+            await MainActor.run {
+                SoundPlayer.shared.play(name: "lizard", ext: "wav")
             }
         }
-        .frame(width: Config.centerButtonSize, height: Config.centerButtonSize)
-        .position(x: size.width * 0.5, y: size.height * 0.5)
-        .simultaneousGesture(
-            DragGesture(minimumDistance: 0)
-                .onChanged { _ in
-                    guard !isPressingMain else { return }
-                    isPressingMain = true
-                    startSpewHold()
+    }
+    
+    /// Performs GameCenter reporting asynchronously
+    private func performAsyncGameCenterReporting() {
+        Task.detached(priority: .utility) {
+            await MainActor.run {
+                self.reportScoresIfReady()
+            }
+        }
+    }
+    
+    /// Creates the button label content with liquid glass effect
+    private var centerButtonLabel: some View {
+        ZStack {
+            // Main iOS 26 liquid glass circle
+            Circle()
+                .fill(.clear)
+                .background {
+                    iOS26LiquidGlassCircle(isPressed: isPressingMain)
                 }
-                .onEnded { _ in
-                    isPressingMain = false
-                    stopSpewHold()
-                }
-        )
+            
+            // Lizard image with enhanced styling
+            centerButtonImage
+        }
+    }
+    
+    /// Creates the lizard image with styling
+    private var centerButtonImage: some View {
+        Image("lizard")
+            .resizable()
+            .scaledToFit()
+            .frame(width: Config.lizardImageSize, height: Config.lizardImageSize)
+            .clipShape(Circle())
+            .padding(20)
+            .scaleEffect(isPressingMain ? 0.95 : 1.0)
+            .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isPressingMain)
+    }
+    
+    /// Creates the drag gesture for hold functionality
+    private var centerButtonDragGesture: some Gesture {
+        DragGesture(minimumDistance: 0)
+            .onChanged { _ in
+                guard !isPressingMain else { return }
+                isPressingMain = true
+                startSpewHold()
+            }
+            .onEnded { _ in
+                isPressingMain = false
+                stopSpewHold()
+            }
+    }
+    
+    // Center circle button for spawning a lizard with iOS 26 liquid glass effect
+    func centerButton(size: CGSize) -> some View {
+        // Create button with extracted action handler
+        let mainButton = Button(action: handleMainButtonTap, label: { centerButtonLabel })
+        
+        // Apply modifiers step by step with explicit types
+        let framedButton = mainButton
+            .frame(width: Config.centerButtonSize, height: Config.centerButtonSize)
+        
+        let positionedButton = framedButton
+            .position(x: size.width * 0.5, y: size.height * 0.5)
+        
+        // Final button with gesture
+        return positionedButton
+            .simultaneousGesture(centerButtonDragGesture)
     }
 
     // Bottom bar with iOS 26 liquid glass styling and dynamic layout
