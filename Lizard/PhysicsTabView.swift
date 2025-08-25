@@ -11,8 +11,7 @@ struct PhysicsTabView: View {
     var body: some View {
         NavigationView {
             ContentView()
-                .navigationTitle("Lizard Physics")
-                .navigationBarTitleDisplayMode(.inline)
+                .navigationBarHidden(true)
         }
         .navigationViewStyle(StackNavigationViewStyle())
     }
