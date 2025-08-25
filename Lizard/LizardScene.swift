@@ -559,8 +559,8 @@ final class LizardScene: SKScene {
 
     private func layoutFPSOverlay() {
         // Position FPS counter in top-left corner, below the HUD counters
-        // Account for safe area and HUD positioning (16pt padding + HUD height ~60pt)
-        fpsLabel.position = CGPoint(x: 20, y: size.height - 90)
+        // Account for safe area (16pt padding) + HUD height (~60pt) + spacing (8pt)
+        fpsLabel.position = CGPoint(x: 20, y: size.height - 100)
         
         // Update color based on background type and color scheme
         updateFPSCounterColor()
