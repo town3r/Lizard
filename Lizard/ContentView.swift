@@ -130,6 +130,14 @@ struct ContentView: View {
             .onChange(of: colorScheme) { _, _ in
                 Task { @MainActor in
                     scene.backgroundColor = .clear
+                    // Update FPS counter color when color scheme changes
+                    scene.updateBackgroundInfo(backgroundType: backgroundType, isDarkMode: colorScheme == .dark)
+                }
+            }
+            .onChange(of: backgroundType) { _, _ in
+                Task { @MainActor in
+                    // Update FPS counter color when background type changes
+                    scene.updateBackgroundInfo(backgroundType: backgroundType, isDarkMode: colorScheme == .dark)
                 }
             }
             .onDisappear {
@@ -326,7 +334,7 @@ private extension ContentView {
                         systemImage: "pause.circle.fill",
                         font: .system(size: 24),
                         style: .secondary,
-                        width: 60
+                        width: 48  // Reduced from 60 to 48 for better spacing
                     ) {
                         stopRainHold()
                         scene.setAgingPaused(true)
@@ -344,7 +352,7 @@ private extension ContentView {
                         systemImage: "trash",
                         font: .system(size: 20, weight: .bold),
                         style: .secondary,
-                        width: 60
+                        width: 48  // Reduced from 60 to 48 for better spacing
                     ) {
                         stopRainHold()
                         scene.clearAll()
@@ -481,6 +489,9 @@ private extension ContentView {
     private func performDeferredInitialization() {
         // Update scene configuration with user settings first (lightweight)
         updateSceneConfiguration()
+        
+        // Initialize background info for FPS counter color adaptation
+        scene.updateBackgroundInfo(backgroundType: backgroundType, isDarkMode: colorScheme == .dark)
         
         // Initialize weather effects based on current settings (lightweight)
         scene.refreshWeatherEffects()
